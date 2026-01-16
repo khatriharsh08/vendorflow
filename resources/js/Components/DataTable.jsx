@@ -9,7 +9,7 @@ export default function DataTable({
 }) {
     return (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className={`overflow-x-auto ${stickyHeader ? 'max-h-[500px] overflow-y-auto' : ''}`}>
+            <div className={`overflow-x-auto ${stickyHeader ? 'max-h-[600px] overflow-y-auto' : ''}`}>
                 <table className="w-full relative border-collapse">
                     <thead className={stickyHeader ? 'sticky top-0 z-10' : ''}>
                         <tr className="bg-gray-50/95 border-b border-gray-100 shadow-sm backdrop-blur-sm">

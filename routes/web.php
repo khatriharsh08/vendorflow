@@ -213,9 +213,9 @@ Route::middleware('auth')->group(function () {
 
         // Documents Management (Admin view)
         Route::get('/documents', [DocumentController::class, 'adminIndex'])->name('documents.index');
-        Route::get('/documents/{id}/preview', [DocumentController::class, 'preview'])->name('documents.preview');
-        Route::post('/documents/{id}/verify', [DocumentController::class, 'verify'])->name('documents.verify');
-        Route::post('/documents/{id}/reject', [DocumentController::class, 'reject'])->name('documents.reject');
+        Route::get('/documents/{document}/preview', [DocumentController::class, 'preview'])->name('documents.preview');
+        Route::post('/documents/{document}/verify', [DocumentController::class, 'verify'])->name('documents.verify');
+        Route::post('/documents/{document}/reject', [DocumentController::class, 'reject'])->name('documents.reject');
 
         // ==========================================
         // COMPLIANCE ROUTES
@@ -301,3 +301,18 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+// Fallback route for undefined routes - redirects to appropriate dashboard
+Route::fallback(function () {
+    $user = auth()->user();
+
+    if (!$user) {
+        return redirect('/');
+    }
+
+    if ($user->isVendor()) {
+        return redirect()->route('vendor.dashboard')->with('error', 'The page you were looking for was not found.');
+    }
+
+    return redirect()->route('admin.dashboard')->with('error', 'The page you were looking for was not found.');
+});

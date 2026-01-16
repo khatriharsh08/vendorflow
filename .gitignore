@@ -1,51 +1,269 @@
-# User requested
-files/
+# ========================================
+# VendorFlow - Professional .gitignore
+# Laravel + React/Inertia.js Project
+# ========================================
 
-# Laravel
-/vendor
-/node_modules
-/public/build
+# ----------------------------------------
+# Laravel Framework
+# ----------------------------------------
+/vendor/
+/node_modules/
+/public/build/
 /public/hot
 /public/storage
 /storage/*.key
-/storage/pail
+/storage/pail/
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+
+# Laravel Cache & Sessions
 /storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitkeep
 /storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
 /storage/framework/testing/*
+!/storage/framework/testing/.gitkeep
 /storage/framework/views/*
+!/storage/framework/views/.gitkeep
+
+# Laravel Logs
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# Laravel Debugbar
+/storage/debugbar/
+
+# ----------------------------------------
+# Environment Files
+# ----------------------------------------
 .env
+.env.*
+!.env.example
 .env.backup
 .env.production
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
+.env.staging
+.env.local
+.env.testing
+
+# ----------------------------------------
+# Composer & PHP
+# ----------------------------------------
+/vendor/
+composer.phar
 auth.json
-/final-submission-report/
+.phpunit.result.cache
+.php-cs-fixer.cache
+phpunit.xml
+.phpactor.json
 
-# Packages
-/.phpactor.json
-/.fleet
-/.idea
-/.nova
-/.vscode
-/.zed
+# PHP CS Fixer
+.php_cs
+.php_cs.cache
 
-# OS / Editor
-.DS_Store
-Thumbs.db
-npm-debug.log
-yarn-error.log
-.idea/
-.vscode/
+# PHPStan
+phpstan.neon
+.phpstan.cache/
+
+# Psalm
+psalm.xml
+
+# ----------------------------------------
+# Node.js & NPM/Yarn/PNPM
+# ----------------------------------------
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.yarn/
+.pnpm-store/
+package-lock.json.bak
+
+# Build Output
+/public/build/
+/public/mix-manifest.json
+/public/js/
+/public/css/
+!/public/js/.gitkeep
+!/public/css/.gitkeep
+
+# ----------------------------------------
+# Testing
+# ----------------------------------------
+/coverage/
+/.phpunit.cache/
+.phpunit.result.cache
+/storage/framework/testing/
+/.pest/
+.pest.php
+junit.xml
+clover.xml
+
+
+# ----------------------------------------
+# IDEs & Editors
+# ----------------------------------------
+
+# JetBrains (PhpStorm, IntelliJ, WebStorm)
+/.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# VS Code
+/.vscode/
+*.code-workspace
+.history/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim/Neovim
 *.swp
+*.swo
 *~
-*.log
+.netrwhist
+tags
 
-# Windows
-desktop.ini
-$RECYCLE.BIN/
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
 
-# Mac
+# Nova
+/.nova/
+
+# Zed
+/.zed/
+
+# Fleet
+/.fleet/
+
+# ----------------------------------------
+# Operating System Files
+# ----------------------------------------
+
+# macOS
+.DS_Store
 .AppleDouble
 .LSOverride
 ._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ----------------------------------------
+# Docker
+# ----------------------------------------
+.docker/
+docker-compose.override.yml
+.docker-sync.yml
+
+# ----------------------------------------
+# Deployment & CI/CD
+# ----------------------------------------
+/.deployer/
+/deploy.php
+/.github/workflows/*.local.yml
+
+# Laravel Vapor
+.vapor/
+
+# Laravel Forge
+.forge/
+
+# ----------------------------------------
+# Security & Secrets
+# ----------------------------------------
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa*
+*.pub
+secrets/
+credentials/
+
+# ----------------------------------------
+# Logs & Debug
+# ----------------------------------------
+*.log
+*.logs
+/storage/logs/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ----------------------------------------
+# Project Specific
+# ----------------------------------------
+files/
+/final-submission-report/
+
+# Uploaded files (stored in storage, linked to public)
+/storage/app/vendor-documents/
+/storage/app/temp/
+
+# Backups
+*.bak
+*.backup
+*.sql
+*.sql.gz
+/database/backups/
+
+# ----------------------------------------
+# Miscellaneous
+# ----------------------------------------
+*.cache
+*.tmp
+*.temp
+.sass-cache/
+*.pid
+*.seed
+*.pid.lock
+
+# Homestead / Vagrant
+Homestead.json
+Homestead.yaml
+.vagrant/
+
+# Sail (Laravel Docker)
+/.sail/
+
+# Ray Debug Tool
+_ray_log.txt
+
+# Telescope (optional - remove if you want to commit)
+# /storage/telescope/
+
+# ----------------------------------------
+# End of .gitignore
+# ----------------------------------------

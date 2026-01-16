@@ -1,74 +1,80 @@
-import { useForm, Link } from '@inertiajs/react';
-import { AdminLayout, Card, Badge, PageHeader } from '@/Components';
+import { useForm, Link, router } from '@inertiajs/react';
+import { AdminLayout, Badge, PageHeader, Button } from '@/Components';
 
 export default function Show({ message }) {
-    const { data,setData, put, processing } = useForm({
+    const { data, setData, put, processing } = useForm({
         status: message.status,
         admin_notes: message.admin_notes || '',
     });
 
-    const statusColors = {
-        new: 'blue',
-        read: 'gray',
-        replied: 'green',
-        closed: 'red',
-    };
-
     const handleUpdate = (e) => {
         e.preventDefault();
-        put(route('admin.contact-messages.update', message.id));
+        put(`/admin/contact-messages/${message.id}`);
     };
 
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this message?')) {
-            router.delete(route('admin.contact-messages.destroy', message.id));
+            router.delete(`/admin/contact-messages/${message.id}`);
         }
     };
 
+    const header = (
+        <PageHeader 
+            title="Message Details" 
+            subtitle={`From ${message.name} • ${new Date(message.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`}
+            backUrl="/admin/contact-messages"
+            actions={
+                <Button variant="danger" onClick={handleDelete}>
+                    Delete
+                </Button>
+            }
+        />
+    );
+
     return (
-        <AdminLayout title={`Message from ${message.name}`}>
-            <PageHeader 
-                title="Message Details" 
-                subtitle={`Received on ${new Date(message.created_at).toLocaleString()}`}
-                backUrl={route('admin.contact-messages.index')}
-            >
-                <button 
-                    onClick={handleDelete}
-                    className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
-                >
-                    Delete Message
-                </button>
-            </PageHeader>
-
+        <AdminLayout title={`Message from ${message.name}`} activeNav="Messages" header={header}>
             <div className="grid lg:grid-cols-3 gap-6">
-                {/* Message Content */}
+                {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                    <Card>
-                        <div className="flex justify-between items-start mb-6">
-                            <div>
-                                <h1 className="text-xl font-bold text-gray-900 mb-1">{message.subject}</h1>
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                    <span>From:</span>
-                                    <span className="font-medium text-gray-900">{message.name}</span>
-                                    <span>&lt;{message.email}&gt;</span>
+                    {/* Message Card */}
+                    <div className="card">
+                        <div className="p-6 border-b border-[var(--color-border-primary)]">
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="min-w-0 flex-1">
+                                    <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">{message.subject}</h2>
+                                    <div className="flex items-center gap-3 text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-full bg-[var(--color-brand-primary)] flex items-center justify-center text-white font-medium text-sm">
+                                                {message.name?.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <span className="text-[var(--color-text-primary)] font-medium">{message.name}</span>
+                                                <span className="text-[var(--color-text-tertiary)] mx-2">•</span>
+                                                <span className="text-[var(--color-text-tertiary)]">{message.email}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                                <Badge status={message.status} />
                             </div>
-                            <Badge variant={statusColors[message.status]}>{message.status.toUpperCase()}</Badge>
                         </div>
-                        
-                        <div className="prose max-w-none p-4 bg-gray-50 rounded-lg border border-gray-100">
-                            <p className="whitespace-pre-wrap text-gray-700">{message.message}</p>
+                        <div className="p-6">
+                            <p className="text-[var(--color-text-secondary)] whitespace-pre-wrap leading-relaxed">{message.message}</p>
                         </div>
-                    </Card>
+                    </div>
 
-                    <Card title="Admin Actions">
-                        <form onSubmit={handleUpdate} className="space-y-4">
+                    {/* Admin Actions */}
+                    <div className="card">
+                        <div className="p-6 border-b border-[var(--color-border-primary)]">
+                            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Update Status</h3>
+                        </div>
+                        <form onSubmit={handleUpdate} className="p-6 space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
+                                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Status</label>
                                 <select
                                     value={data.status}
                                     onChange={e => setData('status', e.target.value)}
-                                    className="w-full rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="input-field w-full"
                                 >
                                     <option value="new">New</option>
                                     <option value="read">Read</option>
@@ -78,62 +84,76 @@ export default function Show({ message }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Internal Notes</label>
+                                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Internal Notes</label>
                                 <textarea
                                     value={data.admin_notes}
                                     onChange={e => setData('admin_notes', e.target.value)}
                                     rows={4}
-                                    className="w-full rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="input-field w-full resize-none"
                                     placeholder="Add notes for your team..."
                                 />
                             </div>
 
-                            <div className="flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-                                >
+                            <div className="flex justify-end pt-2">
+                                <Button type="submit" disabled={processing}>
                                     {processing ? 'Saving...' : 'Save Changes'}
-                                </button>
+                                </Button>
                             </div>
                         </form>
-                    </Card>
+                    </div>
                 </div>
 
-                {/* Sidebar Info */}
+                {/* Sidebar */}
                 <div className="space-y-6">
-                    <Card title="Sender Details">
+                    {/* Sender Info */}
+                    <div className="card p-6">
+                        <h3 className="text-sm font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-4">Sender Details</h3>
                         <div className="space-y-4">
                             <div>
-                                <label className="text-xs text-gray-500 uppercase font-semibold">Name</label>
-                                <p className="text-gray-900">{message.name}</p>
+                                <label className="text-xs text-[var(--color-text-tertiary)] uppercase font-medium">Name</label>
+                                <p className="text-[var(--color-text-primary)] mt-1">{message.name}</p>
                             </div>
                             <div>
-                                <label className="text-xs text-gray-500 uppercase font-semibold">Email</label>
-                                <p className="text-gray-900 break-all">
-                                    <a href={`mailto:${message.email}`} className="text-indigo-600 hover:underline">
+                                <label className="text-xs text-[var(--color-text-tertiary)] uppercase font-medium">Email</label>
+                                <p className="mt-1">
+                                    <a href={`mailto:${message.email}`} className="text-[var(--color-brand-primary)] hover:underline break-all">
                                         {message.email}
                                     </a>
                                 </p>
                             </div>
                             <div>
-                                <label className="text-xs text-gray-500 uppercase font-semibold">Sent On</label>
-                                <p className="text-gray-900">{new Date(message.created_at).toLocaleString()}</p>
+                                <label className="text-xs text-[var(--color-text-tertiary)] uppercase font-medium">Received</label>
+                                <p className="text-[var(--color-text-primary)] mt-1">
+                                    {new Date(message.created_at).toLocaleDateString('en-IN', { 
+                                        day: '2-digit', 
+                                        month: 'long', 
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </p>
                             </div>
                         </div>
-                    </Card>
+                    </div>
 
-                    <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-                        <h4 className="font-semibold text-indigo-900 mb-2">Quick Reply</h4>
-                        <p className="text-sm text-indigo-700 mb-3">
-                            Clicking the email above will open your default email client to reply directly to the user.
+                    {/* Quick Reply */}
+                    <div className="card p-6 bg-gradient-to-br from-[var(--color-brand-primary)]/10 to-[var(--color-brand-secondary)]/10 border-[var(--color-brand-primary)]/20">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-xl bg-[var(--color-brand-primary)] flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h4 className="font-semibold text-[var(--color-text-primary)]">Quick Reply</h4>
+                        </div>
+                        <p className="text-sm text-[var(--color-text-secondary)] mb-4">
+                            Open your email client to respond directly.
                         </p>
                         <a 
-                            href={`mailto:${message.email}?subject=Re: ${message.subject}`}
-                            className="block w-full py-2 px-4 bg-white text-indigo-600 text-center font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 transition-colors"
+                            href={`mailto:${message.email}?subject=Re: ${encodeURIComponent(message.subject)}`}
+                            className="block w-full py-2.5 px-4 bg-[var(--color-brand-primary)] text-white text-center font-medium rounded-lg hover:opacity-90 transition-opacity"
                         >
-                            Compose Email
+                            Compose Reply
                         </a>
                     </div>
                 </div>

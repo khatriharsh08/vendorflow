@@ -1,6 +1,7 @@
 import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { AdminLayout, PageHeader, DataTable, Badge, Button, Modal, ModalCancelButton, ModalPrimaryButton, FormTextarea } from '@/Components';
+import { DocumentViewer } from '@/Components/DocumentViewer';
 
 export default function DocumentsIndex({ documents }) {
     const { auth } = usePage().props;
@@ -9,6 +10,8 @@ export default function DocumentsIndex({ documents }) {
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [rejectReason, setRejectReason] = useState('');
+    const [showViewer, setShowViewer] = useState(false);
+    const [viewerDocument, setViewerDocument] = useState(null);
 
     const verifyDocument = (docId) => {
         router.post(`/admin/documents/${docId}/verify`, {}, { preserveScroll: true });
@@ -39,19 +42,30 @@ export default function DocumentsIndex({ documents }) {
         { header: 'Uploaded', render: (row) => <span className="text-(--color-text-tertiary) text-sm">{row.created_at}</span> },
     ];
 
-    // Add actions column only if user has permission
-    if (can.verify_documents) {
-        columns.push({
-            header: 'Actions',
-            align: 'right',
-            render: (row) => (
-                <div className="flex gap-2 justify-end">
-                    <Button variant="success" size="sm" onClick={() => verifyDocument(row.id)}>✓ Verify</Button>
-                    <Button variant="danger" size="sm" onClick={() => { setSelectedDoc(row.id); setShowRejectModal(true); }}>✗ Reject</Button>
-                </div>
-            )
-        });
-    }
+    // Add actions column with View button (always) and Verify/Reject buttons (if permission)
+    columns.push({
+        header: 'Actions',
+        align: 'right',
+        render: (row) => (
+            <div className="flex gap-2 justify-end items-center">
+                <button
+                    onClick={() => {
+                        setViewerDocument(row);
+                        setShowViewer(true);
+                    }}
+                    className="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
+                >
+                    View
+                </button>
+                {can.verify_documents && (
+                    <>
+                        <Button variant="success" size="sm" onClick={() => verifyDocument(row.id)}>✓</Button>
+                        <Button variant="danger" size="sm" onClick={() => { setSelectedDoc(row.id); setShowRejectModal(true); }}>✗</Button>
+                    </>
+                )}
+            </div>
+        )
+    });
 
     const header = (
         <PageHeader title="Document Verification" subtitle="Review and verify vendor documents" />
@@ -59,11 +73,13 @@ export default function DocumentsIndex({ documents }) {
 
     return (
         <AdminLayout title="Document Verification" activeNav="Documents" header={header}>
+            {/* Scrollable Document List with sticky header */}
             <DataTable 
                 columns={columns} 
                 data={documents?.data || []} 
                 emptyIcon="✅"
                 emptyMessage="All documents have been verified!"
+                stickyHeader={true}
             />
 
             {/* Reject Modal */}
@@ -88,6 +104,16 @@ export default function DocumentsIndex({ documents }) {
                     required
                 />
             </Modal>
+
+            {/* Document Viewer Modal */}
+            <DocumentViewer 
+                document={viewerDocument} 
+                isOpen={showViewer} 
+                onClose={() => {
+                    setShowViewer(false);
+                    setViewerDocument(null);
+                }} 
+            />
         </AdminLayout>
     );
 }

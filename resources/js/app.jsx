@@ -3,7 +3,7 @@ import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
-import { lazy, Suspense } from 'react';
+import { Suspense, Component } from 'react';
 
 // Loading component for lazy-loaded pages - Light theme
 const PageLoader = () => (
@@ -15,13 +15,68 @@ const PageLoader = () => (
     </div>
 );
 
+// Error Boundary to catch React errors gracefully
+class ErrorBoundary extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error('React Error Boundary caught:', error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="min-h-screen bg-[var(--gradient-page)] flex items-center justify-center p-6">
+                    <div className="max-w-md w-full text-center">
+                        <div className="mb-6 flex justify-center">
+                            <div className="w-24 h-24 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+                                <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-3">Something went wrong</h1>
+                        <p className="text-[var(--color-text-tertiary)] mb-8">An unexpected error occurred. Please try refreshing the page.</p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="px-6 py-3 rounded-xl bg-[var(--color-brand-primary)] text-white font-medium hover:opacity-90 transition-opacity"
+                            >
+                                Refresh Page
+                            </button>
+                            <a
+                                href="/dashboard"
+                                className="px-6 py-3 rounded-xl border border-[var(--color-border-primary)] text-[var(--color-text-secondary)] font-medium hover:bg-[var(--color-bg-tertiary)] transition-colors"
+                            >
+                                Go to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        return this.props.children;
+    }
+}
+
 // Page resolver with lazy loading for admin pages
 const resolvePageComponent = (name) => {
     const pages = import.meta.glob('./Pages/**/*.jsx');
     const pagePath = `./Pages/${name}.jsx`;
     
     if (!pages[pagePath]) {
-        throw new Error(`Page not found: ${name}`);
+        // Return the Error page for missing pages instead of throwing
+        return pages['./Pages/Error.jsx']().then(module => {
+            return { default: (props) => <module.default {...props} status={404} /> };
+        });
     }
     
     return pages[pagePath]();
@@ -33,9 +88,11 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
         root.render(
-            <Suspense fallback={<PageLoader />}>
-                <App {...props} />
-            </Suspense>
+            <ErrorBoundary>
+                <Suspense fallback={<PageLoader />}>
+                    <App {...props} />
+                </Suspense>
+            </ErrorBoundary>
         );
     },
     progress: {

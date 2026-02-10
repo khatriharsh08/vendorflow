@@ -1,0 +1,98 @@
+=========================================
+      VENDORFLOW MANUAL TEST DATA
+=========================================
+
+1. SYSTEM ROLES & CREDENTIALS
+-----------------------------------------
+Use these accounts to test different permission levels.
+
+[SUPER ADMIN]
+Email:    admin@vendorflow.com
+Password: password
+Role:     Full System Access
+
+[OPERATIONS MANAGER]
+Email:    ops@vendorflow.com
+Password: password
+Role:     Vendor Onboarding, Document Verification
+
+[FINANCE MANAGER]
+Email:    finance@vendorflow.com
+Password: password
+Role:     Payment Approvals, Financial Reports
+
+-----------------------------------------
+
+2. SAMPLE VENDOR REGISTRATION DATA
+-----------------------------------------
+Use this data when registering a new vendor account or creating one via Admin.
+
+[SCENARIO A: TECH VENDOR - PROPRIETORSHIP]
+Company Name:       TechFlow Solutions
+Registration No:    REG-88214
+Tax ID (GST):       TAX-99102
+PAN Number:         ABCDE1234F
+Business Type:      Proprietorship
+Contact Person:     Rahul Sharma
+Email:              rahul@techflow.com
+Phone:              9876543210
+Address:            123, Tech Park, Sector 5
+City:               Bangalore
+State:              Karnataka
+Country:            India
+Pincode:            560100
+Bank Name:          HDFC Bank
+Account Number:     123456789012
+IFSC Code:          HDFC0001234
+
+[SCENARIO B: LOGISTICS VENDOR - PRIVATE LIMITED]
+Company Name:       FastTrack Logistics Pvt Ltd
+Registration No:    REG-55102
+Tax ID (GST):       TAX-33201
+PAN Number:         XYZAB5678C
+Business Type:      Private Limited
+Contact Person:     Sneha Gupta
+Email:              sneha@fasttrack.com
+Phone:              9123456789
+Address:            45, Industrial Area, Phase 2
+City:               Mumbai
+State:              Maharashtra
+Country:            India
+Pincode:            400001
+Bank Name:          ICICI Bank
+Account Number:     987654321098
+IFSC Code:          ICIC0005678
+
+-----------------------------------------
+
+3. TESTING WORKFLOWS
+-----------------------------------------
+
+[WORKFLOW 1: VENDOR REGISTRATION]
+1. Go to Login page -> Click "Sign Up".
+2. Register as a new user (e.g., vendor@test.com / password).
+3. You will be redirected to the Vendor Onboarding form.
+4. Fill in the details using "SCENARIO A" data above.
+5. Submit the form.
+6. Status should be: "Under Review".
+
+[WORKFLOW 2: VENDOR APPROVAL (OPS TEAM)]
+1. Logout of Vendor account.
+2. Login as "ops@vendorflow.com" (Password: password).
+3. Go to "Vendors" -> "Pending Approvals".
+4. You should see "TechFlow Solutions".
+5. Click "View" -> "Verify Documents" -> "Approve Vendor".
+6. Vendor status changes to: "Active".
+
+[WORKFLOW 3: PAYMENT REQUEST]
+1. Login as the approved Vendor (vendor@test.com).
+2. Dashboard should now show full access.
+3. Go to "Payments" -> "Request Payment".
+4. Enter Amount: 5000, Description: "Service Fee".
+5. Submit.
+
+[WORKFLOW 4: PAYMENT APPROVAL (FINANCE TEAM)]
+1. Login as "finance@vendorflow.com".
+2. Go to "Payments".
+3. You should see the request for 5000.
+4. Click "Approve".

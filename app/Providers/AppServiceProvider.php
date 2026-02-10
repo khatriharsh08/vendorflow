@@ -11,7 +11,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            \App\Interfaces\VendorRepositoryInterface::class,
+            \App\Repositories\VendorRepository::class
+        );
+        $this->app->bind(
+            \App\Interfaces\PaymentRepositoryInterface::class,
+            \App\Repositories\PaymentRepository::class
+        );
     }
 
     /**

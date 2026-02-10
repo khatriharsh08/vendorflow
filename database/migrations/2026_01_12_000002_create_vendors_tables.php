@@ -15,14 +15,14 @@ return new class extends Migration
         Schema::create('vendors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            
+
             // Company Information
             $table->string('company_name');
             $table->string('registration_number')->nullable();
             $table->string('tax_id')->nullable(); // GST/VAT number
             $table->string('pan_number')->nullable();
             $table->string('business_type')->nullable(); // sole_proprietor, partnership, pvt_ltd, etc.
-            
+
             // Contact Information
             $table->string('contact_person');
             $table->string('contact_email');
@@ -32,13 +32,13 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('country')->default('India');
             $table->string('pincode')->nullable();
-            
+
             // Bank Details
             $table->string('bank_name')->nullable();
             $table->string('bank_account_number')->nullable();
             $table->string('bank_ifsc')->nullable();
             $table->string('bank_branch')->nullable();
-            
+
             // Status & Compliance
             $table->enum('status', [
                 'draft',
@@ -47,23 +47,24 @@ return new class extends Migration
                 'approved',
                 'active',
                 'suspended',
-                'terminated'
+                'terminated',
+                'rejected',
             ])->default('draft');
-            
+
             $table->enum('compliance_status', [
                 'pending',
                 'compliant',
                 'at_risk',
                 'non_compliant',
-                'blocked'
+                'blocked',
             ])->default('pending');
-            
+
             $table->integer('compliance_score')->default(0);
             $table->integer('performance_score')->default(0);
-            
+
             // Internal Notes (not visible to vendor)
             $table->text('internal_notes')->nullable();
-            
+
             // Timestamps
             $table->timestamp('submitted_at')->nullable();
             $table->timestamp('approved_at')->nullable();
@@ -71,10 +72,10 @@ return new class extends Migration
             $table->timestamp('suspended_at')->nullable();
             $table->timestamp('terminated_at')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users');
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('status');
             $table->index('compliance_status');
@@ -91,7 +92,7 @@ return new class extends Migration
             $table->text('comment')->nullable(); // Required for rejections
             $table->json('metadata')->nullable(); // Additional context
             $table->timestamps();
-            
+
             $table->index(['vendor_id', 'created_at']);
         });
     }

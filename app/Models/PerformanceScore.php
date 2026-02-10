@@ -56,7 +56,7 @@ class PerformanceScore extends Model
      */
     public function getNormalizedScoreAttribute(): float
     {
-        if (!$this->metric || $this->metric->max_score === 0) {
+        if (! $this->metric || $this->metric->max_score === 0) {
             return 0;
         }
 

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\VendorStatus;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vendor extends Model
 {
-    use HasFactory, SoftDeletes, Auditable;
+    use Auditable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -46,22 +45,38 @@ class Vendor extends Model
         'activated_at' => 'datetime',
         'suspended_at' => 'datetime',
         'terminated_at' => 'datetime',
+        'tax_id' => 'encrypted',
+        'pan_number' => 'encrypted',
+        'bank_account_number' => 'encrypted',
+        'bank_ifsc' => 'encrypted',
     ];
 
     // Status constants
     const STATUS_DRAFT = 'draft';
+
     const STATUS_SUBMITTED = 'submitted';
+
     const STATUS_UNDER_REVIEW = 'under_review';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_ACTIVE = 'active';
+
     const STATUS_SUSPENDED = 'suspended';
+
     const STATUS_TERMINATED = 'terminated';
+
+    const STATUS_REJECTED = 'rejected';
 
     // Compliance status constants
     const COMPLIANCE_PENDING = 'pending';
+
     const COMPLIANCE_COMPLIANT = 'compliant';
+
     const COMPLIANCE_AT_RISK = 'at_risk';
+
     const COMPLIANCE_NON_COMPLIANT = 'non_compliant';
+
     const COMPLIANCE_BLOCKED = 'blocked';
 
     /**
@@ -69,12 +84,13 @@ class Vendor extends Model
      */
     protected static array $validTransitions = [
         self::STATUS_DRAFT => [self::STATUS_SUBMITTED],
-        self::STATUS_SUBMITTED => [self::STATUS_UNDER_REVIEW, self::STATUS_DRAFT],
-        self::STATUS_UNDER_REVIEW => [self::STATUS_APPROVED, self::STATUS_SUBMITTED],
+        self::STATUS_SUBMITTED => [self::STATUS_UNDER_REVIEW, self::STATUS_DRAFT, self::STATUS_REJECTED],
+        self::STATUS_UNDER_REVIEW => [self::STATUS_APPROVED, self::STATUS_SUBMITTED, self::STATUS_REJECTED],
         self::STATUS_APPROVED => [self::STATUS_ACTIVE, self::STATUS_SUSPENDED],
         self::STATUS_ACTIVE => [self::STATUS_SUSPENDED, self::STATUS_TERMINATED],
         self::STATUS_SUSPENDED => [self::STATUS_ACTIVE, self::STATUS_TERMINATED],
         self::STATUS_TERMINATED => [], // Terminal state
+        self::STATUS_REJECTED => [], // Terminal state
     ];
 
     // Relationships
@@ -122,6 +138,7 @@ class Vendor extends Model
     public function canTransitionTo(string $newStatus): bool
     {
         $allowedTransitions = self::$validTransitions[$this->status] ?? [];
+
         return in_array($newStatus, $allowedTransitions);
     }
 
@@ -130,7 +147,7 @@ class Vendor extends Model
      */
     public function transitionTo(string $newStatus, User $user, ?string $comment = null): bool
     {
-        if (!$this->canTransitionTo($newStatus)) {
+        if (! $this->canTransitionTo($newStatus)) {
             return false;
         }
 
@@ -216,6 +233,7 @@ class Vendor extends Model
             self::STATUS_ACTIVE => 'badge-active',
             self::STATUS_SUSPENDED => 'badge-suspended',
             self::STATUS_TERMINATED => 'badge-terminated',
+            self::STATUS_REJECTED => 'badge-rejected',
             default => 'badge-draft',
         };
     }

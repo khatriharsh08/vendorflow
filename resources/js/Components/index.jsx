@@ -13,7 +13,16 @@ export { default as Navbar, NavLink } from './Navbar';
 export { default as Footer, FooterMinimal } from './Footer';
 export { default as PageHeader } from './PageHeader';
 export { default as Logo } from './Logo';
-export { Tabs, Breadcrumb, Dropdown, DropdownItem, Accordion, Pill, FilterPills, SearchInput } from './Navigation';
+export {
+    Tabs,
+    Breadcrumb,
+    Dropdown,
+    DropdownItem,
+    Accordion,
+    Pill,
+    FilterPills,
+    SearchInput,
+} from './Navigation';
 
 // =====================================
 // DATA DISPLAY COMPONENTS
@@ -35,17 +44,17 @@ export { default as Modal, ModalCancelButton, ModalPrimaryButton } from './Modal
 // =====================================
 // UI UTILITIES
 // =====================================
-export { 
-    Alert, 
-    Toast, 
-    EmptyState, 
-    Spinner, 
-    LoadingState, 
-    Skeleton, 
-    Avatar, 
-    ProgressBar, 
-    Divider, 
-    Tooltip 
+export {
+    Alert,
+    Toast,
+    EmptyState,
+    Spinner,
+    LoadingState,
+    Skeleton,
+    Avatar,
+    ProgressBar,
+    Divider,
+    Tooltip,
 } from './UI';
 
 // =====================================
@@ -53,23 +62,26 @@ export {
 // =====================================
 import { Link } from '@inertiajs/react';
 
-export function Button({ 
-    children, 
-    variant = 'primary', 
+export function Button({
+    children,
+    variant = 'primary',
     size = 'md',
     disabled = false,
     onClick,
     type = 'button',
-    className = ''
+    className = '',
 }) {
     const variants = {
-        primary: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200',
-        secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-700',
-        success: 'bg-green-600 hover:bg-green-700 text-white',
-        danger: 'bg-red-600 hover:bg-red-700 text-white',
-        warning: 'bg-yellow-500 hover:bg-yellow-600 text-white',
-        ghost: 'hover:bg-gray-100 text-gray-600 hover:text-gray-900',
-        outline: 'border border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50',
+        primary:
+            'bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white shadow-md shadow-(--color-brand-primary)/30',
+        secondary:
+            'bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)',
+        success: 'bg-(--color-success) hover:bg-(--color-success-dark) text-white',
+        danger: 'bg-(--color-danger) hover:bg-(--color-danger-dark) text-white',
+        warning: 'bg-(--color-warning) hover:bg-(--color-warning-dark) text-white',
+        ghost: 'hover:bg-(--color-bg-secondary) text-(--color-text-secondary) hover:text-(--color-text-primary)',
+        outline:
+            'border border-(--color-border-primary) hover:border-(--color-border-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-secondary)',
     };
 
     const sizes = {
@@ -90,17 +102,12 @@ export function Button({
     );
 }
 
-export function LinkButton({ 
-    href, 
-    children, 
-    variant = 'primary',
-    size = 'md',
-    className = '' 
-}) {
+export function LinkButton({ href, children, variant = 'primary', size = 'md', className = '' }) {
     const variants = {
-        primary: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-        secondary: 'bg-slate-700 hover:bg-slate-600 text-white',
-        ghost: 'hover:bg-slate-800 text-slate-400 hover:text-white',
+        primary: 'bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white',
+        secondary:
+            'bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)',
+        ghost: 'hover:bg-(--color-bg-secondary) text-(--color-text-muted) hover:text-(--color-text-primary)',
     };
 
     const sizes = {
@@ -124,9 +131,10 @@ export function LinkButton({
 // =====================================
 export function IconButton({ icon, onClick, variant = 'ghost', size = 'md', title = '' }) {
     const variants = {
-        ghost: 'hover:bg-slate-800 text-slate-400 hover:text-white',
-        primary: 'bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400',
-        danger: 'hover:bg-red-500/20 text-slate-400 hover:text-red-400',
+        ghost: 'hover:bg-(--color-bg-secondary) text-(--color-text-muted) hover:text-(--color-text-primary)',
+        primary:
+            'bg-(--color-brand-primary)/10 hover:bg-(--color-brand-primary)/20 text-(--color-brand-primary)',
+        danger: 'hover:bg-(--color-danger)/10 text-(--color-text-muted) hover:text-(--color-danger)',
     };
 
     const sizes = {
@@ -162,8 +170,8 @@ export function CopyButton({ text, className = '' }) {
         <button
             onClick={handleCopy}
             className={`px-2 py-1 rounded text-xs transition-colors ${
-                copied 
-                    ? 'bg-green-500/20 text-green-400' 
+                copied
+                    ? 'bg-green-500/20 text-green-400'
                     : 'bg-slate-800 text-slate-400 hover:text-white'
             } ${className}`}
         >

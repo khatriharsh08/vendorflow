@@ -10,12 +10,7 @@ import { useState } from 'react';
  * @param {boolean} [props.linkToHome=true] - Wrap in link to home
  * @param {string} [props.className] - Additional classes
  */
-export default function Logo({ 
-    size = 'md', 
-    light = false, 
-    linkToHome = true,
-    className = '' 
-}) {
+export default function Logo({ size = 'md', light = false, linkToHome = true, className = '' }) {
     const [imageError, setImageError] = useState(false);
 
     const sizes = {
@@ -23,7 +18,7 @@ export default function Logo({
         md: 'h-8',
         lg: 'h-10',
         xl: 'h-12',
-        '2xl': 'h-16'
+        '2xl': 'h-16',
     };
 
     const textSizes = {
@@ -31,20 +26,22 @@ export default function Logo({
         md: 'text-xl',
         lg: 'text-2xl',
         xl: 'text-3xl',
-        '2xl': 'text-4xl'
+        '2xl': 'text-4xl',
     };
 
     const content = (
         <div className={`flex items-center gap-3 ${className}`}>
             {!imageError ? (
-                <img 
-                    src="/images/logo.png" 
-                    alt="VendorFlow" 
+                <img
+                    src="/images/logo.png"
+                    alt="VendorFlow"
                     className={sizes[size] || sizes.md}
                     onError={() => setImageError(true)}
                 />
             ) : (
-                <span className={`font-bold ${textSizes[size] || textSizes.md} ${light ? 'text-gray-900' : 'text-white'}`}>
+                <span
+                    className={`font-bold ${textSizes[size] || textSizes.md} ${light ? 'text-gray-900' : 'text-white'}`}
+                >
                     VendorFlow
                 </span>
             )}

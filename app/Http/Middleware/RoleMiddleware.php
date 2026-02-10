@@ -17,7 +17,7 @@ class RoleMiddleware
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -27,7 +27,7 @@ class RoleMiddleware
         }
 
         // Check if user has any of the required roles
-        if (!$user->hasAnyRole($roles)) {
+        if (! $user->hasAnyRole($roles)) {
             abort(403, 'Unauthorized access.');
         }
 

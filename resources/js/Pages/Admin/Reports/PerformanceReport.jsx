@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
-import { AdminLayout, PageHeader, Card, StatCard, Button, Badge, DataTable, FormInput } from '@/Components';
+import {
+    AdminLayout,
+    PageHeader,
+    Card,
+    StatCard,
+    Button,
+    Badge,
+    DataTable,
+    FormInput,
+} from '@/Components';
 
 export default function PerformanceReport({ vendors, stats, filters }) {
     const { auth } = usePage().props;
@@ -28,13 +37,25 @@ export default function PerformanceReport({ vendors, stats, filters }) {
     const columns = [
         { key: 'rank', label: 'Rank', render: (row, idx) => `#${idx + 1}` },
         { key: 'company_name', label: 'Company', render: (row) => row.company_name },
-        { key: 'performance_score', label: 'Performance', render: (row) => getPerformanceBadge(row.performance_score || 0) },
-        { key: 'compliance_score', label: 'Compliance Score', render: (row) => `${row.compliance_score || 0}%` },
-        { key: 'status', label: 'Status', render: (row) => <Badge variant="success">{row.status}</Badge> },
+        {
+            key: 'performance_score',
+            label: 'Performance',
+            render: (row) => getPerformanceBadge(row.performance_score || 0),
+        },
+        {
+            key: 'compliance_score',
+            label: 'Compliance Score',
+            render: (row) => `${row.compliance_score || 0}%`,
+        },
+        {
+            key: 'status',
+            label: 'Status',
+            render: (row) => <Badge variant="success">{row.status}</Badge>,
+        },
     ];
 
     const header = (
-        <PageHeader 
+        <PageHeader
             title="Performance Report"
             subtitle="Vendor performance scores and rankings"
             actions={
@@ -50,29 +71,29 @@ export default function PerformanceReport({ vendors, stats, filters }) {
             <div className="space-y-6">
                 {/* Summary Stats */}
                 <div className="grid md:grid-cols-4 gap-4">
-                    <StatCard 
-                        label="Active Vendors" 
-                        value={stats.total_active} 
-                        icon="🏢" 
-                        color="primary" 
+                    <StatCard
+                        label="Active Vendors"
+                        value={stats.total_active}
+                        icon="🏢"
+                        color="primary"
                     />
-                    <StatCard 
-                        label="Avg Performance" 
-                        value={`${stats.avg_performance}%`} 
-                        icon="📊" 
-                        color="info" 
+                    <StatCard
+                        label="Avg Performance"
+                        value={`${stats.avg_performance}%`}
+                        icon="📊"
+                        color="info"
                     />
-                    <StatCard 
-                        label="High Performers (≥80%)" 
-                        value={stats.high_performers} 
-                        icon="🏆" 
-                        color="success" 
+                    <StatCard
+                        label="High Performers (≥80%)"
+                        value={stats.high_performers}
+                        icon="🏆"
+                        color="success"
                     />
-                    <StatCard 
-                        label="Top Performer" 
-                        value={stats.top_scorer} 
-                        icon="⭐" 
-                        color="warning" 
+                    <StatCard
+                        label="Top Performer"
+                        value={stats.top_scorer}
+                        icon="⭐"
+                        color="warning"
                     />
                 </div>
 
@@ -80,16 +101,28 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                 <Card title="Performance Distribution">
                     <div className="p-4 grid md:grid-cols-3 gap-4">
                         <div className="p-4 rounded-xl bg-(--color-success-light) border border-(--color-success)/20 text-center">
-                            <div className="text-3xl font-bold text-(--color-success)">{stats.high_performers}</div>
-                            <div className="text-sm text-(--color-text-secondary)">High Performers (≥80%)</div>
+                            <div className="text-3xl font-bold text-(--color-success)">
+                                {stats.high_performers}
+                            </div>
+                            <div className="text-sm text-(--color-text-secondary)">
+                                High Performers (≥80%)
+                            </div>
                         </div>
                         <div className="p-4 rounded-xl bg-(--color-warning-light) border border-(--color-warning)/20 text-center">
-                            <div className="text-3xl font-bold text-(--color-warning)">{stats.medium_performers}</div>
-                            <div className="text-sm text-(--color-text-secondary)">Medium Performers (50-79%)</div>
+                            <div className="text-3xl font-bold text-(--color-warning)">
+                                {stats.medium_performers}
+                            </div>
+                            <div className="text-sm text-(--color-text-secondary)">
+                                Medium Performers (50-79%)
+                            </div>
                         </div>
                         <div className="p-4 rounded-xl bg-(--color-danger-light) border border-(--color-danger)/20 text-center">
-                            <div className="text-3xl font-bold text-(--color-danger)">{stats.low_performers}</div>
-                            <div className="text-sm text-(--color-text-secondary)">Low Performers (&lt;50%)</div>
+                            <div className="text-3xl font-bold text-(--color-danger)">
+                                {stats.low_performers}
+                            </div>
+                            <div className="text-sm text-(--color-text-secondary)">
+                                Low Performers (&lt;50%)
+                            </div>
                         </div>
                     </div>
                 </Card>
@@ -98,14 +131,18 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                 <Card title="Filters">
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">Minimum Score</label>
-                            <FormInput 
-                                type="number" 
+                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
+                                Minimum Score
+                            </label>
+                            <FormInput
+                                type="number"
                                 min="0"
                                 max="100"
                                 placeholder="e.g. 50"
-                                value={localFilters.min_score} 
-                                onChange={(e) => setLocalFilters({...localFilters, min_score: e.target.value})}
+                                value={localFilters.min_score}
+                                onChange={(e) =>
+                                    setLocalFilters({ ...localFilters, min_score: e.target.value })
+                                }
                             />
                         </div>
                         <div className="flex gap-2">
@@ -121,12 +158,12 @@ export default function PerformanceReport({ vendors, stats, filters }) {
 
                 {/* Data Table */}
                 <Card title={`Performance Rankings (${vendors?.data?.length || 0} shown)`}>
-                    <DataTable 
-                        columns={columns} 
+                    <DataTable
+                        columns={columns}
                         data={vendors?.data || []}
                         emptyMessage="No vendors found for the selected filters."
                     />
-                    
+
                     {/* Pagination */}
                     {vendors?.links && vendors.links.length > 3 && (
                         <div className="p-4 border-t border-(--color-border-primary) flex justify-center gap-2">
@@ -135,8 +172,8 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                                     key={idx}
                                     href={link.url || '#'}
                                     className={`px-3 py-1 rounded text-sm ${
-                                        link.active 
-                                            ? 'bg-(--color-brand-primary) text-white' 
+                                        link.active
+                                            ? 'bg-(--color-brand-primary) text-white'
                                             : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-tertiary)'
                                     }`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Vendor;
+use App\Http\Requests\Admin\StorePerformanceRatingRequest;
 use App\Models\PerformanceMetric;
+use App\Models\Vendor;
 use App\Services\PerformanceService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -79,16 +79,9 @@ class PerformanceController extends Controller
     /**
      * Store performance ratings.
      */
-    public function rate(Request $request, Vendor $vendor)
+    public function rate(StorePerformanceRatingRequest $request, Vendor $vendor)
     {
-        $request->validate([
-            'ratings' => 'required|array',
-            'ratings.*.metric_id' => 'required|exists:performance_metrics,id',
-            'ratings.*.score' => 'required|integer|min:0|max:10',
-            'ratings.*.notes' => 'nullable|string|max:500',
-            'period_start' => 'required|date',
-            'period_end' => 'required|date|after_or_equal:period_start',
-        ]);
+        // Validation handled by FormRequest
 
         $metrics = PerformanceMetric::whereIn('id', collect($request->ratings)->pluck('metric_id'))->get()->keyBy('id');
 

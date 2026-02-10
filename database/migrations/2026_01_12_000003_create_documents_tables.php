@@ -31,31 +31,31 @@ return new class extends Migration
             $table->id();
             $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
             $table->foreignId('document_type_id')->constrained()->onDelete('restrict');
-            
+
             $table->string('file_name');
             $table->string('file_path');
             $table->string('file_hash'); // SHA256 for integrity check
             $table->integer('file_size'); // in bytes
             $table->string('mime_type');
-            
+
             $table->integer('version')->default(1);
             $table->boolean('is_current')->default(true);
-            
+
             $table->enum('verification_status', [
                 'pending',
                 'verified',
                 'rejected',
-                'expired'
+                'expired',
             ])->default('pending');
-            
+
             $table->date('expiry_date')->nullable();
             $table->text('verification_notes')->nullable();
             $table->foreignId('verified_by')->nullable()->constrained('users');
             $table->timestamp('verified_at')->nullable();
-            
+
             $table->timestamps();
             $table->softDeletes(); // Never hard delete documents
-            
+
             $table->index(['vendor_id', 'document_type_id', 'is_current']);
             $table->index('expiry_date');
             $table->index('verification_status');
@@ -71,7 +71,7 @@ return new class extends Migration
             $table->foreignId('uploaded_by')->constrained('users');
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->index(['vendor_document_id', 'version']);
         });
     }

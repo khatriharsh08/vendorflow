@@ -29,9 +29,10 @@ class EvaluateVendorCompliance extends Command
 
         if ($vendorId) {
             $vendor = \App\Models\Vendor::find($vendorId);
-            
-            if (!$vendor) {
+
+            if (! $vendor) {
                 $this->error("Vendor with ID {$vendorId} not found.");
+
                 return self::FAILURE;
             }
 
@@ -39,16 +40,16 @@ class EvaluateVendorCompliance extends Command
             $this->displayResult($vendor, $result);
         } else {
             $results = $complianceService->evaluateAllVendors();
-            
-            $this->info("Evaluated " . count($results) . " vendors.");
-            
+
+            $this->info('Evaluated '.count($results).' vendors.');
+
             $table = [];
             foreach ($results as $vendorId => $result) {
                 $table[] = [
                     $vendorId,
                     $result['score'],
                     $result['status'],
-                    $result['failures'] . '/' . $result['rules_evaluated'],
+                    $result['failures'].'/'.$result['rules_evaluated'],
                 ];
             }
 

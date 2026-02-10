@@ -34,7 +34,7 @@ trait Auditable
             // Remove timestamps from audit
             unset($changes['updated_at'], $original['updated_at']);
 
-            if (!empty($changes)) {
+            if (! empty($changes)) {
                 AuditLog::log(
                     AuditLog::EVENT_UPDATED,
                     $model,

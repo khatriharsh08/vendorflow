@@ -31,14 +31,20 @@ class ComplianceRule extends Model
 
     // Rule types
     const TYPE_DOCUMENT_REQUIRED = 'document_required';
+
     const TYPE_DOCUMENT_EXPIRY = 'document_expiry';
+
     const TYPE_PERFORMANCE_THRESHOLD = 'performance_threshold';
+
     const TYPE_CUSTOM = 'custom';
 
     // Severity levels
     const SEVERITY_LOW = 'low';
+
     const SEVERITY_MEDIUM = 'medium';
+
     const SEVERITY_HIGH = 'high';
+
     const SEVERITY_CRITICAL = 'critical';
 
     public function results(): HasMany

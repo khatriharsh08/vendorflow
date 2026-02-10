@@ -49,16 +49,25 @@ function UserMenu({ user, roleDisplay, onLogout }) {
                     {user?.name?.charAt(0) || 'U'}
                 </div>
                 <div className="flex-1 min-w-0 text-left">
-                    <div className="text-sm font-semibold text-gray-900 truncate">{user?.name || 'User'}</div>
-                    <div className="text-xs text-indigo-600 truncate capitalize font-medium">{roleDisplay}</div>
+                    <div className="text-sm font-semibold text-gray-900 truncate">
+                        {user?.name || 'User'}
+                    </div>
+                    <div className="text-xs text-indigo-600 truncate capitalize font-medium">
+                        {roleDisplay}
+                    </div>
                 </div>
-                <svg 
-                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
+                <svg
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                 >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                    />
                 </svg>
             </button>
 
@@ -98,22 +107,22 @@ function NavItem({ item, isActive }) {
             className={`
                 flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                 transition-all duration-200
-                ${isActive
-                    ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-200'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                ${
+                    isActive
+                        ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-200'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }
             `}
         >
             <span className="text-lg w-6 text-center">{item.icon}</span>
             <span>{item.name}</span>
             {item.badge && (
-                <span className={`
+                <span
+                    className={`
                     ml-auto px-2 py-0.5 rounded-full text-xs font-semibold
-                    ${isActive 
-                        ? 'bg-white/20 text-white' 
-                        : 'bg-indigo-100 text-indigo-600'
-                    }
-                `}>
+                    ${isActive ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-600'}
+                `}
+                >
                     {item.badge}
                 </span>
             )}
@@ -124,11 +133,11 @@ function NavItem({ item, isActive }) {
 // =====================================
 // MAIN SIDEBAR COMPONENT
 // =====================================
-export default function Sidebar({ 
-    activeItem = 'Dashboard', 
+export default function Sidebar({
+    activeItem = 'Dashboard',
     variant = 'admin',
     customNav = null,
-    badges = {}
+    badges = {},
 }) {
     const { auth } = usePage().props;
     const user = auth?.user;
@@ -143,19 +152,17 @@ export default function Sidebar({
     const navConfig = customNav || (variant === 'vendor' ? vendorNavConfig : adminNavConfig);
 
     const visibleItems = navConfig
-        .filter(item => !item.permission || can[item.permission])
-        .map(item => ({
+        .filter((item) => !item.permission || can[item.permission])
+        .map((item) => ({
             ...item,
-            badge: badges[item.name] || null
+            badge: badges[item.name] || null,
         }));
 
-    const roleDisplay = roles.length > 0 
-        ? roles.map(r => r.replace('_', ' ')).join(', ') 
-        : 'Staff';
+    const roleDisplay =
+        roles.length > 0 ? roles.map((r) => r.replace('_', ' ')).join(', ') : 'Staff';
 
-    const logoGradient = variant === 'vendor' 
-        ? 'from-emerald-500 to-teal-600' 
-        : 'from-indigo-500 to-violet-600';
+    const logoGradient =
+        variant === 'vendor' ? 'from-emerald-500 to-teal-600' : 'from-indigo-500 to-violet-600';
 
     const logoText = variant === 'vendor' ? 'Vendor Portal' : 'Admin Panel';
 
@@ -180,21 +187,13 @@ export default function Sidebar({
             {/* Navigation */}
             <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
                 {visibleItems.map((item) => (
-                    <NavItem 
-                        key={item.name} 
-                        item={item} 
-                        isActive={activeItem === item.name} 
-                    />
+                    <NavItem key={item.name} item={item} isActive={activeItem === item.name} />
                 ))}
             </nav>
 
             {/* User Section */}
             <div className="p-3 border-t border-gray-100">
-                <UserMenu 
-                    user={user} 
-                    roleDisplay={roleDisplay} 
-                    onLogout={handleLogout} 
-                />
+                <UserMenu user={user} roleDisplay={roleDisplay} onLogout={handleLogout} />
             </div>
         </aside>
     );

@@ -1,10 +1,30 @@
 // Alert/Notification Components - Light Theme
 export function Alert({ type = 'info', title, children, onClose }) {
     const types = {
-        info: { bg: 'bg-[var(--color-info-light)]', border: 'border-[var(--color-info)]', text: 'text-[var(--color-info-dark)]', icon: 'ℹ️' },
-        success: { bg: 'bg-[var(--color-success-light)]', border: 'border-[var(--color-success)]', text: 'text-[var(--color-success-dark)]', icon: '✓' },
-        warning: { bg: 'bg-[var(--color-warning-light)]', border: 'border-[var(--color-warning)]', text: 'text-[var(--color-warning-dark)]', icon: '⚠️' },
-        error: { bg: 'bg-[var(--color-danger-light)]', border: 'border-[var(--color-danger)]', text: 'text-[var(--color-danger-dark)]', icon: '✗' },
+        info: {
+            bg: 'bg-(--color-info-light)',
+            border: 'border-(--color-info)',
+            text: 'text-(--color-info-dark)',
+            icon: 'ℹ️',
+        },
+        success: {
+            bg: 'bg-(--color-success-light)',
+            border: 'border-(--color-success)',
+            text: 'text-(--color-success-dark)',
+            icon: '✓',
+        },
+        warning: {
+            bg: 'bg-(--color-warning-light)',
+            border: 'border-(--color-warning)',
+            text: 'text-(--color-warning-dark)',
+            icon: '⚠️',
+        },
+        error: {
+            bg: 'bg-(--color-danger-light)',
+            border: 'border-(--color-danger)',
+            text: 'text-(--color-danger-dark)',
+            icon: '✗',
+        },
     };
 
     const styles = types[type];
@@ -18,7 +38,9 @@ export function Alert({ type = 'info', title, children, onClose }) {
                     <div className="text-sm opacity-90">{children}</div>
                 </div>
                 {onClose && (
-                    <button onClick={onClose} className="opacity-60 hover:opacity-100">×</button>
+                    <button onClick={onClose} className="opacity-60 hover:opacity-100">
+                        ×
+                    </button>
                 )}
             </div>
         </div>
@@ -28,34 +50,40 @@ export function Alert({ type = 'info', title, children, onClose }) {
 // Toast notification (for temporary messages)
 export function Toast({ message, type = 'success', onClose }) {
     const types = {
-        success: 'bg-[var(--color-success)]',
-        error: 'bg-[var(--color-danger)]',
-        warning: 'bg-[var(--color-warning)]',
-        info: 'bg-[var(--color-info)]',
+        success: 'bg-(--color-success)',
+        error: 'bg-(--color-danger)',
+        warning: 'bg-(--color-warning)',
+        info: 'bg-(--color-info)',
     };
 
     return (
-        <div className={`fixed bottom-4 right-4 ${types[type]} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up`}>
+        <div
+            className={`fixed bottom-4 right-4 ${types[type]} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up`}
+        >
             <span>{message}</span>
             {onClose && (
-                <button onClick={onClose} className="opacity-70 hover:opacity-100">×</button>
+                <button onClick={onClose} className="opacity-70 hover:opacity-100">
+                    ×
+                </button>
             )}
         </div>
     );
 }
 
 // Empty State Component
-export function EmptyState({ 
-    icon = '📭', 
-    title = 'No data found', 
+export function EmptyState({
+    icon = '📭',
+    title = 'No data found',
     description = null,
-    action = null 
+    action = null,
 }) {
     return (
         <div className="text-center py-12">
             <span className="text-5xl block mb-4">{icon}</span>
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{title}</h3>
-            {description && <p className="text-[var(--color-text-tertiary)] text-sm mb-4">{description}</p>}
+            <h3 className="text-lg font-semibold text-(--color-text-primary) mb-2">{title}</h3>
+            {description && (
+                <p className="text-(--color-text-tertiary) text-sm mb-4">{description}</p>
+            )}
             {action}
         </div>
     );
@@ -71,7 +99,7 @@ export function Spinner({ size = 'md', className = '' }) {
 
     return (
         <div className={`${sizes[size]} ${className}`}>
-            <div className="w-full h-full border-2 border-[var(--color-brand-primary)]/30 border-t-[var(--color-brand-primary)] rounded-full animate-spin" />
+            <div className="w-full h-full border-2 border-(--color-brand-primary)/30 border-t-(--color-brand-primary) rounded-full animate-spin" />
         </div>
     );
 }
@@ -81,16 +109,14 @@ export function LoadingState({ message = 'Loading...' }) {
     return (
         <div className="flex flex-col items-center justify-center py-12">
             <Spinner size="lg" className="mb-4" />
-            <span className="text-[var(--color-text-tertiary)]">{message}</span>
+            <span className="text-(--color-text-tertiary)">{message}</span>
         </div>
     );
 }
 
 // Skeleton loader for cards
 export function Skeleton({ className = '' }) {
-    return (
-        <div className={`animate-pulse bg-[var(--color-bg-tertiary)] rounded-lg ${className}`} />
-    );
+    return <div className={`animate-pulse bg-(--color-bg-tertiary) rounded-lg ${className}`} />;
 }
 
 // Avatar Component
@@ -103,38 +129,59 @@ export function Avatar({ name, src = null, size = 'md', className = '' }) {
     };
 
     if (src) {
-        return <img src={src} alt={name} className={`rounded-full object-cover ${sizes[size]} ${className}`} />;
+        return (
+            <img
+                src={src}
+                alt={name}
+                className={`rounded-full object-cover ${sizes[size]} ${className}`}
+            />
+        );
     }
 
     return (
-        <div className={`rounded-full bg-[var(--gradient-primary)] flex items-center justify-center text-white font-semibold ${sizes[size]} ${className}`}>
+        <div
+            className={`rounded-full bg-(--gradient-primary) flex items-center justify-center text-white font-semibold ${sizes[size]} ${className}`}
+        >
             {name?.charAt(0)?.toUpperCase() || '?'}
         </div>
     );
 }
 
 // Progress Bar
-export function ProgressBar({ value = 0, max = 100, color = 'primary', showLabel = false, className = '' }) {
+export function ProgressBar({
+    value = 0,
+    max = 100,
+    color = 'primary',
+    showLabel = false,
+    className = '',
+}) {
     const percentage = Math.min(100, Math.max(0, (value / max) * 100));
-    
+
     const colors = {
-        primary: 'bg-[var(--color-brand-primary)]',
-        success: 'bg-[var(--color-success)]',
-        warning: 'bg-[var(--color-warning)]',
-        danger: 'bg-[var(--color-danger)]',
-        auto: percentage >= 70 ? 'bg-[var(--color-success)]' : percentage >= 40 ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-danger)]',
+        primary: 'bg-(--color-brand-primary)',
+        success: 'bg-(--color-success)',
+        warning: 'bg-(--color-warning)',
+        danger: 'bg-(--color-danger)',
+        auto:
+            percentage >= 70
+                ? 'bg-(--color-success)'
+                : percentage >= 40
+                  ? 'bg-(--color-warning)'
+                  : 'bg-(--color-danger)',
     };
 
     return (
         <div className={className}>
-            <div className="w-full bg-[var(--color-bg-tertiary)] rounded-full h-2">
-                <div 
-                    className={`h-2 rounded-full transition-all ${colors[color]}`} 
-                    style={{ width: `${percentage}%` }} 
+            <div className="w-full bg-(--color-bg-tertiary) rounded-full h-2">
+                <div
+                    className={`h-2 rounded-full transition-all ${colors[color]}`}
+                    style={{ width: `${percentage}%` }}
                 />
             </div>
             {showLabel && (
-                <div className="text-xs text-[var(--color-text-tertiary)] mt-1 text-right">{Math.round(percentage)}%</div>
+                <div className="text-xs text-(--color-text-tertiary) mt-1 text-right">
+                    {Math.round(percentage)}%
+                </div>
             )}
         </div>
     );
@@ -145,13 +192,13 @@ export function Divider({ label = null, className = '' }) {
     if (label) {
         return (
             <div className={`flex items-center gap-4 ${className}`}>
-                <div className="flex-1 border-t border-[var(--color-border-primary)]" />
-                <span className="text-[var(--color-text-muted)] text-sm">{label}</span>
-                <div className="flex-1 border-t border-[var(--color-border-primary)]" />
+                <div className="flex-1 border-t border-(--color-border-primary)" />
+                <span className="text-(--color-text-muted) text-sm">{label}</span>
+                <div className="flex-1 border-t border-(--color-border-primary)" />
             </div>
         );
     }
-    return <div className={`border-t border-[var(--color-border-primary)] ${className}`} />;
+    return <div className={`border-t border-(--color-border-primary) ${className}`} />;
 }
 
 // Tooltip wrapper
@@ -167,7 +214,7 @@ export function Tooltip({ content, children, position = 'top' }) {
         <div className="relative group inline-block">
             {children}
             <div className={`absolute ${positions[position]} hidden group-hover:block z-50`}>
-                <div className="bg-[var(--color-text-primary)] text-[var(--color-bg-primary)] text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
+                <div className="bg-(--color-text-primary) text-(--color-bg-primary) text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
                     {content}
                 </div>
             </div>

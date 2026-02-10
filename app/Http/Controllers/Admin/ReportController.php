@@ -7,8 +7,8 @@ use App\Models\PaymentRequest;
 use App\Models\Vendor;
 use App\Models\VendorDocument;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Response;
+use Inertia\Inertia;
 
 class ReportController extends Controller
 {
@@ -123,7 +123,7 @@ class ReportController extends Controller
         }
 
         // Generate CSV
-        $filename = 'payment_report_' . now()->format('Y-m-d_His') . '.csv';
+        $filename = 'payment_report_'.now()->format('Y-m-d_His').'.csv';
         $handle = fopen('php://temp', 'r+');
 
         fputcsv($handle, $headers);
@@ -137,7 +137,7 @@ class ReportController extends Controller
 
         return Response::make($csv, 200, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
@@ -174,7 +174,7 @@ class ReportController extends Controller
             ];
         }
 
-        $filename = 'vendor_summary_' . now()->format('Y-m-d_His') . '.csv';
+        $filename = 'vendor_summary_'.now()->format('Y-m-d_His').'.csv';
         $handle = fopen('php://temp', 'r+');
 
         fputcsv($handle, $headers);
@@ -188,7 +188,7 @@ class ReportController extends Controller
 
         return Response::make($csv, 200, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
@@ -219,7 +219,7 @@ class ReportController extends Controller
             ];
         }
 
-        $filename = 'performance_report_' . now()->format('Y-m-d_His') . '.csv';
+        $filename = 'performance_report_'.now()->format('Y-m-d_His').'.csv';
         $handle = fopen('php://temp', 'r+');
 
         fputcsv($handle, $headers);
@@ -233,7 +233,7 @@ class ReportController extends Controller
 
         return Response::make($csv, 200, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
@@ -264,7 +264,7 @@ class ReportController extends Controller
             ];
         }
 
-        $filename = 'compliance_report_' . now()->format('Y-m-d_His') . '.csv';
+        $filename = 'compliance_report_'.now()->format('Y-m-d_His').'.csv';
         $handle = fopen('php://temp', 'r+');
 
         fputcsv($handle, $headers);
@@ -278,7 +278,7 @@ class ReportController extends Controller
 
         return Response::make($csv, 200, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
@@ -307,11 +307,11 @@ class ReportController extends Controller
                 $doc->documentType?->display_name ?? 'N/A',
                 $doc->file_name,
                 $doc->expiry_date ? $doc->expiry_date->format('Y-m-d') : 'N/A',
-                $daysUntil !== null ? ($daysUntil < 0 ? 'Expired' : $daysUntil . ' days') : 'Unknown',
+                $daysUntil !== null ? ($daysUntil < 0 ? 'Expired' : $daysUntil.' days') : 'Unknown',
             ];
         }
 
-        $filename = 'document_expiry_' . now()->format('Y-m-d_His') . '.csv';
+        $filename = 'document_expiry_'.now()->format('Y-m-d_His').'.csv';
         $handle = fopen('php://temp', 'r+');
 
         fputcsv($handle, $headers);
@@ -325,7 +325,7 @@ class ReportController extends Controller
 
         return Response::make($csv, 200, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
@@ -356,7 +356,7 @@ class ReportController extends Controller
             'compliance_status',
             'compliance_score',
             'performance_score',
-            'created_at'
+            'created_at',
         ])->orderBy('created_at', 'desc')->paginate(20);
 
         // Summary stats
@@ -400,7 +400,7 @@ class ReportController extends Controller
             'performance_score',
             'compliance_score',
             'status',
-            'created_at'
+            'created_at',
         ])->orderBy('performance_score', 'desc')->paginate(20);
 
         // Performance distribution
@@ -440,7 +440,7 @@ class ReportController extends Controller
             'compliance_status',
             'compliance_score',
             'status',
-            'created_at'
+            'created_at',
         ])->orderBy('compliance_score', 'asc')->paginate(20);
 
         // Stats
@@ -481,6 +481,7 @@ class ReportController extends Controller
         $documents->getCollection()->transform(function ($doc) {
             $doc->expiry_formatted = $doc->expiry_date ? $doc->expiry_date->format('Y-m-d') : 'N/A';
             $doc->days_until_expiry = $doc->expiry_date ? now()->diffInDays($doc->expiry_date, false) : null;
+
             return $doc;
         });
 

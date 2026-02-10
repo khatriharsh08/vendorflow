@@ -29,13 +29,21 @@ class AuditLog extends Model
 
     // Event types
     const EVENT_CREATED = 'created';
+
     const EVENT_UPDATED = 'updated';
+
     const EVENT_DELETED = 'deleted';
+
     const EVENT_STATE_CHANGED = 'state_changed';
+
     const EVENT_APPROVED = 'approved';
+
     const EVENT_REJECTED = 'rejected';
+
     const EVENT_UPLOADED = 'uploaded';
+
     const EVENT_VERIFIED = 'verified';
+
     const EVENT_SCORED = 'scored';
 
     public function user(): BelongsTo

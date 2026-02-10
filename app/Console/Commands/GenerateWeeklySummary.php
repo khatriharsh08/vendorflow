@@ -2,16 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Vendor;
-use App\Models\PaymentRequest;
 use App\Models\ComplianceResult;
+use App\Models\PaymentRequest;
 use App\Models\User;
+use App\Models\Vendor;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class GenerateWeeklySummary extends Command
 {
     protected $signature = 'vendors:weekly-summary';
+
     protected $description = 'Generate weekly summary report for ops managers';
 
     public function handle(): int
@@ -23,7 +24,7 @@ class GenerateWeeklySummary extends Command
 
         // Gather statistics
         $summary = [
-            'period' => $weekStart->format('M d') . ' - ' . $weekEnd->format('M d, Y'),
+            'period' => $weekStart->format('M d').' - '.$weekEnd->format('M d, Y'),
             'vendors' => [
                 'total' => Vendor::count(),
                 'new_this_week' => Vendor::where('created_at', '>=', $weekStart)->count(),
@@ -58,7 +59,7 @@ class GenerateWeeklySummary extends Command
         $this->info("WEEKLY SUMMARY: {$summary['period']}");
         $this->info("========================================\n");
 
-        $this->info("VENDORS:");
+        $this->info('VENDORS:');
         $this->table(
             ['Metric', 'Count'],
             [
@@ -87,7 +88,7 @@ class GenerateWeeklySummary extends Command
             [
                 ['Requested', $summary['payments']['requested']],
                 ['Approved', $summary['payments']['approved']],
-                ['Paid Amount', '₹' . number_format($summary['payments']['paid_amount'], 2)],
+                ['Paid Amount', '₹'.number_format($summary['payments']['paid_amount'], 2)],
                 ['Rejected', $summary['payments']['rejected']],
             ]
         );

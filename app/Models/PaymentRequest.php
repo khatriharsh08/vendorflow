@@ -40,11 +40,17 @@ class PaymentRequest extends Model
 
     // Status constants
     const STATUS_REQUESTED = 'requested';
+
     const STATUS_PENDING_OPS = 'pending_ops';
+
     const STATUS_PENDING_FINANCE = 'pending_finance';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_PAID = 'paid';
+
     const STATUS_REJECTED = 'rejected';
+
     const STATUS_CANCELLED = 'cancelled';
 
     public function vendor(): BelongsTo
@@ -73,6 +79,6 @@ class PaymentRequest extends Model
 
     public function canBeApproved(): bool
     {
-        return $this->isPending() && !$this->is_compliance_blocked;
+        return $this->isPending() && ! $this->is_compliance_blocked;
     }
 }

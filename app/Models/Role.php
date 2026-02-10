@@ -18,8 +18,11 @@ class Role extends Model
 
     // Role constants
     const SUPER_ADMIN = 'super_admin';
+
     const OPS_MANAGER = 'ops_manager';
+
     const FINANCE_MANAGER = 'finance_manager';
+
     const VENDOR = 'vendor';
 
     /**

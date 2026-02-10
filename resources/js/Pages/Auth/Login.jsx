@@ -22,22 +22,39 @@ export default function Login() {
                 <div className="hidden lg:flex lg:w-1/2 bg-indigo-600 relative overflow-hidden">
                     {/* Background pattern */}
                     <div className="absolute inset-0 opacity-10">
-                        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <svg
+                            className="w-full h-full"
+                            viewBox="0 0 100 100"
+                            preserveAspectRatio="none"
+                        >
                             <defs>
-                                <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5"/>
+                                <pattern
+                                    id="grid"
+                                    width="10"
+                                    height="10"
+                                    patternUnits="userSpaceOnUse"
+                                >
+                                    <path
+                                        d="M 10 0 L 0 0 0 10"
+                                        fill="none"
+                                        stroke="white"
+                                        strokeWidth="0.5"
+                                    />
                                 </pattern>
                             </defs>
                             <rect width="100" height="100" fill="url(#grid)" />
                         </svg>
                     </div>
-                    
+
                     <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
                         {/* Logo */}
-                        <Link 
-                            href="/" 
+                        <Link
+                            href="/"
                             className="inline-flex items-center gap-3 p-3 rounded-xl"
-                            style={{ background: 'linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 27%, rgba(255,255,255,0) 100%)' }}
+                            style={{
+                                background:
+                                    'linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 27%, rgba(255,255,255,0) 100%)',
+                            }}
                         >
                             <Logo size="2xl" light={false} />
                         </Link>
@@ -48,9 +65,10 @@ export default function Login() {
                                 Manage your vendors with confidence
                             </h1>
                             <p className="text-indigo-100 text-lg leading-relaxed max-w-md">
-                                Streamline onboarding, track compliance, and process payments — all from one powerful platform.
+                                Streamline onboarding, track compliance, and process payments — all
+                                from one powerful platform.
                             </p>
-                            
+
                             {/* Stats */}
                             <div className="flex gap-8 pt-6">
                                 <div>
@@ -85,12 +103,16 @@ export default function Login() {
 
                         <div className="mb-8">
                             <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-                            <p className="text-gray-500 mt-2">Enter your credentials to access your account</p>
+                            <p className="text-gray-500 mt-2">
+                                Enter your credentials to access your account
+                            </p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Email
+                                </label>
                                 <input
                                     type="email"
                                     value={form.data.email}
@@ -99,11 +121,15 @@ export default function Login() {
                                     placeholder="you@company.com"
                                     required
                                 />
-                                {form.errors.email && <p className="mt-1 text-sm text-red-600">{form.errors.email}</p>}
+                                {form.errors.email && (
+                                    <p className="mt-1 text-sm text-red-600">{form.errors.email}</p>
+                                )}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Password
+                                </label>
                                 <input
                                     type="password"
                                     value={form.data.password}
@@ -112,7 +138,11 @@ export default function Login() {
                                     placeholder="••••••••"
                                     required
                                 />
-                                {form.errors.password && <p className="mt-1 text-sm text-red-600">{form.errors.password}</p>}
+                                {form.errors.password && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {form.errors.password}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex items-center justify-between">
@@ -125,7 +155,10 @@ export default function Login() {
                                     />
                                     <span className="text-sm text-gray-600">Remember me</span>
                                 </label>
-                                <Link href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+                                <Link
+                                    href="/forgot-password"
+                                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                                >
                                     Forgot password?
                                 </Link>
                             </div>
@@ -141,7 +174,10 @@ export default function Login() {
 
                         <p className="mt-8 text-center text-gray-500">
                             Don't have an account?{' '}
-                            <Link href="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
+                            <Link
+                                href="/register"
+                                className="text-indigo-600 hover:text-indigo-700 font-medium"
+                            >
                                 Create one
                             </Link>
                         </p>

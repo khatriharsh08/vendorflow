@@ -2,28 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Vendor;
+use App\Http\Requests\Vendor\StorePaymentRequest;
+use App\Http\Requests\Vendor\StoreStep1Request;
+use App\Http\Requests\Vendor\StoreStep2Request;
+use App\Http\Requests\Vendor\StoreStep3Request;
+use App\Http\Requests\Vendor\UpdateProfileRequest;
+use App\Http\Requests\Vendor\UploadDocumentRequest;
 use App\Models\DocumentType;
-use App\Models\VendorDocument;
+use App\Models\Vendor;
+use App\Services\VendorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class VendorController extends Controller
 {
+    protected VendorService $vendorService;
+
+    public function __construct(VendorService $vendorService)
+    {
+        $this->vendorService = $vendorService;
+    }
+
     /**
      * Show the onboarding wizard.
      */
     public function showOnboarding(Request $request)
     {
         $user = Auth::user();
+        if (! $user instanceof \App\Models\User) {
+            abort(403);
+        }
         $vendor = $user->vendor;
         $step = $request->query('step', 1);
 
         // If vendor has already submitted, redirect to dashboard
-        if ($vendor && !in_array($vendor->status, [Vendor::STATUS_DRAFT])) {
+        if ($vendor && ! in_array($vendor->status, [Vendor::STATUS_DRAFT])) {
             return redirect()->route('vendor.dashboard');
         }
 
@@ -43,27 +58,11 @@ class VendorController extends Controller
     /**
      * Save Step 1 data to session (not database).
      */
-    public function storeStep1(Request $request)
+    public function storeStep1(StoreStep1Request $request)
     {
-        $validated = $request->validate([
-            'company_name' => 'required|string|max:255',
-            'registration_number' => 'nullable|string|max:50',
-            'tax_id' => 'nullable|string|max:50',
-            'pan_number' => 'required|string|max:20',
-            'business_type' => 'nullable|string|max:50',
-            'contact_person' => 'required|string|max:255',
-            'contact_phone' => 'required|string|max:20',
-            'address' => 'required|string|max:500',
-            'city' => 'required|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'pincode' => 'required|string|max:20',
-        ]);
+        $validated = $request->validated();
 
-        // Store in session instead of database
-        $sessionData = session('vendor_onboarding', []);
-        $sessionData['step1'] = $validated;
-        $sessionData['step1']['contact_email'] = Auth::user()->email;
-        session(['vendor_onboarding' => $sessionData]);
+        $this->vendorService->storeOnboardingStep1($validated);
 
         return redirect()->route('vendor.onboarding', ['step' => 2]);
     }
@@ -71,14 +70,9 @@ class VendorController extends Controller
     /**
      * Save Step 2 data to session (not database).
      */
-    public function storeStep2(Request $request)
+    public function storeStep2(StoreStep2Request $request)
     {
-        $validated = $request->validate([
-            'bank_name' => 'required|string|max:255',
-            'bank_account_number' => 'required|string|max:50',
-            'bank_ifsc' => 'required|string|max:20',
-            'bank_branch' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         // Check if step 1 is complete
         $sessionData = session('vendor_onboarding', []);
@@ -87,9 +81,7 @@ class VendorController extends Controller
                 ->withErrors(['step' => 'Please complete Step 1 first.']);
         }
 
-        // Store in session
-        $sessionData['step2'] = $validated;
-        session(['vendor_onboarding' => $sessionData]);
+        $this->vendorService->storeOnboardingStep2($validated);
 
         return redirect()->route('vendor.onboarding', ['step' => 3]);
     }
@@ -97,13 +89,8 @@ class VendorController extends Controller
     /**
      * Save Step 3 documents to temp storage (not database).
      */
-    public function storeStep3(Request $request)
+    public function storeStep3(StoreStep3Request $request)
     {
-        $request->validate([
-            'documents' => 'required|array',
-            'documents.*.document_type_id' => 'required|exists:document_types,id',
-            'documents.*.file' => 'required|file|max:10240', // 10MB max
-        ]);
 
         // Check if previous steps are complete
         $sessionData = session('vendor_onboarding', []);
@@ -112,29 +99,29 @@ class VendorController extends Controller
                 ->withErrors(['step' => 'Please complete previous steps first.']);
         }
 
-        // Store files in temp folder with unique session key
-        $tempFolder = 'temp-documents/' . session()->getId();
-        $documents = [];
-
-        foreach ($request->documents as $doc) {
-            $file = $doc['file'];
-            $path = $file->store($tempFolder, 'private');
-
-            $documents[] = [
-                'document_type_id' => $doc['document_type_id'],
-                'file_name' => $file->getClientOriginalName(),
-                'file_path' => $path,
-                'file_size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-                'file_hash' => hash_file('sha256', $file->getRealPath()),
-            ];
-        }
-
-        // Store document info in session
-        $sessionData['step3'] = ['documents' => $documents];
-        session(['vendor_onboarding' => $sessionData]);
+        $this->vendorService->storeOnboardingStep3($request->documents);
 
         return redirect()->route('vendor.onboarding', ['step' => 4]);
+    }
+
+    /**
+     * View a temporary onboarding document.
+     */
+    public function viewOnboardingDocument($typeId)
+    {
+        $sessionData = session('vendor_onboarding', []);
+        $documents = $sessionData['step3']['documents'] ?? [];
+
+        foreach ($documents as $doc) {
+            if ($doc['document_type_id'] == $typeId) {
+                $path = $doc['file_path'];
+                if (Storage::disk('private')->exists($path)) {
+                    return Storage::disk('private')->response($path, $doc['file_name']);
+                }
+            }
+        }
+
+        abort(404);
     }
 
     /**
@@ -155,75 +142,18 @@ class VendorController extends Controller
         $uploadedTypes = collect($sessionData['step3']['documents'])->pluck('document_type_id')->toArray();
         $missingDocs = array_diff($mandatoryTypes, $uploadedTypes);
 
-        if (!empty($missingDocs)) {
+        if (! empty($missingDocs)) {
             return redirect()->route('vendor.onboarding', ['step' => 3])
                 ->withErrors(['documents' => 'Please upload all mandatory documents before submitting.']);
         }
 
-        // Use database transaction to save everything at once
-        DB::transaction(function () use ($sessionData) {
-            $user = Auth::user();
+        try {
+            $this->vendorService->submitApplication(Auth::user());
 
-            // 1. Create or Update Vendor with all data from step 1 & 2
-            $vendorData = array_merge(
-                $sessionData['step1'],
-                $sessionData['step2'],
-                ['status' => Vendor::STATUS_SUBMITTED]
-            );
-
-            $vendor = Vendor::updateOrCreate(
-                ['user_id' => $user->id],
-                $vendorData
-            );
-
-            // Sync contact_phone to user's phone field
-            if (!empty($sessionData['step1']['contact_phone'])) {
-                $user->phone = $sessionData['step1']['contact_phone'];
-                $user->save();
-            }
-
-            // 2. Delete any existing documents (prevent duplicates)
-            $vendor->documents()->delete();
-
-            // 3. Move temp files to permanent storage and create document records
-            foreach ($sessionData['step3']['documents'] as $doc) {
-                $tempPath = $doc['file_path'];
-                $newPath = 'vendor-documents/' . $vendor->id . '/' . basename($tempPath);
-
-                // Move from temp to permanent location
-                if (Storage::disk('private')->exists($tempPath)) {
-                    Storage::disk('private')->move($tempPath, $newPath);
-                }
-
-                VendorDocument::create([
-                    'vendor_id' => $vendor->id,
-                    'document_type_id' => $doc['document_type_id'],
-                    'file_name' => $doc['file_name'],
-                    'file_path' => $newPath,
-                    'file_hash' => $doc['file_hash'],
-                    'file_size' => $doc['file_size'],
-                    'mime_type' => $doc['mime_type'],
-                    'verification_status' => 'pending',
-                ]);
-            }
-
-            // 4. Log the status transition
-            $vendor->stateLogs()->create([
-                'from_status' => Vendor::STATUS_DRAFT,
-                'to_status' => Vendor::STATUS_SUBMITTED,
-                'user_id' => $user->id,
-                'comment' => 'Vendor application submitted for review',
-            ]);
-        });
-
-        // Clear session data after successful submission
-        session()->forget('vendor_onboarding');
-
-        // Clean up temp folder
-        $tempFolder = 'temp-documents/' . session()->getId();
-        Storage::disk('private')->deleteDirectory($tempFolder);
-
-        return redirect()->route('vendor.dashboard')->with('success', 'Application submitted successfully!');
+            return redirect()->route('vendor.dashboard')->with('success', 'Application submitted successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to submit application: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -231,9 +161,11 @@ class VendorController extends Controller
      */
     public function index()
     {
-        $vendor = Auth::user()->vendor;
+        $user = Auth::user();
+        /** @var \App\Models\User $user */
+        $vendor = $user->vendor;
 
-        if (!$vendor) {
+        if (! $vendor) {
             return redirect()->route('vendor.onboarding');
         }
 
@@ -260,9 +192,11 @@ class VendorController extends Controller
      */
     public function documents()
     {
-        $vendor = Auth::user()->vendor;
+        $user = Auth::user();
+        /** @var \App\Models\User $user */
+        $vendor = $user->vendor;
 
-        if (!$vendor) {
+        if (! $vendor) {
             return redirect()->route('vendor.onboarding');
         }
 
@@ -279,46 +213,30 @@ class VendorController extends Controller
     /**
      * Upload a new document.
      */
-    public function uploadDocument(Request $request)
+    public function uploadDocument(UploadDocumentRequest $request)
     {
-        $request->validate([
-            'document_type_id' => 'required|exists:document_types,id',
-            'file' => 'required|file|max:10240',
-            'expiry_date' => 'nullable|date',
-        ]);
+        // Validation handled by FormRequest
 
-        $vendor = Auth::user()->vendor;
+        $user = Auth::user();
+        /** @var \App\Models\User $user */
+        $vendor = $user->vendor;
 
-        if (!$vendor || $vendor->status === Vendor::STATUS_DRAFT) {
+        if (! $vendor || $vendor->status === Vendor::STATUS_DRAFT) {
             return back()->withErrors(['upload' => 'Cannot upload documents in draft status.']);
         }
 
-        $file = $request->file('file');
-        $path = $file->store('vendor-documents/' . $vendor->id, 'private');
-        $hash = hash_file('sha256', $file->getRealPath());
+        try {
+            $this->vendorService->uploadDocument(
+                $vendor,
+                $request->file('file'),
+                $request->document_type_id,
+                $request->expiry_date
+            );
 
-        // Check for existing document of same type
-        $existing = $vendor->documents()->where('document_type_id', $request->document_type_id)->first();
-
-        if ($existing) {
-            // Delete old file
-            Storage::disk('private')->delete($existing->file_path);
-            $existing->delete();
+            return back()->with('success', 'Document uploaded successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['upload' => 'Upload failed: ' . $e->getMessage()]);
         }
-
-        VendorDocument::create([
-            'vendor_id' => $vendor->id,
-            'document_type_id' => $request->document_type_id,
-            'file_name' => $file->getClientOriginalName(),
-            'file_path' => $path,
-            'file_hash' => $hash,
-            'file_size' => $file->getSize(),
-            'mime_type' => $file->getMimeType(),
-            'expiry_date' => $request->expiry_date,
-            'verification_status' => 'pending',
-        ]);
-
-        return back()->with('success', 'Document uploaded successfully!');
     }
 
     /**
@@ -326,9 +244,11 @@ class VendorController extends Controller
      */
     public function payments()
     {
-        $vendor = Auth::user()->vendor;
+        $user = Auth::user();
+        /** @var \App\Models\User $user */
+        $vendor = $user->vendor;
 
-        if (!$vendor) {
+        if (! $vendor) {
             return redirect()->route('vendor.onboarding');
         }
 
@@ -343,17 +263,15 @@ class VendorController extends Controller
     /**
      * Create new payment request.
      */
-    public function createPaymentRequest(Request $request)
+    public function createPaymentRequest(StorePaymentRequest $request)
     {
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'description' => 'required|string|max:500',
-            'invoice_number' => 'nullable|string|max:50',
-        ]);
+        $validated = $request->validated();
 
-        $vendor = Auth::user()->vendor;
+        $user = Auth::user();
+        /** @var \App\Models\User $user */
+        $vendor = $user->vendor;
 
-        if (!$vendor || $vendor->status !== Vendor::STATUS_ACTIVE) {
+        if (! $vendor || $vendor->status !== Vendor::STATUS_ACTIVE) {
             return back()->withErrors(['submit' => 'Only active vendors can request payments.']);
         }
 
@@ -392,6 +310,7 @@ class VendorController extends Controller
     public function profile()
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
         return Inertia::render('Vendor/Profile', [
@@ -402,40 +321,19 @@ class VendorController extends Controller
     /**
      * Update vendor profile.
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
-        if (!$vendor) {
+        if (! $vendor) {
             return back()->with('error', 'Vendor profile not found.');
         }
 
-        $validated = $request->validate([
-            'company_name' => 'required|string|max:255',
-            'registration_number' => 'nullable|string|max:50',
-            'tax_id' => 'nullable|string|max:50',
-            'pan_number' => 'required|string|max:20',
-            'business_type' => 'nullable|string|max:50',
-            'contact_person' => 'required|string|max:255',
-            'contact_phone' => 'required|string|max:20',
-            'address' => 'required|string|max:500',
-            'city' => 'required|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'pincode' => 'required|string|max:20',
-            'bank_name' => 'nullable|string|max:100',
-            'bank_account_number' => 'nullable|string|max:30',
-            'bank_ifsc' => 'nullable|string|max:20',
-            'bank_branch' => 'nullable|string|max:100',
-        ]);
+        $validated = $request->validated();
 
-        $vendor->update($validated);
-
-        // Sync contact_phone to user's phone field
-        if (!empty($validated['contact_phone'])) {
-            $user->phone = $validated['contact_phone'];
-            $user->save();
-        }
+        $this->vendorService->updateProfile($vendor, $validated);
 
         return back()->with('success', 'Profile updated successfully!');
     }
@@ -446,9 +344,10 @@ class VendorController extends Controller
     public function compliance()
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
-        if (!$vendor) {
+        if (! $vendor) {
             return redirect()->route('vendor.onboarding');
         }
 
@@ -473,9 +372,10 @@ class VendorController extends Controller
     public function performance()
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
-        if (!$vendor) {
+        if (! $vendor) {
             return redirect()->route('vendor.onboarding');
         }
 
@@ -500,6 +400,7 @@ class VendorController extends Controller
     public function notifications()
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
         // Get notifications for this user
@@ -519,6 +420,7 @@ class VendorController extends Controller
     public function markNotificationAsRead($id)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $notification = $user->notifications()->findOrFail($id);
         $notification->markAsRead();
 
@@ -531,6 +433,7 @@ class VendorController extends Controller
     public function markAllNotificationsAsRead()
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $user->unreadNotifications->markAsRead();
 
         return back()->with('success', 'All notifications marked as read.');

@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Vendor;
-use App\Models\ComplianceRule;
 use App\Models\ComplianceResult;
+use App\Models\ComplianceRule;
 use App\Models\DocumentType;
+use App\Models\Vendor;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class ComplianceService
 {
@@ -46,7 +45,7 @@ class ComplianceService
 
             if ($result['status'] === ComplianceResult::STATUS_FAIL) {
                 $totalPenalty += $rule->penalty_points;
-                
+
                 if ($rule->blocks_payment || $rule->blocks_activation) {
                     $hasBlockingFailure = true;
                 }
@@ -157,7 +156,7 @@ class ComplianceService
 
         return [
             'status' => ComplianceResult::STATUS_FAIL,
-            'details' => 'Missing mandatory documents: ' . implode(', ', $missingNames),
+            'details' => 'Missing mandatory documents: '.implode(', ', $missingNames),
             'metadata' => ['missing_document_ids' => $missingTypes->toArray()],
         ];
     }
@@ -177,13 +176,13 @@ class ComplianceService
             ->with('documentType')
             ->get();
 
-        $expiredDocs = $expiringDocs->filter(fn($doc) => Carbon::parse($doc->expiry_date)->isPast());
-        $soonToExpire = $expiringDocs->filter(fn($doc) => !Carbon::parse($doc->expiry_date)->isPast());
+        $expiredDocs = $expiringDocs->filter(fn ($doc) => Carbon::parse($doc->expiry_date)->isPast());
+        $soonToExpire = $expiringDocs->filter(fn ($doc) => ! Carbon::parse($doc->expiry_date)->isPast());
 
         if ($expiredDocs->isNotEmpty()) {
             return [
                 'status' => ComplianceResult::STATUS_FAIL,
-                'details' => 'Expired documents: ' . $expiredDocs->pluck('documentType.display_name')->implode(', '),
+                'details' => 'Expired documents: '.$expiredDocs->pluck('documentType.display_name')->implode(', '),
                 'metadata' => ['expired_document_ids' => $expiredDocs->pluck('id')->toArray()],
             ];
         }
@@ -191,7 +190,7 @@ class ComplianceService
         if ($soonToExpire->isNotEmpty()) {
             return [
                 'status' => ComplianceResult::STATUS_WARNING,
-                'details' => 'Documents expiring soon: ' . $soonToExpire->pluck('documentType.display_name')->implode(', '),
+                'details' => 'Documents expiring soon: '.$soonToExpire->pluck('documentType.display_name')->implode(', '),
                 'metadata' => ['expiring_document_ids' => $soonToExpire->pluck('id')->toArray()],
             ];
         }

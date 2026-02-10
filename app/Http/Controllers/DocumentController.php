@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\VendorDocument;
 use App\Models\AuditLog;
+use App\Models\VendorDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -28,7 +28,7 @@ class DocumentController extends Controller
         // Search by vendor name
         if ($request->has('search') && $request->search) {
             $query->whereHas('vendor', function ($q) use ($request) {
-                $q->where('business_name', 'like', '%' . $request->search . '%');
+                $q->where('business_name', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -130,9 +130,9 @@ class DocumentController extends Controller
             abort(403);
         }
 
-        $path = storage_path('app/private/' . $document->file_path);
+        $path = storage_path('app/private/'.$document->file_path);
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             abort(404, 'Document not found.');
         }
 
@@ -153,13 +153,13 @@ class DocumentController extends Controller
             abort(403, 'You do not have permission to view this document.');
         }
 
-        $path = storage_path('app/private/' . $document->file_path);
+        $path = storage_path('app/private/'.$document->file_path);
 
         // If file doesn't exist, return a placeholder response
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             // Return a simple HTML page indicating file not found
             return response()->view('errors.document-not-found', [
-                'document' => $document
+                'document' => $document,
             ], 404);
         }
 
@@ -167,7 +167,7 @@ class DocumentController extends Controller
 
         return response()->file($path, [
             'Content-Type' => $mimeType,
-            'Content-Disposition' => 'inline; filename="' . $document->file_name . '"',
+            'Content-Disposition' => 'inline; filename="'.$document->file_name.'"',
         ]);
     }
 }

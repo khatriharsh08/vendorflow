@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use App\Models\Role;
 use App\Models\Permission;
+use App\Models\Role;
 
 trait HasRoles
 {
@@ -21,7 +21,7 @@ trait HasRoles
     public function assignRole(string $roleName): void
     {
         $role = Role::where('name', $roleName)->first();
-        if ($role && !$this->hasRole($roleName)) {
+        if ($role && ! $this->hasRole($roleName)) {
             $this->roles()->attach($role);
         }
     }
@@ -126,6 +126,7 @@ trait HasRoles
     public function getRoleDisplayName(): string
     {
         $role = $this->getPrimaryRole();
+
         return $role ? $role->display_name : 'No Role';
     }
 }

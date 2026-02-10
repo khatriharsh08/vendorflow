@@ -1,12 +1,22 @@
 import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { AdminLayout, PageHeader, DataTable, Badge, Button, Modal, ModalCancelButton, ModalPrimaryButton, FormTextarea } from '@/Components';
+import {
+    AdminLayout,
+    PageHeader,
+    DataTable,
+    Badge,
+    Button,
+    Modal,
+    ModalCancelButton,
+    ModalPrimaryButton,
+    FormTextarea,
+} from '@/Components';
 import { DocumentViewer } from '@/Components/DocumentViewer';
 
 export default function DocumentsIndex({ documents }) {
     const { auth } = usePage().props;
     const can = auth?.can || {};
-    
+
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [rejectReason, setRejectReason] = useState('');
@@ -18,28 +28,56 @@ export default function DocumentsIndex({ documents }) {
     };
 
     const rejectDocument = () => {
-        router.post(`/admin/documents/${selectedDoc}/reject`, { reason: rejectReason }, {
-            onSuccess: () => {
-                setShowRejectModal(false);
-                setSelectedDoc(null);
-                setRejectReason('');
-            },
-            preserveScroll: true,
-        });
+        router.post(
+            `/admin/documents/${selectedDoc}/reject`,
+            { reason: rejectReason },
+            {
+                onSuccess: () => {
+                    setShowRejectModal(false);
+                    setSelectedDoc(null);
+                    setRejectReason('');
+                },
+                preserveScroll: true,
+            }
+        );
     };
 
     const columns = [
-        { header: 'Vendor', render: (row) => <span className="text-(--color-text-primary) font-medium">{row.vendor?.company_name}</span> },
-        { header: 'Document Type', render: (row) => <span className="text-(--color-text-secondary)">{row.document_type?.display_name}</span> },
-        { 
-            header: 'File', 
+        {
+            header: 'Vendor',
             render: (row) => (
-                <a href={`/admin/documents/${row.id}/download`} className="text-(--color-brand-primary) hover:underline" target="_blank">
+                <span className="text-(--color-text-primary) font-medium">
+                    {row.vendor?.company_name}
+                </span>
+            ),
+        },
+        {
+            header: 'Document Type',
+            render: (row) => (
+                <span className="text-(--color-text-secondary)">
+                    {row.document_type?.display_name}
+                </span>
+            ),
+        },
+        {
+            header: 'File',
+            render: (row) => (
+                <a
+                    href={`/admin/documents/${row.id}/download`}
+                    className="text-(--color-brand-primary) hover:underline"
+                    target="_blank"
+                    rel="noreferrer"
+                >
                     {row.file_name}
                 </a>
-            )
+            ),
         },
-        { header: 'Uploaded', render: (row) => <span className="text-(--color-text-tertiary) text-sm">{row.created_at}</span> },
+        {
+            header: 'Uploaded',
+            render: (row) => (
+                <span className="text-(--color-text-tertiary) text-sm">{row.created_at}</span>
+            ),
+        },
     ];
 
     // Add actions column with View button (always) and Verify/Reject buttons (if permission)
@@ -59,12 +97,23 @@ export default function DocumentsIndex({ documents }) {
                 </button>
                 {can.verify_documents && (
                     <>
-                        <Button variant="success" size="sm" onClick={() => verifyDocument(row.id)}>✓</Button>
-                        <Button variant="danger" size="sm" onClick={() => { setSelectedDoc(row.id); setShowRejectModal(true); }}>✗</Button>
+                        <Button variant="success" size="sm" onClick={() => verifyDocument(row.id)}>
+                            ✓
+                        </Button>
+                        <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => {
+                                setSelectedDoc(row.id);
+                                setShowRejectModal(true);
+                            }}
+                        >
+                            ✗
+                        </Button>
                     </>
                 )}
             </div>
-        )
+        ),
     });
 
     const header = (
@@ -74,23 +123,27 @@ export default function DocumentsIndex({ documents }) {
     return (
         <AdminLayout title="Document Verification" activeNav="Documents" header={header}>
             {/* Scrollable Document List with sticky header */}
-            <DataTable 
-                columns={columns} 
-                data={documents?.data || []} 
+            <DataTable
+                columns={columns}
+                data={documents?.data || []}
                 emptyIcon="✅"
                 emptyMessage="All documents have been verified!"
                 stickyHeader={true}
             />
 
             {/* Reject Modal */}
-            <Modal 
-                isOpen={showRejectModal && can.reject_documents} 
+            <Modal
+                isOpen={showRejectModal && can.reject_documents}
                 onClose={() => setShowRejectModal(false)}
                 title="Reject Document"
                 footer={
                     <>
                         <ModalCancelButton onClick={() => setShowRejectModal(false)} />
-                        <ModalPrimaryButton variant="danger" onClick={rejectDocument} disabled={!rejectReason}>
+                        <ModalPrimaryButton
+                            variant="danger"
+                            onClick={rejectDocument}
+                            disabled={!rejectReason}
+                        >
                             Reject Document
                         </ModalPrimaryButton>
                     </>
@@ -106,13 +159,13 @@ export default function DocumentsIndex({ documents }) {
             </Modal>
 
             {/* Document Viewer Modal */}
-            <DocumentViewer 
-                document={viewerDocument} 
-                isOpen={showViewer} 
+            <DocumentViewer
+                document={viewerDocument}
+                isOpen={showViewer}
                 onClose={() => {
                     setShowViewer(false);
                     setViewerDocument(null);
-                }} 
+                }}
             />
         </AdminLayout>
     );

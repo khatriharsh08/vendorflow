@@ -30,9 +30,9 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
     const displayNotifications = notifications?.data || notifications || [];
 
     const header = (
-        <PageHeader 
+        <PageHeader
             title="Notifications"
-            subtitle={`${unreadCount || displayNotifications.filter(n => !n.read_at).length} unread`}
+            subtitle={`${unreadCount || displayNotifications.filter((n) => !n.read_at).length} unread`}
             actions={
                 <Button variant="ghost" onClick={markAllAsRead}>
                     Mark all as read
@@ -44,15 +44,15 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
     // Use VendorLayout for vendors, AdminLayout for staff
     const Layout = isVendor ? VendorLayout : AdminLayout;
     const layoutProps = {
-        title: "Notifications",
-        activeNav: "Dashboard", // Keep Dashboard active, notifications is in user menu
+        title: 'Notifications',
+        activeNav: 'Dashboard', // Keep Dashboard active, notifications is in user menu
         header: header,
     };
 
     return (
         <Layout {...layoutProps}>
             {displayNotifications.length === 0 ? (
-                <EmptyState 
+                <EmptyState
                     icon="🔔"
                     title="No notifications"
                     description="You're all caught up! New notifications will appear here."
@@ -61,10 +61,11 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                 <Card>
                     <div className="divide-y divide-slate-800">
                         {displayNotifications.map((notification) => (
-                            <div 
-                                key={notification.id} 
+                            <div
+                                key={notification.id}
                                 className={`p-5 border-l-4 transition-colors ${
-                                    severityColors[notification.data?.severity] || 'border-l-slate-500'
+                                    severityColors[notification.data?.severity] ||
+                                    'border-l-slate-500'
                                 } ${!notification.read_at ? 'bg-slate-800/20' : 'hover:bg-slate-800/10'}`}
                             >
                                 <div className="flex items-start justify-between gap-4">
@@ -85,19 +86,21 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                                                 {notification.data?.message}
                                             </p>
                                             <div className="text-xs text-slate-500">
-                                                {new Date(notification.created_at).toLocaleDateString('en-IN', {
+                                                {new Date(
+                                                    notification.created_at
+                                                ).toLocaleDateString('en-IN', {
                                                     day: 'numeric',
                                                     month: 'short',
                                                     year: 'numeric',
                                                     hour: '2-digit',
-                                                    minute: '2-digit'
+                                                    minute: '2-digit',
                                                 })}
                                             </div>
                                         </div>
                                     </div>
                                     {!notification.read_at && (
-                                        <Button 
-                                            variant="ghost" 
+                                        <Button
+                                            variant="ghost"
                                             size="sm"
                                             onClick={() => markAsRead(notification.id)}
                                         >

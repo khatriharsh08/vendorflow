@@ -2,11 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Vendor;
 use App\Models\PerformanceMetric;
 use App\Models\PerformanceScore;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Models\Vendor;
 
 class PerformanceService
 {
@@ -49,7 +48,7 @@ class PerformanceService
     public function recalculateVendorScore(Vendor $vendor): int
     {
         $metrics = PerformanceMetric::where('is_active', true)->get();
-        
+
         if ($metrics->isEmpty()) {
             return 0;
         }
@@ -72,8 +71,8 @@ class PerformanceService
             }
         }
 
-        $overallScore = $totalWeight > 0 
-            ? (int) round($weightedSum / $totalWeight) 
+        $overallScore = $totalWeight > 0
+            ? (int) round($weightedSum / $totalWeight)
             : 0;
 
         $vendor->update(['performance_score' => $overallScore]);
@@ -96,7 +95,7 @@ class PerformanceService
         $monthlyData = [];
         foreach ($scores as $score) {
             $month = $score->period_end->format('Y-m');
-            if (!isset($monthlyData[$month])) {
+            if (! isset($monthlyData[$month])) {
                 $monthlyData[$month] = [
                     'month' => $month,
                     'scores' => [],
@@ -113,8 +112,8 @@ class PerformanceService
         // Calculate monthly averages
         foreach ($monthlyData as &$data) {
             $total = array_sum(array_column($data['scores'], 'score'));
-            $data['average'] = count($data['scores']) > 0 
-                ? round($total / count($data['scores'])) 
+            $data['average'] = count($data['scores']) > 0
+                ? round($total / count($data['scores']))
                 : 0;
         }
 
@@ -145,8 +144,8 @@ class PerformanceService
                 'weight' => $metric->weight,
                 'current_score' => $latestScore?->score ?? 0,
                 'max_score' => $metric->max_score,
-                'average_score' => $allScores->isNotEmpty() 
-                    ? round($allScores->average()) 
+                'average_score' => $allScores->isNotEmpty()
+                    ? round($allScores->average())
                     : 0,
                 'score_count' => $allScores->count(),
             ];

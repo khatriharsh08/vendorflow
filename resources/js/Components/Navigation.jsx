@@ -60,10 +60,10 @@ export function Dropdown({ trigger, children, align = 'right' }) {
     return (
         <div className="relative group">
             {trigger}
-            <div className={`absolute ${alignments[align]} top-full mt-2 hidden group-hover:block z-50`}>
-                <div className="glass-card p-2 min-w-[160px] shadow-xl">
-                    {children}
-                </div>
+            <div
+                className={`absolute ${alignments[align]} top-full mt-2 hidden group-hover:block z-50`}
+            >
+                <div className="glass-card p-2 min-w-[160px] shadow-xl">{children}</div>
             </div>
         </div>
     );
@@ -71,8 +71,8 @@ export function Dropdown({ trigger, children, align = 'right' }) {
 
 export function DropdownItem({ href, onClick, icon, children, danger = false }) {
     const className = `w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-        danger 
-            ? 'text-red-400 hover:bg-red-500/20' 
+        danger
+            ? 'text-red-400 hover:bg-red-500/20'
             : 'text-slate-300 hover:bg-slate-800 hover:text-white'
     }`;
 
@@ -99,11 +99,11 @@ export function Accordion({ items, allowMultiple = false }) {
 
     const toggle = (id) => {
         if (allowMultiple) {
-            setOpenItems(prev => 
-                prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+            setOpenItems((prev) =>
+                prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
             );
         } else {
-            setOpenItems(prev => prev.includes(id) ? [] : [id]);
+            setOpenItems((prev) => (prev.includes(id) ? [] : [id]));
         }
     };
 
@@ -116,14 +116,14 @@ export function Accordion({ items, allowMultiple = false }) {
                         className="w-full flex items-center justify-between p-4 text-left"
                     >
                         <span className="font-medium text-white">{item.title}</span>
-                        <span className={`transform transition-transform ${openItems.includes(item.id) ? 'rotate-180' : ''}`}>
+                        <span
+                            className={`transform transition-transform ${openItems.includes(item.id) ? 'rotate-180' : ''}`}
+                        >
                             ▼
                         </span>
                     </button>
                     {openItems.includes(item.id) && (
-                        <div className="px-4 pb-4 text-slate-400">
-                            {item.content}
-                        </div>
+                        <div className="px-4 pb-4 text-slate-400">{item.content}</div>
                     )}
                 </div>
             ))}
@@ -142,10 +142,14 @@ export function Pill({ children, color = 'default', onRemove }) {
     };
 
     return (
-        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${colors[color]}`}>
+        <span
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${colors[color]}`}
+        >
             {children}
             {onRemove && (
-                <button onClick={onRemove} className="hover:opacity-70">×</button>
+                <button onClick={onRemove} className="hover:opacity-70">
+                    ×
+                </button>
             )}
         </span>
     );
@@ -182,7 +186,7 @@ export function SearchInput({ value, onChange, onSubmit, placeholder = 'Search..
             <input
                 type="text"
                 value={value}
-                onChange={e => onChange(e.target.value)}
+                onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 className="input-field w-full pl-10"
             />

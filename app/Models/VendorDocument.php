@@ -36,8 +36,11 @@ class VendorDocument extends Model
 
     // Verification status constants
     const STATUS_PENDING = 'pending';
+
     const STATUS_VERIFIED = 'verified';
+
     const STATUS_REJECTED = 'rejected';
+
     const STATUS_EXPIRED = 'expired';
 
     public function vendor(): BelongsTo

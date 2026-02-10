@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
-import { AdminLayout, PageHeader, Card, StatCard, Button, Badge, DataTable, FormInput, FormSelect } from '@/Components';
+import {
+    AdminLayout,
+    PageHeader,
+    Card,
+    StatCard,
+    Button,
+    Badge,
+    DataTable,
+    FormInput,
+    FormSelect,
+} from '@/Components';
 
 export default function PaymentReport({ payments, stats, filters }) {
     const { auth } = usePage().props;
@@ -57,11 +67,15 @@ export default function PaymentReport({ payments, stats, filters }) {
         { key: 'invoice_number', label: 'Invoice #', render: (row) => row.invoice_number || '-' },
         { key: 'amount', label: 'Amount', render: (row) => formatCurrency(row.amount) },
         { key: 'status', label: 'Status', render: (row) => getStatusBadge(row.status) },
-        { key: 'created_at', label: 'Requested', render: (row) => new Date(row.created_at).toLocaleDateString() },
+        {
+            key: 'created_at',
+            label: 'Requested',
+            render: (row) => new Date(row.created_at).toLocaleDateString(),
+        },
     ];
 
     const header = (
-        <PageHeader 
+        <PageHeader
             title="Payment Report"
             subtitle="View and export payment request data"
             actions={
@@ -77,29 +91,29 @@ export default function PaymentReport({ payments, stats, filters }) {
             <div className="space-y-6">
                 {/* Summary Stats */}
                 <div className="grid md:grid-cols-4 gap-4">
-                    <StatCard 
-                        label="Total Amount" 
-                        value={formatCurrency(stats.total_amount)} 
-                        icon="💰" 
-                        color="primary" 
+                    <StatCard
+                        label="Total Amount"
+                        value={formatCurrency(stats.total_amount)}
+                        icon="💰"
+                        color="primary"
                     />
-                    <StatCard 
-                        label="Pending" 
-                        value={`${stats.pending_count} (${formatCurrency(stats.pending_amount)})`} 
-                        icon="⏳" 
-                        color="warning" 
+                    <StatCard
+                        label="Pending"
+                        value={`${stats.pending_count} (${formatCurrency(stats.pending_amount)})`}
+                        icon="⏳"
+                        color="warning"
                     />
-                    <StatCard 
-                        label="Approved" 
-                        value={`${stats.approved_count} (${formatCurrency(stats.approved_amount)})`} 
-                        icon="✅" 
-                        color="info" 
+                    <StatCard
+                        label="Approved"
+                        value={`${stats.approved_count} (${formatCurrency(stats.approved_amount)})`}
+                        icon="✅"
+                        color="info"
                     />
-                    <StatCard 
-                        label="Paid" 
-                        value={`${stats.paid_count} (${formatCurrency(stats.paid_amount)})`} 
-                        icon="💵" 
-                        color="success" 
+                    <StatCard
+                        label="Paid"
+                        value={`${stats.paid_count} (${formatCurrency(stats.paid_amount)})`}
+                        icon="💵"
+                        color="success"
                     />
                 </div>
 
@@ -107,26 +121,38 @@ export default function PaymentReport({ payments, stats, filters }) {
                 <Card title="Filters">
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">Start Date</label>
-                            <FormInput 
-                                type="date" 
-                                value={localFilters.start_date} 
-                                onChange={(e) => setLocalFilters({...localFilters, start_date: e.target.value})}
+                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
+                                Start Date
+                            </label>
+                            <FormInput
+                                type="date"
+                                value={localFilters.start_date}
+                                onChange={(e) =>
+                                    setLocalFilters({ ...localFilters, start_date: e.target.value })
+                                }
                             />
                         </div>
                         <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">End Date</label>
-                            <FormInput 
-                                type="date" 
-                                value={localFilters.end_date} 
-                                onChange={(e) => setLocalFilters({...localFilters, end_date: e.target.value})}
+                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
+                                End Date
+                            </label>
+                            <FormInput
+                                type="date"
+                                value={localFilters.end_date}
+                                onChange={(e) =>
+                                    setLocalFilters({ ...localFilters, end_date: e.target.value })
+                                }
                             />
                         </div>
                         <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">Status</label>
-                            <FormSelect 
-                                value={localFilters.status} 
-                                onChange={(val) => setLocalFilters({...localFilters, status: val})}
+                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
+                                Status
+                            </label>
+                            <FormSelect
+                                value={localFilters.status}
+                                onChange={(val) =>
+                                    setLocalFilters({ ...localFilters, status: val })
+                                }
                                 options={statusOptions}
                             />
                         </div>
@@ -143,12 +169,12 @@ export default function PaymentReport({ payments, stats, filters }) {
 
                 {/* Data Table */}
                 <Card title={`Payment Records (${payments?.data?.length || 0} shown)`}>
-                    <DataTable 
-                        columns={columns} 
+                    <DataTable
+                        columns={columns}
                         data={payments?.data || []}
                         emptyMessage="No payment records found for the selected filters."
                     />
-                    
+
                     {/* Pagination */}
                     {payments?.links && payments.links.length > 3 && (
                         <div className="p-4 border-t border-(--color-border-primary) flex justify-center gap-2">
@@ -157,8 +183,8 @@ export default function PaymentReport({ payments, stats, filters }) {
                                     key={idx}
                                     href={link.url || '#'}
                                     className={`px-3 py-1 rounded text-sm ${
-                                        link.active 
-                                            ? 'bg-(--color-brand-primary) text-white' 
+                                        link.active
+                                            ? 'bg-(--color-brand-primary) text-white'
                                             : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-tertiary)'
                                     }`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}

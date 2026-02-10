@@ -41,10 +41,10 @@ class HandleInertiaRequests extends Middleware
         // Use lazy evaluation to prevent unnecessary queries
         return [
             ...parent::share($request),
-            'auth' => fn() => $this->getAuthData($user),
+            'auth' => fn () => $this->getAuthData($user),
             'flash' => [
-                'success' => fn() => $request->session()->get('success'),
-                'error' => fn() => $request->session()->get('error'),
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
         ];
     }
@@ -54,7 +54,7 @@ class HandleInertiaRequests extends Middleware
      */
     protected function getAuthData($user): array
     {
-        if (!$user) {
+        if (! $user) {
             return [
                 'user' => null,
                 'roles' => [],
@@ -82,7 +82,7 @@ class HandleInertiaRequests extends Middleware
 
             // Get unique permissions
             $permissions = $user->roles
-                ->flatMap(fn($role) => $role->permissions->pluck('name'))
+                ->flatMap(fn ($role) => $role->permissions->pluck('name'))
                 ->unique()
                 ->values()
                 ->toArray();
@@ -122,7 +122,7 @@ class HandleInertiaRequests extends Middleware
 
                     // Admin access
                     'view_audit' => $isSuperAdmin,
-                    'view_reports' => !$isVendor,
+                    'view_reports' => ! $isVendor,
                     'is_staff' => $isStaff,
 
                     // View permissions for reports (using dot notation keys)

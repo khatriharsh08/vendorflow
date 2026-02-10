@@ -29,7 +29,9 @@ class ComplianceResult extends Model
 
     // Status constants
     const STATUS_PASS = 'pass';
+
     const STATUS_FAIL = 'fail';
+
     const STATUS_WARNING = 'warning';
 
     public function vendor(): BelongsTo

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Vendor;
-use App\Models\ComplianceRule;
+use App\Http\Requests\Admin\UpdateComplianceRuleRequest;
 use App\Models\ComplianceResult;
+use App\Models\ComplianceRule;
+use App\Models\Vendor;
 use App\Services\ComplianceService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ComplianceController extends Controller
@@ -49,7 +48,7 @@ class ComplianceController extends Controller
             ->get();
 
         $rules = ComplianceRule::withCount([
-            'results as failures_count' => fn($q) => $q->where('status', 'fail')->whereNull('resolved_at')
+            'results as failures_count' => fn ($q) => $q->where('status', 'fail')->whereNull('resolved_at'),
         ])->get();
 
         return Inertia::render('Admin/Compliance/Dashboard', [
@@ -100,7 +99,7 @@ class ComplianceController extends Controller
     {
         $results = $this->complianceService->evaluateAllVendors();
 
-        return back()->with('success', 'Compliance evaluation completed for ' . count($results) . ' vendors.');
+        return back()->with('success', 'Compliance evaluation completed for '.count($results).' vendors.');
     }
 
     /**
@@ -118,14 +117,9 @@ class ComplianceController extends Controller
     /**
      * Update a compliance rule.
      */
-    public function updateRule(Request $request, ComplianceRule $rule)
+    public function updateRule(UpdateComplianceRuleRequest $request, ComplianceRule $rule)
     {
-        $validated = $request->validate([
-            'is_active' => 'boolean',
-            'penalty_points' => 'integer|min:0|max:100',
-            'blocks_payment' => 'boolean',
-            'blocks_activation' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $rule->update($validated);
 

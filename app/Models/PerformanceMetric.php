@@ -26,8 +26,11 @@ class PerformanceMetric extends Model
 
     // Metric constants
     const DELIVERY_TIMELINESS = 'delivery_timeliness';
+
     const ISSUE_FREQUENCY = 'issue_frequency';
+
     const OPS_RATING = 'ops_rating';
+
     const CONTRACT_ADHERENCE = 'contract_adherence';
 
     public function scores(): HasMany

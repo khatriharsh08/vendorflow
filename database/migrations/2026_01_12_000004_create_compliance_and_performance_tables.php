@@ -20,7 +20,7 @@ return new class extends Migration
                 'document_required',
                 'document_expiry',
                 'performance_threshold',
-                'custom'
+                'custom',
             ]);
             $table->json('conditions'); // JSON rules configuration
             $table->enum('severity', ['low', 'medium', 'high', 'critical'])->default('medium');
@@ -36,17 +36,17 @@ return new class extends Migration
             $table->id();
             $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
             $table->foreignId('compliance_rule_id')->constrained()->onDelete('cascade');
-            
+
             $table->enum('status', ['pass', 'fail', 'warning'])->default('warning');
             $table->text('details')->nullable();
             $table->json('metadata')->nullable();
-            
+
             $table->timestamp('evaluated_at');
             $table->timestamp('resolved_at')->nullable();
             $table->foreignId('resolved_by')->nullable()->constrained('users');
-            
+
             $table->timestamps();
-            
+
             $table->index(['vendor_id', 'status']);
             $table->index('evaluated_at');
         });
@@ -69,15 +69,15 @@ return new class extends Migration
             $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
             $table->foreignId('performance_metric_id')->constrained()->onDelete('cascade');
             $table->foreignId('scored_by')->constrained('users');
-            
+
             $table->integer('score'); // 0-100
             $table->text('notes')->nullable();
             $table->date('period_start');
             $table->date('period_end');
-            
+
             $table->timestamps();
             // No update allowed after creation - immutable
-            
+
             $table->index(['vendor_id', 'period_end']);
         });
     }

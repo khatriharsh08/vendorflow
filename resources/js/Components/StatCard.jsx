@@ -1,15 +1,15 @@
 // Professional StatCard Component with refined styling
-export default function StatCard({ 
-    label, 
-    value, 
-    icon, 
+export default function StatCard({
+    label,
+    value,
+    icon,
     color = 'primary', // 'primary', 'success', 'warning', 'danger', 'info'
     trend = null, // { value: '+12%', positive: true }
     onClick = null,
-    className = ''
+    className = '',
 }) {
     const Component = onClick ? 'button' : 'div';
-    
+
     // Professional icon backgrounds using global variables
     const iconStyles = {
         primary: 'icon-bg-primary',
@@ -18,9 +18,9 @@ export default function StatCard({
         danger: 'icon-bg-danger',
         info: 'icon-bg-info',
     };
-    
+
     return (
-        <Component 
+        <Component
             onClick={onClick}
             className={`
                 bg-(--color-bg-primary) rounded-xl p-3 border border-(--color-border-primary)
@@ -41,7 +41,9 @@ export default function StatCard({
                         {label}
                     </div>
                 </div>
-                <div className={`p-2 rounded-lg flex-shrink-0 ${iconStyles[color]} opacity-80 group-hover:opacity-100 transition-opacity`}>
+                <div
+                    className={`p-2 rounded-lg flex-shrink-0 ${iconStyles[color]} opacity-80 group-hover:opacity-100 transition-opacity`}
+                >
                     <span className="text-lg leading-none block">{icon}</span>
                 </div>
             </div>
@@ -62,9 +64,5 @@ export function StatGrid({ children, cols = 6 }) {
         6: 'md:grid-cols-3 lg:grid-cols-6',
     };
 
-    return (
-        <div className={`grid gap-4 ${colClasses[cols] || colClasses[6]}`}>
-            {children}
-        </div>
-    );
+    return <div className={`grid gap-4 ${colClasses[cols] || colClasses[6]}`}>{children}</div>;
 }

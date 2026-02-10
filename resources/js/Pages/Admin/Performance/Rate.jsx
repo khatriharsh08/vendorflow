@@ -3,15 +3,16 @@ import { AdminLayout, PageHeader, Card, Button } from '@/Components';
 
 export default function RateVendor({ vendor, metrics = [] }) {
     const form = useForm({
-        ratings: metrics.map(m => ({ metric_id: m.id, score: 7, notes: '' })),
+        ratings: metrics.map((m) => ({ metric_id: m.id, score: 7, notes: '' })),
         period_start: new Date().toISOString().split('T')[0].slice(0, 7) + '-01',
         period_end: new Date().toISOString().split('T')[0],
     });
 
     const updateRating = (metricId, field, value) => {
-        form.setData('ratings', form.data.ratings.map(r => 
-            r.metric_id === metricId ? { ...r, [field]: value } : r
-        ));
+        form.setData(
+            'ratings',
+            form.data.ratings.map((r) => (r.metric_id === metricId ? { ...r, [field]: value } : r))
+        );
     };
 
     const handleSubmit = (e) => {
@@ -20,9 +21,9 @@ export default function RateVendor({ vendor, metrics = [] }) {
     };
 
     const header = (
-        <PageHeader 
-            title="Rate Performance" 
-            subtitle={vendor?.company_name} 
+        <PageHeader
+            title="Rate Performance"
+            subtitle={vendor?.company_name}
             backLink="/admin/performance"
         />
     );
@@ -35,12 +36,26 @@ export default function RateVendor({ vendor, metrics = [] }) {
                     <div className="p-6">
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
-                                <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">Start Date</label>
-                                <input type="date" value={form.data.period_start} onChange={e => form.setData('period_start', e.target.value)} className="input-field w-full" />
+                                <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
+                                    Start Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={form.data.period_start}
+                                    onChange={(e) => form.setData('period_start', e.target.value)}
+                                    className="input-field w-full"
+                                />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">End Date</label>
-                                <input type="date" value={form.data.period_end} onChange={e => form.setData('period_end', e.target.value)} className="input-field w-full" />
+                                <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
+                                    End Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={form.data.period_end}
+                                    onChange={(e) => form.setData('period_end', e.target.value)}
+                                    className="input-field w-full"
+                                />
                             </div>
                         </div>
                     </div>
@@ -49,32 +64,56 @@ export default function RateVendor({ vendor, metrics = [] }) {
                 {/* Metrics Rating */}
                 <Card title="Performance Ratings">
                     <div className="p-6">
-                        <p className="text-sm text-(--color-text-secondary) mb-6">Rate the vendor on each metric from 0 to 10. Scores are immutable once submitted.</p>
+                        <p className="text-sm text-(--color-text-secondary) mb-6">
+                            Rate the vendor on each metric from 0 to 10. Scores are immutable once
+                            submitted.
+                        </p>
                         <div className="space-y-6">
                             {metrics.map((metric) => {
-                                const rating = form.data.ratings.find(r => r.metric_id === metric.id);
+                                const rating = form.data.ratings.find(
+                                    (r) => r.metric_id === metric.id
+                                );
                                 return (
-                                    <div key={metric.id} className="p-4 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)">
+                                    <div
+                                        key={metric.id}
+                                        className="p-4 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
+                                    >
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
-                                                <div className="text-(--color-text-primary) font-medium">{metric.display_name}</div>
-                                                <div className="text-sm text-(--color-text-secondary)">{metric.description}</div>
-                                                <span className="text-xs text-(--color-brand-primary) mt-1 inline-block">Weight: {(metric.weight * 100).toFixed(0)}%</span>
+                                                <div className="text-(--color-text-primary) font-medium">
+                                                    {metric.display_name}
+                                                </div>
+                                                <div className="text-sm text-(--color-text-secondary)">
+                                                    {metric.description}
+                                                </div>
+                                                <span className="text-xs text-(--color-brand-primary) mt-1 inline-block">
+                                                    Weight: {(metric.weight * 100).toFixed(0)}%
+                                                </span>
                                             </div>
-                                            <div className="text-3xl font-bold text-(--color-text-primary)">{rating?.score || 0}/{metric.max_score}</div>
+                                            <div className="text-3xl font-bold text-(--color-text-primary)">
+                                                {rating?.score || 0}/{metric.max_score}
+                                            </div>
                                         </div>
                                         <input
                                             type="range"
                                             min="0"
                                             max={metric.max_score}
                                             value={rating?.score || 0}
-                                            onChange={e => updateRating(metric.id, 'score', parseInt(e.target.value))}
+                                            onChange={(e) =>
+                                                updateRating(
+                                                    metric.id,
+                                                    'score',
+                                                    parseInt(e.target.value)
+                                                )
+                                            }
                                             className="w-full h-2 bg-(--color-bg-tertiary) rounded-lg appearance-none cursor-pointer accent-indigo-500 mb-2"
                                         />
                                         <input
                                             type="text"
                                             value={rating?.notes || ''}
-                                            onChange={e => updateRating(metric.id, 'notes', e.target.value)}
+                                            onChange={(e) =>
+                                                updateRating(metric.id, 'notes', e.target.value)
+                                            }
                                             className="input-field w-full text-sm"
                                             placeholder="Optional notes..."
                                         />
@@ -98,4 +137,3 @@ export default function RateVendor({ vendor, metrics = [] }) {
         </AdminLayout>
     );
 }
-

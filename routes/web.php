@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\VendorController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PerformanceController;
-use App\Http\Controllers\Admin\DashboardController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -28,11 +28,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
 
-        if ($user->isVendor()) {
-            return redirect()->route('vendor.dashboard');
+        // Check for admin/staff roles first
+        if ($user->hasAnyRole([\App\Models\Role::SUPER_ADMIN, \App\Models\Role::OPS_MANAGER, \App\Models\Role::FINANCE_MANAGER])) {
+            return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->route('admin.dashboard');
+        // Default to vendor dashboard for everyone else (including new registrations)
+        return redirect()->route('vendor.dashboard');
     })->middleware(['verified'])->name('dashboard');
 
     // ==========================================
@@ -56,6 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/onboarding/step1', [VendorController::class, 'storeStep1'])->name('onboarding.step1');
         Route::post('/onboarding/step2', [VendorController::class, 'storeStep2'])->name('onboarding.step2');
         Route::post('/onboarding/step3', [VendorController::class, 'storeStep3'])->name('onboarding.step3');
+        Route::get('/onboarding/document/{typeId}', [VendorController::class, 'viewOnboardingDocument'])->name('onboarding.document');
         Route::post('/onboarding/submit', [VendorController::class, 'submitApplication'])->name('onboarding.submit');
         Route::get('/dashboard', [VendorController::class, 'index'])->name('dashboard');
 
@@ -104,7 +107,7 @@ Route::middleware('auth')->group(function () {
                 'status',
                 'performance_score',
                 'compliance_status',
-                'created_at'
+                'created_at',
             ])
                 ->latest();
 
@@ -134,10 +137,10 @@ Route::middleware('auth')->group(function () {
             // Load only essential relationships first
             $vendor->load([
                 'documents:id,vendor_id,document_type_id,file_name,verification_status,expiry_date,created_at' => [
-                    'documentType:id,name,display_name'
+                    'documentType:id,name,display_name',
                 ],
                 'stateLogs:id,vendor_id,user_id,from_status,to_status,comment,created_at' => [
-                    'user:id,name'
+                    'user:id,name',
                 ],
             ]);
 
@@ -145,10 +148,10 @@ Route::middleware('auth')->group(function () {
             if (in_array($vendor->status, ['approved', 'active'])) {
                 $vendor->load([
                     'complianceResults:id,vendor_id,compliance_rule_id,status,details,evaluated_at' => [
-                        'rule:id,name,description'
+                        'rule:id,name,description',
                     ],
                     'performanceScores:id,vendor_id,performance_metric_id,score,period_start,period_end' => [
-                        'metric:id,name,display_name'
+                        'metric:id,name,display_name',
                     ],
                 ]);
             }
@@ -165,6 +168,7 @@ Route::middleware('auth')->group(function () {
                 'to_status' => 'active',
                 'comment' => $request->comment ?? 'Vendor approved',
             ]);
+
             return back()->with('success', 'Vendor approved and activated!');
         })->name('vendors.approve');
 
@@ -176,6 +180,7 @@ Route::middleware('auth')->group(function () {
                 'to_status' => 'rejected',
                 'comment' => $request->comment ?? 'Vendor rejected',
             ]);
+
             return back()->with('success', 'Vendor rejected.');
         })->name('vendors.reject');
 
@@ -187,6 +192,7 @@ Route::middleware('auth')->group(function () {
                 'to_status' => 'active',
                 'comment' => $request->comment ?? 'Vendor activated',
             ]);
+
             return back()->with('success', 'Vendor activated!');
         })->name('vendors.activate');
 
@@ -198,11 +204,13 @@ Route::middleware('auth')->group(function () {
                 'to_status' => 'suspended',
                 'comment' => $request->comment ?? 'Vendor suspended',
             ]);
+
             return back()->with('success', 'Vendor suspended.');
         })->name('vendors.suspend');
 
         Route::post('/vendors/{vendor}/notes', function (\App\Models\Vendor $vendor, \Illuminate\Http\Request $request) {
             $vendor->update(['internal_notes' => $request->internal_notes]);
+
             return back()->with('success', 'Notes saved.');
         })->name('vendors.notes');
 
@@ -251,6 +259,7 @@ Route::middleware('auth')->group(function () {
                     ->latest()
                     ->paginate(50);
             });
+
             return Inertia::render('Admin/Audit/Index', ['logs' => $logs->items()]);
         })->name('audit.index');
 
@@ -265,6 +274,7 @@ Route::middleware('auth')->group(function () {
                 'pending_payments' => \App\Models\PaymentRequest::whereIn('status', ['requested', 'pending_ops', 'pending_finance'])->count(),
                 'total_paid' => \App\Models\PaymentRequest::where('status', 'paid')->sum('amount'),
             ];
+
             return Inertia::render('Admin/Reports/Index', ['stats' => $stats]);
         })->name('reports.index');
 
@@ -306,7 +316,7 @@ require __DIR__ . '/auth.php';
 Route::fallback(function () {
     $user = auth()->user();
 
-    if (!$user) {
+    if (! $user) {
         return redirect('/');
     }
 

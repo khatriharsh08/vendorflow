@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Vendor;
-use App\Models\VendorDocument;
 use App\Models\User;
+use App\Models\VendorDocument;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Notification;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Notification;
 class SendExpiryReminders extends Command
 {
     protected $signature = 'vendors:expiry-reminders';
+
     protected $description = 'Send reminders for documents expiring soon';
 
     public function handle(): int
@@ -29,7 +29,7 @@ class SendExpiryReminders extends Command
 
         foreach ($expiringDocs as $doc) {
             $daysUntilExpiry = Carbon::now()->diffInDays($doc->expiry_date, false);
-            
+
             // Send reminders at 30, 15, 7, 3, 1 days before expiry
             if (in_array($daysUntilExpiry, [30, 15, 7, 3, 1])) {
                 $this->createNotification($doc, $daysUntilExpiry);
@@ -66,9 +66,11 @@ class SendExpiryReminders extends Command
         $vendor = $doc->vendor;
         $user = $vendor->user;
 
-        if (!$user) return;
+        if (! $user) {
+            return;
+        }
 
-        $message = $isExpired 
+        $message = $isExpired
             ? "Your {$doc->documentType->display_name} has expired. Please upload a new document."
             : "Your {$doc->documentType->display_name} will expire in {$daysRemaining} days. Please renew it.";
 

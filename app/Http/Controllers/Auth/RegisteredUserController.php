@@ -32,7 +32,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|in:vendor,ops_manager,finance_manager',
         ]);
@@ -44,9 +44,23 @@ class RegisteredUserController extends Controller
         ]);
 
         // Assign role
-        $user->assignRole($request->role);
+        // Assign role
+        $roleName = $request->role;
+        $user->assignRole($roleName);
+
+        // Verify role assignment
+        if (! $user->hasRole($roleName)) {
+            // Fallback: Manually attach if trait failed or role name case mismatch
+            $role = \App\Models\Role::where('name', $roleName)->first();
+            if ($role) {
+                $user->roles()->attach($role);
+            }
+        }
 
         event(new Registered($user));
+
+        // Refresh user to ensure relations are loaded if needed (though authenticatable usually reloads)
+        $user = $user->fresh();
 
         Auth::login($user);
 

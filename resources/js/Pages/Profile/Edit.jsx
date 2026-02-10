@@ -1,12 +1,23 @@
 import { useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { VendorLayout, AdminLayout, PageHeader, Card, Button, FormInput, Modal, ModalCancelButton, ModalPrimaryButton, Alert } from '@/Components';
+import {
+    VendorLayout,
+    AdminLayout,
+    PageHeader,
+    Card,
+    Button,
+    FormInput,
+    Modal,
+    ModalCancelButton,
+    ModalPrimaryButton,
+    Alert,
+} from '@/Components';
 
 export default function ProfileEdit() {
     const { auth } = usePage().props;
     const user = auth?.user;
     const isVendor = auth?.roles?.includes('vendor');
-    
+
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [activeSection, setActiveSection] = useState('profile');
 
@@ -40,12 +51,12 @@ export default function ProfileEdit() {
 
     const deleteAccount = () => {
         deleteForm.delete('/profile', {
-            onSuccess: () => window.location.href = '/',
+            onSuccess: () => (window.location.href = '/'),
         });
     };
 
     const Layout = isVendor ? VendorLayout : AdminLayout;
-    const layoutProps = isVendor 
+    const layoutProps = isVendor
         ? { title: 'Profile Settings', activeNav: 'Profile' }
         : { title: 'Profile Settings', activeNav: 'Dashboard' };
 
@@ -136,7 +147,9 @@ export default function ProfileEdit() {
                                 label="Confirm New Password"
                                 type="password"
                                 value={passwordForm.data.password_confirmation}
-                                onChange={(val) => passwordForm.setData('password_confirmation', val)}
+                                onChange={(val) =>
+                                    passwordForm.setData('password_confirmation', val)
+                                }
                                 required
                             />
                             <div className="flex justify-end">
@@ -153,8 +166,8 @@ export default function ProfileEdit() {
                     <Card title="Danger Zone">
                         <div className="p-6">
                             <Alert type="warning" title="Delete Account">
-                                Once you delete your account, all of your data will be permanently removed. 
-                                This action cannot be undone.
+                                Once you delete your account, all of your data will be permanently
+                                removed. This action cannot be undone.
                             </Alert>
                             <div className="mt-6">
                                 <Button variant="danger" onClick={() => setShowDeleteModal(true)}>
@@ -174,8 +187,8 @@ export default function ProfileEdit() {
                 footer={
                     <>
                         <ModalCancelButton onClick={() => setShowDeleteModal(false)} />
-                        <ModalPrimaryButton 
-                            variant="danger" 
+                        <ModalPrimaryButton
+                            variant="danger"
                             onClick={deleteAccount}
                             disabled={!deleteForm.data.password || deleteForm.processing}
                         >

@@ -20,11 +20,14 @@ class PaymentApproval extends Model
 
     // Stages
     const STAGE_OPS_VALIDATION = 'ops_validation';
+
     const STAGE_FINANCE_APPROVAL = 'finance_approval';
 
     // Actions
     const ACTION_APPROVED = 'approved';
+
     const ACTION_REJECTED = 'rejected';
+
     const ACTION_PENDING = 'pending';
 
     public function paymentRequest(): BelongsTo

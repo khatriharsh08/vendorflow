@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Admin\UpdateContactMessageRequest;
+use App\Http\Requests\StoreContactMessageRequest;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,14 +13,9 @@ class ContactController extends Controller
     /**
      * Store a new contact message
      */
-    public function store(Request $request)
+    public function store(StoreContactMessageRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|max:255',
-            'subject' => 'required|string|max:200',
-            'message' => 'required|string|max:5000',
-        ]);
+        $validated = $request->validated();
 
         ContactMessage::create($validated);
 
@@ -79,12 +76,9 @@ class ContactController extends Controller
     /**
      * Update message status
      */
-    public function update(Request $request, ContactMessage $contactMessage)
+    public function update(UpdateContactMessageRequest $request, ContactMessage $contactMessage)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:new,read,replied,closed',
-            'admin_notes' => 'nullable|string|max:2000',
-        ]);
+        $validated = $request->validated();
 
         $contactMessage->update($validated);
 

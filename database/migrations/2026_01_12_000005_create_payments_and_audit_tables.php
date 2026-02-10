@@ -16,13 +16,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
             $table->foreignId('requested_by')->constrained('users');
-            
+
             $table->string('reference_number')->unique();
             $table->string('invoice_number')->nullable();
             $table->decimal('amount', 12, 2);
             $table->string('currency', 3)->default('INR');
             $table->text('description');
-            
+
             $table->enum('status', [
                 'requested',
                 'pending_ops',
@@ -30,22 +30,22 @@ return new class extends Migration
                 'approved',
                 'paid',
                 'rejected',
-                'cancelled'
+                'cancelled',
             ])->default('requested');
-            
+
             $table->text('rejection_reason')->nullable();
             $table->boolean('is_duplicate_flagged')->default(false);
             $table->boolean('is_compliance_blocked')->default(false);
-            
+
             // Payment Details
             $table->date('due_date')->nullable();
             $table->date('paid_date')->nullable();
             $table->string('payment_reference')->nullable();
             $table->string('payment_method')->nullable();
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->index('status');
             $table->index('reference_number');
             $table->index(['vendor_id', 'status']);
@@ -55,14 +55,14 @@ return new class extends Migration
         Schema::create('payment_approvals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('payment_request_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained();
-            
+            $table->foreignId('user_id')->nullable()->constrained();
+
             $table->enum('stage', ['ops_validation', 'finance_approval']);
             $table->enum('action', ['approved', 'rejected', 'pending'])->default('pending');
             $table->text('comment')->nullable();
-            
+
             $table->timestamps();
-            
+
             $table->index(['payment_request_id', 'stage']);
         });
 
@@ -80,20 +80,20 @@ return new class extends Migration
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained();
-            
+
             $table->string('auditable_type'); // Model class
             $table->unsignedBigInteger('auditable_id');
             $table->string('event'); // created, updated, deleted, state_changed, approved, rejected
-            
+
             $table->json('old_values')->nullable();
             $table->json('new_values')->nullable();
             $table->text('reason')->nullable();
-            
+
             $table->string('ip_address', 45)->nullable();
             $table->string('user_agent')->nullable();
-            
+
             $table->timestamps();
-            
+
             $table->index(['auditable_type', 'auditable_id']);
             $table->index('user_id');
             $table->index('created_at');

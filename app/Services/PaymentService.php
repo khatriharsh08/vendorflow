@@ -2,20 +2,23 @@
 
 namespace App\Services;
 
-use App\Models\Vendor;
-use App\Models\PaymentRequest;
-use App\Models\PaymentApproval;
+use App\Interfaces\PaymentRepositoryInterface;
 use App\Models\AuditLog;
+use App\Models\PaymentApproval;
+use App\Models\PaymentRequest;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Models\Vendor;
 
 class PaymentService
 {
     protected ComplianceService $complianceService;
 
-    public function __construct(ComplianceService $complianceService)
+    protected PaymentRepositoryInterface $paymentRepository;
+
+    public function __construct(ComplianceService $complianceService, PaymentRepositoryInterface $paymentRepository)
     {
         $this->complianceService = $complianceService;
+        $this->paymentRepository = $paymentRepository;
     }
 
     /**
@@ -35,7 +38,7 @@ class PaymentService
         // Check for duplicate requests
         $this->checkForDuplicates($vendor, $amount, $invoiceNumber);
 
-        $request = PaymentRequest::create([
+        $request = $this->paymentRepository->createRequest([
             'vendor_id' => $vendor->id,
             'requested_by' => $requestedBy->id,
             'reference_number' => $this->generateReferenceNumber(),
@@ -44,11 +47,11 @@ class PaymentService
             'description' => $description,
             'due_date' => $dueDate,
             'status' => PaymentRequest::STATUS_REQUESTED,
-            'is_compliance_blocked' => !$vendor->isCompliant(),
+            'is_compliance_blocked' => ! $vendor->isCompliant(),
         ]);
 
         // Create initial approval record for ops
-        PaymentApproval::create([
+        $this->paymentRepository->createApproval([
             'payment_request_id' => $request->id,
             'user_id' => null,
             'stage' => PaymentApproval::STAGE_OPS_VALIDATION,
@@ -74,7 +77,7 @@ class PaymentService
         }
 
         // Update or create the approval record
-        PaymentApproval::updateOrCreate(
+        $this->paymentRepository->updateOrCreateApproval(
             [
                 'payment_request_id' => $request->id,
                 'stage' => PaymentApproval::STAGE_OPS_VALIDATION,
@@ -87,10 +90,10 @@ class PaymentService
         );
 
         if ($approve) {
-            $request->update(['status' => PaymentRequest::STATUS_PENDING_FINANCE]);
-            
+            $this->paymentRepository->updateRequest($request, ['status' => PaymentRequest::STATUS_PENDING_FINANCE]);
+
             // Create finance approval record
-            PaymentApproval::create([
+            $this->paymentRepository->createApproval([
                 'payment_request_id' => $request->id,
                 'user_id' => null,
                 'stage' => PaymentApproval::STAGE_FINANCE_APPROVAL,
@@ -102,7 +105,7 @@ class PaymentService
                 'approved_by' => $opsManager->name,
             ], $comment);
         } else {
-            $request->update([
+            $this->paymentRepository->updateRequest($request, [
                 'status' => PaymentRequest::STATUS_REJECTED,
                 'rejection_reason' => $comment,
             ]);
@@ -131,7 +134,7 @@ class PaymentService
         }
 
         // Update the approval record
-        PaymentApproval::updateOrCreate(
+        $this->paymentRepository->updateOrCreateApproval(
             [
                 'payment_request_id' => $request->id,
                 'stage' => PaymentApproval::STAGE_FINANCE_APPROVAL,
@@ -144,7 +147,7 @@ class PaymentService
         );
 
         if ($approve) {
-            $request->update(['status' => PaymentRequest::STATUS_APPROVED]);
+            $this->paymentRepository->updateRequest($request, ['status' => PaymentRequest::STATUS_APPROVED]);
 
             AuditLog::log(AuditLog::EVENT_APPROVED, $request, null, [
                 'stage' => 'finance_approval',
@@ -152,7 +155,7 @@ class PaymentService
                 'amount' => $request->amount,
             ], $comment);
         } else {
-            $request->update([
+            $this->paymentRepository->updateRequest($request, [
                 'status' => PaymentRequest::STATUS_REJECTED,
                 'rejection_reason' => $comment,
             ]);
@@ -175,7 +178,7 @@ class PaymentService
             throw new \Exception('Payment has not been approved yet.');
         }
 
-        $request->update([
+        $this->paymentRepository->updateRequest($request, [
             'status' => PaymentRequest::STATUS_PAID,
             'paid_date' => now(),
             'payment_reference' => $paymentReference,
@@ -196,11 +199,11 @@ class PaymentService
      */
     protected function validateVendorCanRequestPayment(Vendor $vendor): void
     {
-        if (!$vendor->isActive()) {
+        if (! $vendor->isActive()) {
             throw new \Exception('Only active vendors can request payments.');
         }
 
-        if (!$vendor->isCompliant()) {
+        if (! $vendor->isCompliant()) {
             throw new \Exception('Vendor is not compliant. Please resolve compliance issues first.');
         }
     }
@@ -210,21 +213,7 @@ class PaymentService
      */
     protected function checkForDuplicates(Vendor $vendor, float $amount, ?string $invoiceNumber): void
     {
-        $recentRequests = PaymentRequest::where('vendor_id', $vendor->id)
-            ->where('created_at', '>=', now()->subDays(30))
-            ->where(function ($query) use ($amount, $invoiceNumber) {
-                $query->where('amount', $amount);
-                if ($invoiceNumber) {
-                    $query->orWhere('invoice_number', $invoiceNumber);
-                }
-            })
-            ->whereNotIn('status', [
-                PaymentRequest::STATUS_REJECTED,
-                PaymentRequest::STATUS_CANCELLED,
-            ])
-            ->exists();
-
-        if ($recentRequests) {
+        if ($this->paymentRepository->existsRecentDuplicate($vendor->id, $amount, $invoiceNumber)) {
             throw new \Exception('A similar payment request already exists within the last 30 days.');
         }
     }
@@ -234,6 +223,6 @@ class PaymentService
      */
     protected function generateReferenceNumber(): string
     {
-        return 'PAY-' . strtoupper(uniqid()) . '-' . date('Ymd');
+        return 'PAY-'.strtoupper(uniqid()).'-'.date('Ymd');
     }
 }

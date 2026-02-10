@@ -3,12 +3,12 @@ import { useState } from 'react';
 /**
  * Reusable Document Viewer Modal
  * Use this component to view documents in a popup across the application.
- * 
+ *
  * Usage:
- * <DocumentViewer 
- *     document={selectedDocument} 
- *     isOpen={showViewer} 
- *     onClose={() => setShowViewer(false)} 
+ * <DocumentViewer
+ *     document={selectedDocument}
+ *     isOpen={showViewer}
+ *     onClose={() => setShowViewer(false)}
  * />
  */
 export function DocumentViewer({ document, isOpen, onClose }) {
@@ -19,7 +19,7 @@ export function DocumentViewer({ document, isOpen, onClose }) {
 
     const viewUrl = `/documents/${document.id}/view`;
     const downloadUrl = `/documents/${document.id}/download`;
-    
+
     // Determine file type for proper rendering
     const fileName = document.file_name || '';
     const isPdf = fileName.toLowerCase().endsWith('.pdf');
@@ -41,16 +41,12 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-gray-200">
                     <div className="flex items-center gap-3">
-                        <span className="text-2xl">
-                            {isPdf ? '📄' : isImage ? '🖼️' : '📎'}
-                        </span>
+                        <span className="text-2xl">{isPdf ? '📄' : isImage ? '🖼️' : '📎'}</span>
                         <div>
                             <h3 className="font-semibold text-gray-900 truncate max-w-md">
                                 {document.document_type?.display_name || 'Document'}
                             </h3>
-                            <p className="text-sm text-gray-500 truncate max-w-md">
-                                {fileName}
-                            </p>
+                            <p className="text-sm text-gray-500 truncate max-w-md">{fileName}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -58,8 +54,18 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                             href={downloadUrl}
                             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors inline-flex items-center gap-2"
                         >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
                             </svg>
                             Download
                         </a>
@@ -67,8 +73,18 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                             onClick={onClose}
                             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
                             </svg>
                         </button>
                     </div>
@@ -84,7 +100,7 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                             </div>
                         </div>
                     )}
-                    
+
                     {error ? (
                         <div className="flex flex-col items-center justify-center h-full gap-4">
                             <span className="text-4xl">⚠️</span>
@@ -134,18 +150,23 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                     <div className="flex items-center justify-between text-sm text-gray-500">
                         <div className="flex items-center gap-4">
                             {document.verification_status && (
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    document.verification_status === 'approved' || document.verification_status === 'verified' 
-                                        ? 'bg-green-100 text-green-700' 
-                                        : document.verification_status === 'rejected' 
-                                        ? 'bg-red-100 text-red-700' 
-                                        : 'bg-yellow-100 text-yellow-700'
-                                }`}>
+                                <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                        document.verification_status === 'approved' ||
+                                        document.verification_status === 'verified'
+                                            ? 'bg-green-100 text-green-700'
+                                            : document.verification_status === 'rejected'
+                                              ? 'bg-red-100 text-red-700'
+                                              : 'bg-yellow-100 text-yellow-700'
+                                    }`}
+                                >
                                     {document.verification_status}
                                 </span>
                             )}
                             {document.created_at && (
-                                <span>Uploaded: {new Date(document.created_at).toLocaleDateString()}</span>
+                                <span>
+                                    Uploaded: {new Date(document.created_at).toLocaleDateString()}
+                                </span>
                             )}
                         </div>
                     </div>

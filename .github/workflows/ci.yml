@@ -20,8 +20,11 @@ jobs:
                   extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
                   coverage: none
 
-            - name: Copy .env
-              run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+            - name: Copy environment files
+              run: |
+                php -r "file_exists('.env') || copy('.env.example', '.env');"
+                # ensure testing env exists (committed above)
+                php -r "file_exists('.env.testing') || copy('.env.testing', '.env.testing');"
 
             - name: Install Dependencies
               run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
@@ -44,7 +47,7 @@ jobs:
               run: chmod -R 777 storage bootstrap/cache
 
             - name: Execute tests (Unit and Feature) via Artisan
-              # using `artisan test` ensures the correct environment and migration
+              # using the dedicated testing environment file guarantees sqlite in-memory
               run: php artisan test --env=testing
 
             - name: Run PHPStan

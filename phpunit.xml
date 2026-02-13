@@ -5,6 +5,11 @@
          colors="true"
 >
     <testsuites>
+        <!--
+            Unit directory may be empty during initial setup.  Git doesn't track
+            empty folders, so include a .gitkeep (or at least one test) to
+            prevent PHPUnit from failing with "directory not found" in CI.
+        -->
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
         </testsuite>

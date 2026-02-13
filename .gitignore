@@ -1,216 +1,75 @@
-# ========================================
-# VendorFlow - Professional .gitignore
-# Laravel + React/Inertia.js Project
-# ========================================
+# Generated .gitignore for VendorFlow
+# Based on default Laravel + Node.js templates, cleaned and structured.
 
-# ----------------------------------------
-# Core Dependencies
-# ----------------------------------------
+### Dependencies ----------------------------------------------------------
 /vendor/
 /node_modules/
 
-# ----------------------------------------
-# Environment & Configuration
-# ----------------------------------------
+# lock files
+package-lock.json
+npm-shrinkwrap.json
+yarn.lock
+pnpm-lock.yaml
+
+### Environment & Secrets --------------------------------------------------
 .env
 .env.*
-!.env.example
-.env.backup
-.env.production
-.env.staging
-.env.local
-.env.testing
 auth.json
 
-# ----------------------------------------
-# Build Output & Public Assets
-# ----------------------------------------
+### Build artifacts & output ---------------------------------------------
 /public/build/
 /public/hot
 /public/storage
 /public/mix-manifest.json
-/public/js/
-/public/css/
-!/public/js/.gitkeep
-!/public/css/.gitkeep
 
-# ----------------------------------------
-# Laravel Storage & Framework
-# ----------------------------------------
+### Laravel storage and cache -------------------------------------------
 /storage/*.key
-/storage/pail/
 /storage/app/public/*
-!/storage/app/public/.gitkeep
-/storage/app/vendor-documents/
-/storage/app/temp/
 /storage/framework/cache/data/*
-!/storage/framework/cache/data/.gitkeep
 /storage/framework/sessions/*
-!/storage/framework/sessions/.gitkeep
 /storage/framework/testing/*
-!/storage/framework/testing/.gitkeep
 /storage/framework/views/*
-!/storage/framework/views/.gitkeep
 /storage/logs/*
-!/storage/logs/.gitkeep
-/storage/debugbar/
-# /storage/telescope/
 
-# ----------------------------------------
-# Testing & Code Quality
-# ----------------------------------------
+# keep empty directories
+!*/.gitkeep
+
+### Testing / QA artefacts -----------------------------------------------
 /coverage/
 .phpunit.cache/
 .phpunit.result.cache
-.try-cache/
 .php-cs-fixer.cache
 .phpactor.json
 phpstan.neon
 .phpstan.cache/
-phpunit.xml
 junit.xml
 clover.xml
 .pest/
-.pest.php
 
-# ----------------------------------------
-# Logs & Debugging
-# ----------------------------------------
+# phpunit.xml should generally be committed; ignore if generated locally
+# but allow the distributed copy
+phpunit.xml
+!phpunit.xml.dist
+
+### IDEs & Editors --------------------------------------------------------
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*.iml
+*.sublime-workspace
+
+### OS generated files ----------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+### Logs ------------------------------------------------------------------
 *.log
-*.logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-_ray_log.txt
 
-# ----------------------------------------
-# Package Managers & Tooling
-# ----------------------------------------
-composer.phar
-.npm/
-.yarn/
-.pnpm-store/
-package-lock.json.bak
-.sass-cache/
-
-# ----------------------------------------
-# IDEs & Editors
-# ----------------------------------------
-# JetBrains
-.idea/
-*.iml
-*.ipr
-*.iws
-.idea_modules/
-
-# VS Code
-.vscode/
-*.code-workspace
-.history/
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# Vim/Neovim
-*.swp
-*.swo
-.netrwhist
-tags
-
-# Emacs
-*~
-\#*\#
-.emacs.desktop
-.emacs.desktop.lock
-.elc
-auto-save-list
-
-# Editors
-.nova/
-.zed/
-.fleet/
-
-# ----------------------------------------
-# Operating System Files
-# ----------------------------------------
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-.Spotlight-V100
-.Trashes
-.fseventsd
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
-# Windows
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-*.stackdump
-[Dd]esktop.ini
-$RECYCLE.BIN/
-*.lnk
-
-# Linux
-.fuse_hidden*
-.directory
-.Trash-*
-.nfs*
-
-# ----------------------------------------
-# Docker & Virtualization
-# ----------------------------------------
-.docker/
-docker-compose.override.yml
-.docker-sync.yml
-Homestead.json
-Homestead.yaml
-.vagrant/
-.sail/
-
-# ----------------------------------------
-# Deployment & CI/CD
-# ----------------------------------------
-.deployer/
-deploy.php
-.github/workflows/*.local.yml
-.vapor/
-.forge/
-
-# ----------------------------------------
-# Security & Secrets
-# ----------------------------------------
-*.pem
-*.key
-*.crt
-*.p12
-*.pfx
-id_rsa*
-*.pub
-secrets/
-credentials/
-
-# ----------------------------------------
-# Project Specific & Micellaneous
-# ----------------------------------------
-.agent/
-.agents/
-files/
-/final-submission-report/
-*.bak
-*.backup
-*.sql
-*.sql.gz
-/database/backups/
-*.cache
-*.tmp
-*.temp
-*.pid
-*.seed
-*.pid.lock
+### Project-specific ------------------------------------------------------
+/database/*.sqlite
+/database/*.sqlite-journal

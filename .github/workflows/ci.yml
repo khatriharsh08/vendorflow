@@ -43,16 +43,9 @@ jobs:
             - name: Directory Permissions
               run: chmod -R 777 storage bootstrap/cache
 
-            - name: Create Database
-              run: |
-                  mkdir -p database
-                  touch database/database.sqlite
-
-            - name: Execute tests (Unit and Feature) via PHPUnit
-              env:
-                  DB_CONNECTION: sqlite
-                  DB_DATABASE: database/database.sqlite
-              run: vendor/bin/phpunit
+            - name: Execute tests (Unit and Feature) via Artisan
+              # using `artisan test` ensures the correct environment and migration
+              run: php artisan test --env=testing
 
             - name: Run PHPStan
               run: vendor/bin/phpstan analyse --no-progress

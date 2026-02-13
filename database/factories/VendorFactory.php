@@ -37,7 +37,7 @@ class VendorFactory extends Factory
             'state' => $this->faker->state(),
             'country' => $this->faker->country(),
             'pincode' => $this->faker->postcode(),
-            'bank_name' => $this->faker->company() . ' Bank',
+            'bank_name' => $this->faker->company().' Bank',
             'bank_account_number' => $this->faker->bankAccountNumber(),
             'bank_ifsc' => $this->faker->bothify('????0######'),
             'status' => Vendor::STATUS_DRAFT,

@@ -17,11 +17,11 @@ Route::get('/', function () {
 });
 
 // Static pages
-Route::get('/about', fn() => Inertia::render('About'))->name('about');
-Route::get('/contact', fn() => Inertia::render('Contact'))->name('contact');
+Route::get('/about', fn () => Inertia::render('About'))->name('about');
+Route::get('/contact', fn () => Inertia::render('Contact'))->name('contact');
 Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
-Route::get('/privacy', fn() => Inertia::render('Privacy'))->name('privacy');
-Route::get('/terms', fn() => Inertia::render('Terms'))->name('terms');
+Route::get('/privacy', fn () => Inertia::render('Privacy'))->name('privacy');
+Route::get('/terms', fn () => Inertia::render('Terms'))->name('terms');
 
 Route::middleware('auth')->group(function () {
     // Default Dashboard - redirects based on role
@@ -253,7 +253,7 @@ Route::middleware('auth')->group(function () {
         // AUDIT LOG ROUTES - Cached for 1 minute
         // ==========================================
         Route::get('/audit', function () {
-            $logs = Cache::remember('audit_logs_page_' . request('page', 1), 60, function () {
+            $logs = Cache::remember('audit_logs_page_'.request('page', 1), 60, function () {
                 return \App\Models\AuditLog::with('user:id,name')
                     ->select(['id', 'user_id', 'event', 'auditable_type', 'auditable_id', 'reason', 'ip_address', 'created_at'])
                     ->latest()
@@ -310,7 +310,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 // Fallback route for undefined routes - redirects to appropriate dashboard
 Route::fallback(function () {

@@ -129,4 +129,18 @@ trait HasRoles
 
         return $role ? $role->display_name : 'No Role';
     }
+
+    /**
+     * Scope a query to only include users with a given role.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $roleName
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRole($query, string $roleName)
+    {
+        return $query->whereHas('roles', function ($q) use ($roleName) {
+            $q->where('name', $roleName);
+        });
+    }
 }

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ==========================================
    VendorFlow - Complete Light Theme Design System
@@ -14,7 +14,7 @@
     --color-brand-primary-hover: #4f46e5;
     --color-brand-primary-light: #e0e7ff;
     --color-brand-primary-dark: #4338ca;
-    
+
     --color-brand-secondary: #8b5cf6;
     --color-brand-secondary-hover: #7c3aed;
     --color-brand-secondary-light: #ede9fe;
@@ -25,19 +25,19 @@
     --color-success-hover: #059669;
     --color-success-light: #d1fae5;
     --color-success-dark: #047857;
-    
+
     /* Warning */
     --color-warning: #f59e0b;
     --color-warning-hover: #d97706;
     --color-warning-light: #fef3c7;
     --color-warning-dark: #b45309;
-    
+
     /* Danger */
     --color-danger: #ef4444;
     --color-danger-hover: #dc2626;
     --color-danger-light: #fee2e2;
     --color-danger-dark: #b91c1c;
-    
+
     /* Info */
     --color-info: #3b82f6;
     --color-info-hover: #2563eb;
@@ -52,7 +52,7 @@
     --color-bg-hover: #f8fafc;
     --color-bg-active: #f1f5f9;
     --color-bg-muted: #e2e8f0;
-    
+
     /* Text */
     --color-text-primary: #0f172a;
     --color-text-secondary: #334155;
@@ -60,7 +60,7 @@
     --color-text-muted: #94a3b8;
     --color-text-placeholder: #94a3b8;
     --color-text-inverse: #ffffff;
-    
+
     /* Border */
     --color-border-primary: #e2e8f0;
     --color-border-secondary: #f1f5f9;
@@ -75,14 +75,14 @@
     --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
     --gradient-info: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
     --gradient-page: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-    
+
     /* ========== SHADOWS ========== */
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
     --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
-    
+
     /* Colored Shadows */
     --shadow-primary: 0 4px 14px 0 rgb(99 102 241 / 0.25);
     --shadow-success: 0 4px 14px 0 rgb(16 185 129 / 0.25);
@@ -115,7 +115,6 @@
 /* ==========================================
    BASE STYLES
    ========================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 html {
     font-size: 16px;
@@ -135,40 +134,65 @@ body {
    ========================================== */
 
 /* Backgrounds */
-.bg-page { background: var(--gradient-page); }
-.bg-card { background: var(--color-bg-primary); }
-.bg-muted { background: var(--color-bg-tertiary); }
-.bg-hover { background: var(--color-bg-hover); }
+.bg-page {
+    background: var(--gradient-page);
+}
+.bg-card {
+    background: var(--color-bg-primary);
+}
+.bg-muted {
+    background: var(--color-bg-tertiary);
+}
+.bg-hover {
+    background: var(--color-bg-hover);
+}
 
 /* Text Colors */
-.text-primary { color: var(--color-text-primary); }
-.text-secondary { color: var(--color-text-secondary); }
-.text-muted { color: var(--color-text-tertiary); }
-.text-placeholder { color: var(--color-text-muted); }
+.text-primary {
+    color: var(--color-text-primary);
+}
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+.text-muted {
+    color: var(--color-text-tertiary);
+}
+.text-placeholder {
+    color: var(--color-text-muted);
+}
 
 /* Border Colors */
-.border-default { border-color: var(--color-border-primary); }
-.border-light { border-color: var(--color-border-secondary); }
+.border-default {
+    border-color: var(--color-border-primary);
+}
+.border-light {
+    border-color: var(--color-border-secondary);
+}
 
 /* ==========================================
    CARD COMPONENT
    ========================================== */
-.card {
-    background: var(--color-bg-primary);
-    border: 1px solid var(--color-border-primary);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-sm);
-}
-
-.card:hover {
-    box-shadow: var(--shadow-md);
-}
-
+/* Glassmorphism */
 .glass-card {
-    background: var(--color-bg-primary);
-    border: 1px solid var(--color-border-primary);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.dark .glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.glass-modal {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* ==========================================
@@ -236,15 +260,39 @@ body {
     text-transform: capitalize;
 }
 
-.badge-default { background: var(--color-bg-tertiary); color: var(--color-text-tertiary); }
-.badge-primary { background: var(--color-brand-primary-light); color: var(--color-brand-primary-dark); }
-.badge-success { background: var(--color-success-light); color: var(--color-success-dark); }
-.badge-warning { background: var(--color-warning-light); color: var(--color-warning-dark); }
-.badge-danger { background: var(--color-danger-light); color: var(--color-danger-dark); }
-.badge-info { background: var(--color-info-light); color: var(--color-info-dark); }
+.badge-default {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-tertiary);
+}
+.badge-primary {
+    background: var(--color-brand-primary-light);
+    color: var(--color-brand-primary-dark);
+}
+.badge-success {
+    background: var(--color-success-light);
+    color: var(--color-success-dark);
+}
+.badge-warning {
+    background: var(--color-warning-light);
+    color: var(--color-warning-dark);
+}
+.badge-danger {
+    background: var(--color-danger-light);
+    color: var(--color-danger-dark);
+}
+.badge-info {
+    background: var(--color-info-light);
+    color: var(--color-info-dark);
+}
 
-.badge-solid-success { background: var(--color-success); color: var(--color-text-inverse); }
-.badge-solid-danger { background: var(--color-danger); color: var(--color-text-inverse); }
+.badge-solid-success {
+    background: var(--color-success);
+    color: var(--color-text-inverse);
+}
+.badge-solid-danger {
+    background: var(--color-danger);
+    color: var(--color-text-inverse);
+}
 
 /* ==========================================
    INPUT STYLES
@@ -402,28 +450,43 @@ body {
 /* ==========================================
    ICON BACKGROUNDS
    ========================================== */
-.icon-bg-primary { background: var(--color-brand-primary-light); color: var(--color-brand-primary); }
-.icon-bg-success { background: var(--color-success-light); color: var(--color-success); }
-.icon-bg-warning { background: var(--color-warning-light); color: var(--color-warning); }
-.icon-bg-danger { background: var(--color-danger-light); color: var(--color-danger); }
-.icon-bg-info { background: var(--color-info-light); color: var(--color-info); }
+.icon-bg-primary {
+    background: var(--color-brand-primary-light);
+    color: var(--color-brand-primary);
+}
+.icon-bg-success {
+    background: var(--color-success-light);
+    color: var(--color-success);
+}
+.icon-bg-warning {
+    background: var(--color-warning-light);
+    color: var(--color-warning);
+}
+.icon-bg-danger {
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+}
+.icon-bg-info {
+    background: var(--color-info-light);
+    color: var(--color-info);
+}
 
 /* Gradient Icon Backgrounds */
-.icon-bg-gradient-primary { 
-    background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%); 
-    color: var(--color-brand-primary); 
+.icon-bg-gradient-primary {
+    background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%);
+    color: var(--color-brand-primary);
 }
-.icon-bg-gradient-success { 
-    background: linear-gradient(135deg, #d1fae5 0%, #ccfbf1 100%); 
-    color: var(--color-success); 
+.icon-bg-gradient-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #ccfbf1 100%);
+    color: var(--color-success);
 }
-.icon-bg-gradient-warning { 
-    background: linear-gradient(135deg, #fef3c7 0%, #ffedd5 100%); 
-    color: var(--color-warning); 
+.icon-bg-gradient-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #ffedd5 100%);
+    color: var(--color-warning);
 }
-.icon-bg-gradient-danger { 
-    background: linear-gradient(135deg, #fee2e2 0%, #fce7f3 100%); 
-    color: var(--color-danger); 
+.icon-bg-gradient-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fce7f3 100%);
+    color: var(--color-danger);
 }
 
 /* ==========================================
@@ -451,23 +514,47 @@ body {
    ANIMATIONS
    ========================================== */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-12px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
-.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-.animate-scale-in { animation: scaleIn 0.3s ease-out forwards; }
-.animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+.animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+}
+.animate-slide-in {
+    animation: slideIn 0.4s ease-out forwards;
+}
 
 /* ==========================================
    GRADIENT TEXT

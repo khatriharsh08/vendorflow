@@ -42,7 +42,10 @@ class VendorController extends Controller
             return redirect()->route('vendor.dashboard');
         }
 
-        $documentTypes = DocumentType::where('is_active', true)->get();
+        // Cache document types for 24 hours as they rarely change
+        $documentTypes = \Illuminate\Support\Facades\Cache::remember('document_types_active', 60 * 60 * 24, function () {
+            return DocumentType::where('is_active', true)->get();
+        });
 
         // Get session data for pre-filling if user goes back
         $sessionData = session('vendor_onboarding', []);
@@ -152,7 +155,7 @@ class VendorController extends Controller
 
             return redirect()->route('vendor.dashboard')->with('success', 'Application submitted successfully!');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to submit application: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to submit application: '.$e->getMessage()]);
         }
     }
 
@@ -201,7 +204,10 @@ class VendorController extends Controller
         }
 
         $documents = $vendor->documents()->with('documentType')->get();
-        $documentTypes = DocumentType::where('is_active', true)->get();
+        // Cache document types for 24 hours as they rarely change
+        $documentTypes = \Illuminate\Support\Facades\Cache::remember('document_types_active', 60 * 60 * 24, function () {
+            return DocumentType::where('is_active', true)->get();
+        });
 
         return Inertia::render('Vendor/Documents', [
             'vendor' => $vendor,
@@ -235,7 +241,7 @@ class VendorController extends Controller
 
             return back()->with('success', 'Document uploaded successfully!');
         } catch (\Exception $e) {
-            return back()->withErrors(['upload' => 'Upload failed: ' . $e->getMessage()]);
+            return back()->withErrors(['upload' => 'Upload failed: '.$e->getMessage()]);
         }
     }
 
@@ -277,7 +283,7 @@ class VendorController extends Controller
 
         $vendor->paymentRequests()->create([
             'requested_by' => Auth::id(),
-            'reference_number' => 'PAY-' . strtoupper(uniqid()),
+            'reference_number' => 'PAY-'.strtoupper(uniqid()),
             'amount' => $validated['amount'],
             'description' => $validated['description'],
             'invoice_number' => $validated['invoice_number'],
@@ -352,7 +358,7 @@ class VendorController extends Controller
         }
 
         $vendor->load([
-            'complianceResults' => fn($q) => $q->with('rule'),
+            'complianceResults' => fn ($q) => $q->with('rule'),
         ]);
 
         $rules = \App\Models\ComplianceRule::where('is_active', true)
@@ -380,7 +386,7 @@ class VendorController extends Controller
         }
 
         $vendor->load([
-            'performanceScores' => fn($q) => $q->with('metric')->latest()->take(10),
+            'performanceScores' => fn ($q) => $q->with('metric')->latest()->take(10),
         ]);
 
         $metrics = \App\Models\PerformanceMetric::where('is_active', true)

@@ -145,11 +145,16 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                                 accept=".pdf,.jpg,.jpeg,.png"
                                                 onChange={(e) => {
                                                     if (e.target.files[0])
-                                                        handleFileUpload(docType.id, e.target.files[0]);
+                                                        handleFileUpload(
+                                                            docType.id,
+                                                            e.target.files[0]
+                                                        );
                                                 }}
                                             />
                                             <span className="px-4 py-2 rounded-lg bg-(--color-bg-primary) border border-(--color-border-primary) hover:border-(--color-brand-primary) text-(--color-text-secondary) text-sm font-medium transition-colors">
-                                                {uploadedDocs.find((d) => d.typeId === docType.id) ||
+                                                {uploadedDocs.find(
+                                                    (d) => d.typeId === docType.id
+                                                ) ||
                                                 sessionDocs.find(
                                                     (d) => d.document_type_id === docType.id
                                                 )

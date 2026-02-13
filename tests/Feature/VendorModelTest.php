@@ -69,7 +69,7 @@ class VendorModelTest extends TestCase
      */
     public function test_status_badge_classes()
     {
-        $vendor = new Vendor();
+        $vendor = new Vendor;
 
         $vendor->status = Vendor::STATUS_ACTIVE;
         $this->assertEquals('badge-active', $vendor->getStatusBadgeClass());

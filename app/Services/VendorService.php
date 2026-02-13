@@ -178,6 +178,12 @@ class VendorService
             $tempFolder = 'temp-documents/'.session()->getId();
             Storage::disk('private')->deleteDirectory($tempFolder);
 
+            // Notify Ops Managers
+            $opsManagers = User::role(\App\Models\Role::OPS_MANAGER)->get();
+            foreach ($opsManagers as $manager) {
+                $manager->notify(new \App\Notifications\VendorApplicationSubmitted($vendor));
+            }
+
             return $vendor;
         });
     }

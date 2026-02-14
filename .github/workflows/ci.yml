@@ -48,7 +48,7 @@ jobs:
               run: php artisan test --env=testing
 
             - name: Run PHPStan
-              run: vendor/bin/phpstan analyse --no-progress
+              run: vendor/bin/phpstan analyse app --configuration=phpstan.neon --no-progress
 
     frontend-tests:
         runs-on: ubuntu-latest

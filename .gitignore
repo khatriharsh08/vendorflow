@@ -41,7 +41,6 @@ auth.json
 .phpunit.result.cache
 .php-cs-fixer.cache
 .phpactor.json
-phpstan.neon
 .phpstan.cache/
 junit.xml
 clover.xml

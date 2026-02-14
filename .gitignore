@@ -14,7 +14,7 @@ pnpm-lock.yaml
 ### Environment & Secrets --------------------------------------------------
 .env
 .env.*
-!\.env.testing        # keep testing config in repo; it contains no secrets
+!.env.testing         # keep testing config in repo; it contains no secrets
 auth.json
 
 ### Build artifacts & output ---------------------------------------------

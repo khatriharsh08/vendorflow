@@ -20,11 +20,8 @@ jobs:
                   extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
                   coverage: none
 
-            - name: Copy environment files
-              run: |
-                php -r "file_exists('.env') || copy('.env.example', '.env');"
-                # ensure testing env exists (committed above)
-                php -r "file_exists('.env.testing') || copy('.env.testing', '.env.testing');"
+            - name: Copy .env
+              run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
             - name: Install Dependencies
               run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist

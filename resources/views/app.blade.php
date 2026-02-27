@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -8,17 +8,25 @@
 
     <title inertia>{{ config('app.name', 'VendorFlow') }}</title>
 
-    <!-- Preload critical resources -->
     <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800&display=swap" rel="stylesheet" />
 
-    <!-- Fonts with display swap for faster rendering -->
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('vendorflow-theme') || 'aurora';
+                document.documentElement.dataset.theme = theme;
+                if (theme === 'midnight') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
 
-    <!-- Prevent FOUC -->
     <style>
         html {
-            background: #020617;
+            background: #f6fbff;
         }
 
         .page-loader {
@@ -27,9 +35,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #020617;
+            background: radial-gradient(circle at 10% 10%, rgba(13, 148, 136, 0.16), transparent 45%), #f6fbff;
             z-index: 9999;
-            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            transition: opacity 0.45s ease-out, visibility 0.45s ease-out;
         }
 
         .page-loader.fade-out {
@@ -39,12 +47,12 @@
 
         .page-loader::after {
             content: '';
-            width: 40px;
-            height: 40px;
-            border: 2px solid rgba(99, 102, 241, 0.3);
-            border-top-color: #6366f1;
+            width: 38px;
+            height: 38px;
+            border: 2px solid rgba(15, 118, 110, 0.22);
+            border-top-color: #0f766e;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
@@ -54,26 +62,15 @@
         }
     </style>
 
-    <!-- Scripts -->
     @routes
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     @inertiaHead
 </head>
 
-<body class="font-sans antialiased bg-slate-950 text-slate-100">
+<body class="font-sans antialiased">
     <div id="page-loader" class="page-loader"></div>
     @inertia
-</body>
-<script>
-    // Fallback: Remove loader after 3s if React fails/hangs
-    /* setTimeout(function() {
-        var loader = document.getElementById('page-loader');
-        if (loader && !loader.classList.contains('fade-out')) {
-           // loader.classList.add('fade-out'); // Optional: force remove? Better to let user see blank if broken?
-        }
-    }, 5000); */
-</script>
 </body>
 
 </html>

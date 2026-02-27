@@ -1,14 +1,21 @@
-import { useState } from 'react';
-import { router, usePage } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
+import { router } from '@inertiajs/react';
 
 export default function StepReview({ vendor, sessionData, documentTypes }) {
     const step1Session = sessionData?.step1 || {};
     const step2Session = sessionData?.step2 || {};
+    const normalizeDocumentTypeId = (typeId) => String(typeId ?? '');
+    const documentTypesById = useMemo(() => {
+        const map = new Map();
+
+        (Array.isArray(documentTypes) ? documentTypes : []).forEach((type) => {
+            map.set(normalizeDocumentTypeId(type.id), type);
+        });
+
+        return map;
+    }, [documentTypes]);
 
     const [processing, setProcessing] = useState(false);
-    const { props } = usePage();
-    const errors = props.errors || {};
-
     const submitApplication = () => {
         router.post(
             '/vendor/onboarding/submit',
@@ -145,9 +152,21 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                     {sessionData?.step3?.documents?.length > 0 ? (
                         <div className="space-y-3">
                             {sessionData.step3.documents.map((doc, index) => {
-                                const type = documentTypes?.find(
-                                    (t) => t.id === doc.document_type_id
+                                const type = documentTypesById.get(
+                                    normalizeDocumentTypeId(doc.document_type_id)
                                 );
+                                const displayName =
+                                    type?.display_name ||
+                                    doc?.document_type_name ||
+                                    (doc?.file_name
+                                        ? doc.file_name.replace(/\.[^/.]+$/, '')
+                                        : 'Uploaded Document');
+                                const fileSizeInBytes = Number(doc?.file_size || 0);
+                                const fileSizeLabel =
+                                    Number.isFinite(fileSizeInBytes) && fileSizeInBytes > 0
+                                        ? `${(fileSizeInBytes / 1024).toFixed(1)} KB`
+                                        : '-';
+
                                 return (
                                     <div
                                         key={index}
@@ -171,7 +190,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-medium text-(--color-text-primary)">
-                                                    {type?.display_name || 'Unknown Document'}
+                                                    {displayName}
                                                 </p>
                                                 <p className="text-xs text-(--color-text-tertiary)">
                                                     {doc.file_name}
@@ -179,7 +198,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                             </div>
                                         </div>
                                         <span className="text-xs px-2 py-1 rounded bg-(--color-bg-secondary) text-(--color-text-secondary)">
-                                            {(doc.file_size / 1024).toFixed(1)} KB
+                                            {fileSizeLabel}
                                         </span>
                                     </div>
                                 );
@@ -212,9 +231,10 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                 </button>
                 <button
                     onClick={submitApplication}
-                    className="btn-primary flex items-center gap-2 text-lg px-8 py-3"
+                    disabled={processing}
+                    className="bg-linear-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/25 hover:-translate-y-px hover:shadow-indigo-500/40 transition-all flex items-center gap-2 text-lg px-8 py-3"
                 >
-                    Submit Application
+                    {processing ? 'Submitting...' : 'Submit Application'}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                             strokeLinecap="round"

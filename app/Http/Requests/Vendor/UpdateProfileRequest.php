@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Vendor;
 
+use App\Models\Vendor;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,6 +23,22 @@ class UpdateProfileRequest extends FormRequest
      */
     public function rules(): array
     {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        $vendor = $user?->vendor;
+
+        if ($vendor && $vendor->status !== Vendor::STATUS_DRAFT) {
+            // After submission, only operational contact/location fields are editable.
+            return [
+                'contact_person' => 'required|string|max:255',
+                'contact_phone' => 'required|string|max:20',
+                'address' => 'required|string|max:500',
+                'city' => 'required|string|max:100',
+                'state' => 'nullable|string|max:100',
+                'pincode' => 'required|string|max:20',
+            ];
+        }
+
         return [
             'company_name' => 'required|string|max:255',
             'registration_number' => 'nullable|string|max:50',

@@ -10,6 +10,12 @@ import {
     DataTable,
     FormSelect,
 } from '@/Components';
+const formatPaginationLabel = (label) =>
+    String(label || '')
+        .replace(/&laquo;/g, '<<')
+        .replace(/&raquo;/g, '>>')
+        .replace(/<[^>]*>/g, '')
+        .trim();
 
 export default function VendorSummaryReport({ vendors, stats, filters }) {
     const { auth } = usePage().props;
@@ -95,7 +101,7 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
             subtitle="Overview of all vendors by status and compliance"
             actions={
                 <Link href="/admin/reports">
-                    <Button variant="secondary">← Back to Reports</Button>
+                    <Button variant="secondary">Back to Reports</Button>
                 </Link>
             }
         />
@@ -118,7 +124,7 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                 </div>
 
                 {/* Filters */}
-                <Card title="Filters">
+                <Card title="Filters" allowOverflow>
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
@@ -148,7 +154,7 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                             <Button onClick={handleFilter}>Apply Filters</Button>
                             {can['reports.export'] && (
                                 <Button variant="secondary" onClick={handleExport}>
-                                    📥 Export CSV
+                                    Export CSV
                                 </Button>
                             )}
                         </div>
@@ -175,8 +181,9 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                                             ? 'bg-(--color-brand-primary) text-white'
                                             : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-tertiary)'
                                     }`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
+                                >
+                                    {formatPaginationLabel(link.label)}
+                                </Link>
                             ))}
                         </div>
                     )}

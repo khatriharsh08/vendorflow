@@ -1,4 +1,18 @@
+import React from 'react';
 import { Link } from '@inertiajs/react';
+import AppIcon from './AppIcon';
+
+function renderIcon(icon, className = 'h-4 w-4') {
+    if (!icon) {
+        return null;
+    }
+
+    if (typeof icon !== 'string') {
+        return icon;
+    }
+
+    return <AppIcon name={icon} className={className} fallback={<span>{icon}</span>} />;
+}
 
 // Tabs Component
 export function Tabs({ tabs, activeTab, onChange }) {
@@ -15,7 +29,11 @@ export function Tabs({ tabs, activeTab, onChange }) {
                                 : 'border-transparent text-slate-400 hover:text-white'
                         }`}
                     >
-                        {tab.icon && <span className="mr-2">{tab.icon}</span>}
+                        {tab.icon && (
+                            <span className="mr-2 inline-flex items-center">
+                                {renderIcon(tab.icon)}
+                            </span>
+                        )}
                         {tab.label}
                         {tab.badge && (
                             <span className="ml-2 px-2 py-0.5 rounded-full bg-slate-700 text-xs">
@@ -79,7 +97,7 @@ export function DropdownItem({ href, onClick, icon, children, danger = false }) 
     if (href) {
         return (
             <Link href={href} className={className}>
-                {icon && <span>{icon}</span>}
+                {icon && <span className="inline-flex items-center">{renderIcon(icon)}</span>}
                 {children}
             </Link>
         );
@@ -87,7 +105,7 @@ export function DropdownItem({ href, onClick, icon, children, danger = false }) 
 
     return (
         <button onClick={onClick} className={className}>
-            {icon && <span>{icon}</span>}
+            {icon && <span className="inline-flex items-center">{renderIcon(icon)}</span>}
             {children}
         </button>
     );
@@ -117,9 +135,21 @@ export function Accordion({ items, allowMultiple = false }) {
                     >
                         <span className="font-medium text-white">{item.title}</span>
                         <span
-                            className={`transform transition-transform ${openItems.includes(item.id) ? 'rotate-180' : ''}`}
+                            className={`inline-flex transform transition-transform ${openItems.includes(item.id) ? 'rotate-180' : ''}`}
                         >
-                            ▼
+                            <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
                         </span>
                     </button>
                     {openItems.includes(item.id) && (
@@ -147,8 +177,8 @@ export function Pill({ children, color = 'default', onRemove }) {
         >
             {children}
             {onRemove && (
-                <button onClick={onRemove} className="hover:opacity-70">
-                    ×
+                <button onClick={onRemove} className="hover:opacity-70" aria-label="Remove">
+                    x
                 </button>
             )}
         </span>
@@ -190,10 +220,9 @@ export function SearchInput({ value, onChange, onSubmit, placeholder = 'Search..
                 placeholder={placeholder}
                 className="input-field w-full pl-10"
             />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <AppIcon name="search" className="h-4 w-4" />
+            </span>
         </form>
     );
 }
-
-// Import React for useState
-import React from 'react';

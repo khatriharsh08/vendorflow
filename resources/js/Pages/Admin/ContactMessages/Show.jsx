@@ -1,4 +1,4 @@
-import { useForm, Link, router } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { AdminLayout, Badge, PageHeader, Button } from '@/Components';
 
 export default function Show({ message }) {

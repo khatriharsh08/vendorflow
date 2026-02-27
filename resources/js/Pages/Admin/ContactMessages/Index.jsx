@@ -94,7 +94,7 @@ export default function Index() {
             <div className="space-y-6">
                 {/* Stats Overview */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="card p-5">
+                    <div className="card p-5 rounded-2xl border-2 border-(--color-text-tertiary)">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-(--color-text-tertiary) mb-1">Total</p>
@@ -119,7 +119,7 @@ export default function Index() {
                             </div>
                         </div>
                     </div>
-                    <div className="card p-5">
+                    <div className="card p-5 rounded-2xl border-2 border-(--color-info)">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-(--color-info) mb-1">New</p>
@@ -144,7 +144,7 @@ export default function Index() {
                             </div>
                         </div>
                     </div>
-                    <div className="card p-5">
+                    <div className="card p-5 rounded-2xl border-2 border-(--color-success)">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-(--color-success) mb-1">Replied</p>
@@ -169,7 +169,7 @@ export default function Index() {
                             </div>
                         </div>
                     </div>
-                    <div className="card p-5">
+                    <div className="card p-5 rounded-2xl border-2 border-(--color-text-primary)">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-(--color-text-tertiary) mb-1">Read</p>

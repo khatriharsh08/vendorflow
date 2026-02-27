@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { usePage, Link } from '@inertiajs/react';
-import { AdminLayout, PageHeader, Card, StatCard, Button, FormSelect } from '@/Components';
+import { Link, usePage } from '@inertiajs/react';
+import { AdminLayout, PageHeader, Card, StatCard, Button, FormSelect, AppIcon } from '@/Components';
 
-export default function ReportsIndex({ stats = {}, reports = [] }) {
+export default function ReportsIndex({ stats = {} }) {
     const [dateRange, setDateRange] = useState('this_month');
     const { auth } = usePage().props;
     const can = auth?.can || {};
@@ -12,7 +12,7 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
             id: 'vendor_summary',
             title: 'Vendor Summary',
             description: 'Overview of all vendors by status, compliance, and performance',
-            icon: '🏢',
+            icon: 'vendors',
             permission: 'vendors.view',
             route: '/admin/reports/vendor-summary',
         },
@@ -20,7 +20,7 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
             id: 'compliance_report',
             title: 'Compliance Report',
             description: 'Detailed compliance status and rule violations',
-            icon: '🛡️',
+            icon: 'compliance',
             permission: 'compliance.view',
             route: '/admin/reports/compliance',
         },
@@ -28,7 +28,7 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
             id: 'payment_report',
             title: 'Payment Report',
             description: 'Payment requests, approvals, and disbursements',
-            icon: '💰',
+            icon: 'payments',
             permission: 'payments.view',
             route: '/admin/reports/payment',
         },
@@ -36,7 +36,7 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
             id: 'document_expiry',
             title: 'Document Expiry Report',
             description: 'Documents expiring within selected date range',
-            icon: '📄',
+            icon: 'documents',
             permission: 'documents.view',
             route: '/admin/reports/document-expiry',
         },
@@ -44,7 +44,7 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
             id: 'performance_report',
             title: 'Performance Report',
             description: 'Vendor performance scores and trends',
-            icon: '📈',
+            icon: 'performance',
             permission: 'vendors.view',
             route: '/admin/reports/performance',
         },
@@ -52,7 +52,7 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
             id: 'audit_trail',
             title: 'Audit Trail Report',
             description: 'Complete history of all system activities',
-            icon: '📋',
+            icon: 'audit',
             permission: 'audit.view',
             route: '/admin/audit',
         },
@@ -86,31 +86,31 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
                     <StatCard
                         label="Total Vendors"
                         value={stats.total_vendors || 0}
-                        icon="🏢"
+                        icon="vendors"
                         color="primary"
                     />
                     <StatCard
                         label="Active Vendors"
                         value={stats.active_vendors || 0}
-                        icon="✅"
+                        icon="success"
                         color="success"
                     />
                     <StatCard
                         label="Compliance Rate"
                         value={`${stats.compliance_rate || 0}%`}
-                        icon="🛡️"
+                        icon="compliance"
                         color="info"
                     />
                     <StatCard
                         label="Pending Payments"
                         value={stats.pending_payments || 0}
-                        icon="⏳"
+                        icon="clock"
                         color="warning"
                     />
                     <StatCard
                         label="Total Paid"
-                        value={`₹${((stats.total_paid || 0) / 100000).toFixed(1)}L`}
-                        icon="💰"
+                        value={`INR ${((stats.total_paid || 0) / 100000).toFixed(1)}L`}
+                        icon="payments"
                         color="success"
                     />
                 </div>
@@ -125,8 +125,16 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
                                     className="p-5 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary) hover:border-(--color-brand-primary-light) hover:shadow-lg transition-all cursor-pointer group"
                                 >
                                     <div className="flex items-start gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-(--gradient-primary) text-white flex items-center justify-center text-2xl shadow-(--shadow-primary) group-hover:scale-110 transition-transform">
-                                            {report.icon}
+                                        <div className="w-12 h-12 rounded-xl bg-(--gradient-primary) text-(--color-text-primary) flex items-center justify-center shadow-(--shadow-primary) group-hover:scale-110 transition-transform">
+                                            <AppIcon
+                                                name={report.icon}
+                                                className="h-6 w-6"
+                                                fallback={
+                                                    <span className="text-xs font-semibold uppercase tracking-wide">
+                                                        {report.icon}
+                                                    </span>
+                                                }
+                                            />
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="text-(--color-text-primary) font-semibold mb-1">
@@ -149,7 +157,7 @@ export default function ReportsIndex({ stats = {}, reports = [] }) {
                                                 )}
                                                 {can['reports.export'] && report.route && (
                                                     <a
-                                                        href={`/admin/reports/export/${report.id.replace('_report', '')}?`}
+                                                        href={`/admin/reports/export/${report.id.replace('_report', '')}`}
                                                     >
                                                         <Button variant="secondary" size="sm">
                                                             Export CSV

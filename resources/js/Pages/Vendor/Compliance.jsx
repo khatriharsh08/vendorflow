@@ -109,7 +109,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                 <p>No compliance rules defined yet.</p>
                             </div>
                         ) : (
-                            rules.map((rule, index) => {
+                            rules.map((rule) => {
                                 const result = complianceResults.find(
                                     (r) => r.compliance_rule_id === rule.id
                                 );

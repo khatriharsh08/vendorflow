@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\Permission;
 use App\Models\Role;
 
@@ -23,6 +24,7 @@ trait HasRoles
         $role = Role::where('name', $roleName)->first();
         if ($role && ! $this->hasRole($roleName)) {
             $this->roles()->attach($role);
+            HandleInertiaRequests::clearAuthCache($this->id);
         }
     }
 
@@ -34,6 +36,7 @@ trait HasRoles
         $role = Role::where('name', $roleName)->first();
         if ($role) {
             $this->roles()->detach($role);
+            HandleInertiaRequests::clearAuthCache($this->id);
         }
     }
 

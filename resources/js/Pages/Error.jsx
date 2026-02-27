@@ -98,7 +98,7 @@ export default function Error({ status }) {
                         onClick={() => window.history.back()}
                         className="px-6 py-3 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) font-medium hover:bg-(--color-bg-tertiary) transition-colors"
                     >
-                        ← Go Back
+                        Go Back
                     </button>
                     <Link
                         href="/dashboard"

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ComplianceFlag;
 use App\Models\ComplianceResult;
 use App\Models\ComplianceRule;
 use App\Models\DocumentType;
@@ -55,8 +56,12 @@ class ComplianceService
         // Calculate compliance score (100 - penalty, min 0)
         $complianceScore = max(0, 100 - $totalPenalty);
 
+        $openFlags = ComplianceFlag::where('vendor_id', $vendor->id)
+            ->where('status', 'open')
+            ->count();
+
         // Determine compliance status
-        $complianceStatus = $this->determineComplianceStatus($complianceScore, $hasBlockingFailure);
+        $complianceStatus = $this->determineComplianceStatus($complianceScore, $hasBlockingFailure, $openFlags);
 
         // Update vendor
         $vendor->update([
@@ -70,6 +75,7 @@ class ComplianceService
             'status' => $complianceStatus,
             'rules_evaluated' => count($results),
             'failures' => collect($results)->where('status', ComplianceResult::STATUS_FAIL)->count(),
+            'open_flags' => $openFlags,
         ];
     }
 
@@ -108,20 +114,18 @@ class ComplianceService
                 break;
         }
 
-        // Store the result
-        ComplianceResult::updateOrCreate(
-            [
-                'vendor_id' => $vendor->id,
-                'compliance_rule_id' => $rule->id,
-            ],
-            [
-                'status' => $status,
-                'details' => $details,
-                'metadata' => $metadata,
-                'evaluated_at' => now(),
-                'resolved_at' => $status === ComplianceResult::STATUS_PASS ? now() : null,
-            ]
-        );
+        // Store immutable result (append-only history).
+        $complianceResult = ComplianceResult::create([
+            'vendor_id' => $vendor->id,
+            'compliance_rule_id' => $rule->id,
+            'status' => $status,
+            'details' => $details,
+            'metadata' => $metadata,
+            'evaluated_at' => now(),
+            'resolved_at' => $status === ComplianceResult::STATUS_PASS ? now() : null,
+        ]);
+
+        $this->syncComplianceFlag($vendor, $rule, $complianceResult, $status, $details, $metadata);
 
         return [
             'rule_id' => $rule->id,
@@ -129,6 +133,45 @@ class ComplianceService
             'status' => $status,
             'details' => $details,
         ];
+    }
+
+    protected function syncComplianceFlag(
+        Vendor $vendor,
+        ComplianceRule $rule,
+        ComplianceResult $complianceResult,
+        string $status,
+        string $details,
+        array $metadata
+    ): void {
+        if ($status === ComplianceResult::STATUS_PASS) {
+            ComplianceFlag::where('vendor_id', $vendor->id)
+                ->where('compliance_rule_id', $rule->id)
+                ->where('status', 'open')
+                ->update([
+                    'status' => 'resolved',
+                    'resolved_at' => now(),
+                    'resolved_by' => null,
+                ]);
+
+            return;
+        }
+
+        ComplianceFlag::updateOrCreate(
+            [
+                'vendor_id' => $vendor->id,
+                'compliance_rule_id' => $rule->id,
+                'status' => 'open',
+            ],
+            [
+                'compliance_result_id' => $complianceResult->id,
+                'severity' => $rule->severity,
+                'reason' => $details,
+                'metadata' => $metadata,
+                'flagged_at' => now(),
+                'resolved_at' => null,
+                'resolved_by' => null,
+            ]
+        );
     }
 
     /**
@@ -225,9 +268,9 @@ class ComplianceService
     /**
      * Determine overall compliance status based on score and blocking rules.
      */
-    protected function determineComplianceStatus(int $score, bool $hasBlockingFailure): string
+    protected function determineComplianceStatus(int $score, bool $hasBlockingFailure, int $openFlags): string
     {
-        if ($hasBlockingFailure) {
+        if ($hasBlockingFailure || $openFlags > 2) {
             return Vendor::COMPLIANCE_BLOCKED;
         }
 

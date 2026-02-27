@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Http\Requests\Admin\UpdateContactMessageRequest;
 use App\Http\Requests\StoreContactMessageRequest;
 use App\Models\ContactMessage;
+use App\Services\ContactMessageService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ContactController extends Controller
 {
+    public function __construct(protected ContactMessageService $contactMessageService) {}
+
     /**
      * Store a new contact message
      */
     public function store(StoreContactMessageRequest $request)
     {
-        $validated = $request->validated();
-
-        ContactMessage::create($validated);
+        $this->contactMessageService->create($request->validated());
 
         return back()->with('success', 'Thank you for your message! We\'ll get back to you soon.');
     }
@@ -27,34 +29,12 @@ class ContactController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ContactMessage::query()->latest();
-
-        // Filter by status
-        if ($request->status && $request->status !== 'all') {
-            $query->where('status', $request->status);
-        }
-
-        // Search
-        if ($request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('subject', 'like', "%{$search}%");
-            });
-        }
-
-        $messages = $query->paginate(15)->withQueryString();
+        $data = $this->contactMessageService->indexData($request);
 
         return Inertia::render('Admin/ContactMessages/Index', [
-            'messages' => $messages,
-            'filters' => $request->only(['status', 'search']),
-            'stats' => [
-                'total' => ContactMessage::count(),
-                'new' => ContactMessage::where('status', 'new')->count(),
-                'read' => ContactMessage::where('status', 'read')->count(),
-                'replied' => ContactMessage::where('status', 'replied')->count(),
-            ],
+            'messages' => $data['messages'],
+            'filters' => $data['filters'],
+            'stats' => $data['stats'],
         ]);
     }
 
@@ -63,13 +43,10 @@ class ContactController extends Controller
      */
     public function show(ContactMessage $contactMessage)
     {
-        // Mark as read if new
-        if ($contactMessage->status === 'new') {
-            $contactMessage->update(['status' => 'read']);
-        }
+        $message = $this->contactMessageService->markAsReadIfNew($contactMessage);
 
         return Inertia::render('Admin/ContactMessages/Show', [
-            'message' => $contactMessage,
+            'message' => $message,
         ]);
     }
 
@@ -78,9 +55,7 @@ class ContactController extends Controller
      */
     public function update(UpdateContactMessageRequest $request, ContactMessage $contactMessage)
     {
-        $validated = $request->validated();
-
-        $contactMessage->update($validated);
+        $this->contactMessageService->update($contactMessage, $request->validated());
 
         return back()->with('success', 'Message updated successfully.');
     }
@@ -90,6 +65,17 @@ class ContactController extends Controller
      */
     public function destroy(ContactMessage $contactMessage)
     {
+        AuditLog::log(
+            AuditLog::EVENT_DELETED,
+            $contactMessage,
+            [
+                'status' => $contactMessage->status,
+                'email' => $contactMessage->email,
+            ],
+            null,
+            'Contact message soft-deleted by staff'
+        );
+
         $contactMessage->delete();
 
         return redirect()->route('admin.contact-messages.index')

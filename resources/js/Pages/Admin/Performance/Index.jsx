@@ -1,13 +1,5 @@
 import { Link } from '@inertiajs/react';
-import {
-    AdminLayout,
-    PageHeader,
-    DataTable,
-    Badge,
-    Button,
-    StatCard,
-    StatGrid,
-} from '@/Components';
+import { AdminLayout, PageHeader, DataTable, Badge, Button } from '@/Components';
 
 export default function PerformanceIndex({
     vendors = [],
@@ -61,11 +53,18 @@ export default function PerformanceIndex({
             header: 'Actions',
             align: 'right',
             render: (row) => (
-                <Link href={`/admin/performance/${row.id}/rate`}>
-                    <Button variant="primary" size="sm">
-                        Rate Vendor
-                    </Button>
-                </Link>
+                <div className="flex items-center justify-end gap-2">
+                    <Link href={`/admin/performance/${row.id}`}>
+                        <Button variant="outline" size="sm">
+                            View
+                        </Button>
+                    </Link>
+                    <Link href={`/admin/performance/${row.id}/rate`}>
+                        <Button variant="primary" size="sm">
+                            Rate
+                        </Button>
+                    </Link>
+                </div>
             ),
         },
     ];

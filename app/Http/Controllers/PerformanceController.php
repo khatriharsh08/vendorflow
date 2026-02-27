@@ -23,6 +23,8 @@ class PerformanceController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewPerformance');
+
         $vendors = Vendor::where('status', 'active')
             ->orderBy('performance_score', 'desc')
             ->get()
@@ -53,6 +55,8 @@ class PerformanceController extends Controller
      */
     public function show(Vendor $vendor)
     {
+        $this->authorize('viewPerformance');
+
         $breakdown = $this->performanceService->getMetricBreakdown($vendor);
         $history = $this->performanceService->getVendorHistory($vendor);
 
@@ -68,6 +72,8 @@ class PerformanceController extends Controller
      */
     public function rateForm(Vendor $vendor)
     {
+        $this->authorize('ratePerformance');
+
         $metrics = PerformanceMetric::where('is_active', true)->get();
 
         return Inertia::render('Admin/Performance/Rate', [
@@ -81,6 +87,8 @@ class PerformanceController extends Controller
      */
     public function rate(StorePerformanceRatingRequest $request, Vendor $vendor)
     {
+        $this->authorize('ratePerformance');
+
         // Validation handled by FormRequest
 
         $metrics = PerformanceMetric::whereIn('id', collect($request->ratings)->pluck('metric_id'))->get()->keyBy('id');

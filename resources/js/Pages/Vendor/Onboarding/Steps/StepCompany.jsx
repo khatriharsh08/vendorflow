@@ -1,4 +1,5 @@
 import { useForm } from '@inertiajs/react';
+import { FormSelect } from '@/Components/index.jsx';
 
 export default function StepCompany({ vendor, sessionData }) {
     const step1Session = sessionData?.step1 || {};
@@ -40,7 +41,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.company_name}
                             onChange={(e) => setData('company_name', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                             placeholder="Legal Entity Name"
                         />
                         {errors.company_name && (
@@ -52,18 +53,18 @@ export default function StepCompany({ vendor, sessionData }) {
                         <label className="text-sm font-medium text-(--color-text-secondary)">
                             Business Type
                         </label>
-                        <select
+                        <FormSelect
                             value={data.business_type}
-                            onChange={(e) => setData('business_type', e.target.value)}
-                            className="input-field w-full"
-                        >
-                            <option value="">Select Type</option>
-                            <option value="sole_proprietor">Sole Proprietorship</option>
-                            <option value="partnership">Partnership</option>
-                            <option value="llp">LLP</option>
-                            <option value="pvt_ltd">Private Limited</option>
-                            <option value="public_ltd">Public Limited</option>
-                        </select>
+                            onChange={(value) => setData('business_type', value)}
+                            placeholder="Select Type"
+                            options={[
+                                { value: 'sole_proprietor', label: 'Sole Proprietorship' },
+                                { value: 'partnership', label: 'Partnership' },
+                                { value: 'llp', label: 'LLP' },
+                                { value: 'pvt_ltd', label: 'Private Limited' },
+                                { value: 'public_ltd', label: 'Public Limited' },
+                            ]}
+                        />
                     </div>
 
                     <div className="space-y-2">
@@ -74,7 +75,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.registration_number}
                             onChange={(e) => setData('registration_number', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                             placeholder="CIN / LLPIN"
                         />
                     </div>
@@ -87,7 +88,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.tax_id}
                             onChange={(e) => setData('tax_id', e.target.value.toUpperCase())}
-                            className="input-field w-full uppercase"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                             placeholder="22AAAAA0000A1Z5"
                         />
                     </div>
@@ -100,7 +101,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.pan_number}
                             onChange={(e) => setData('pan_number', e.target.value.toUpperCase())}
-                            className="input-field w-full uppercase"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                             placeholder="ABCDE1234F"
                         />
                         {errors.pan_number && (
@@ -116,7 +117,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.contact_person}
                             onChange={(e) => setData('contact_person', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                         />
                     </div>
 
@@ -128,7 +129,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="tel"
                             value={data.contact_phone}
                             onChange={(e) => setData('contact_phone', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                             placeholder="+91 98765 43210"
                         />
                         {errors.contact_phone && (
@@ -143,7 +144,7 @@ export default function StepCompany({ vendor, sessionData }) {
                         <textarea
                             value={data.address}
                             onChange={(e) => setData('address', e.target.value)}
-                            className="input-field w-full min-h-[80px]"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all min-h-[80px]"
                             placeholder="Full street address"
                         ></textarea>
                     </div>
@@ -156,7 +157,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.city}
                             onChange={(e) => setData('city', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                         />
                     </div>
 
@@ -168,7 +169,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.state}
                             onChange={(e) => setData('state', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                         />
                     </div>
 
@@ -180,7 +181,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.pincode}
                             onChange={(e) => setData('pincode', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                         />
                     </div>
                 </div>
@@ -189,7 +190,7 @@ export default function StepCompany({ vendor, sessionData }) {
                     <button
                         type="submit"
                         disabled={processing}
-                        className="btn-primary flex items-center gap-2 text-lg px-8 py-3"
+                        className="bg-linear-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/25 hover:-translate-y-px hover:shadow-indigo-500/40 transition-all flex items-center gap-2 text-lg px-8 py-3"
                     >
                         {processing ? 'Saving...' : 'Save & Continue'}
                         <svg

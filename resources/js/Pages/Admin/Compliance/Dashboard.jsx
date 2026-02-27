@@ -1,5 +1,14 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { AdminLayout, PageHeader, Card, StatCard, StatGrid, Badge, Button } from '@/Components';
+import {
+    AdminLayout,
+    AppIcon,
+    Badge,
+    Button,
+    Card,
+    PageHeader,
+    StatCard,
+    StatGrid,
+} from '@/Components';
 
 export default function ComplianceDashboard({ stats, atRiskVendors, recentResults, rules }) {
     const { auth } = usePage().props;
@@ -27,25 +36,25 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                     <StatCard
                         label="Compliant"
                         value={stats?.compliant || 0}
-                        icon="✅"
+                        icon="success"
                         color="success"
                     />
                     <StatCard
                         label="At Risk"
                         value={stats?.at_risk || 0}
-                        icon="⚠️"
+                        icon="warning"
                         color="warning"
                     />
                     <StatCard
                         label="Non-Compliant"
                         value={stats?.non_compliant || 0}
-                        icon="❌"
+                        icon="error"
                         color="danger"
                     />
                     <StatCard
                         label="Blocked"
                         value={stats?.blocked || 0}
-                        icon="🚫"
+                        icon="failed"
                         color="danger"
                     />
                 </StatGrid>
@@ -63,7 +72,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-xl bg-(--color-brand-primary-light) flex items-center justify-center">
-                                                🏢
+                                                <AppIcon name="vendors" className="h-5 w-5" />
                                             </div>
                                             <div>
                                                 <div className="text-(--color-text-primary) font-medium">
@@ -79,7 +88,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                 ))
                             ) : (
                                 <div className="text-center text-(--color-text-tertiary) py-8">
-                                    All vendors are compliant! 🎉
+                                    All vendors are compliant!
                                 </div>
                             )}
                         </div>
@@ -127,7 +136,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                             href="/admin/compliance/rules"
                             className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
                         >
-                            Manage Rules →
+                            Manage Rules
                         </Link>
                     }
                 >

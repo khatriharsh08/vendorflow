@@ -1,4 +1,4 @@
-import { GuestLayout } from '@/Components';
+import GuestLayout from '@/Components/GuestLayout';
 
 export default function Terms() {
     const sections = [

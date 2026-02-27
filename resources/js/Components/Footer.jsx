@@ -1,113 +1,136 @@
 import { Link } from '@inertiajs/react';
+import AppIcon from './AppIcon';
 import Logo from './Logo';
 
 const defaultLinks = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Privacy', href: '/privacy' },
+    { label: 'Terms', href: '/terms' },
 ];
 
-const socialLinks = [
-    { icon: '𝕏', href: '#', label: 'Twitter' },
-    { icon: '📘', href: '#', label: 'Facebook' },
-    { icon: '💼', href: '#', label: 'LinkedIn' },
+const toolLinks = [
+    { label: 'Write Tools', href: '/vendor/onboarding' },
+    { label: 'Documents', href: '/vendor/documents' },
+    { label: 'Payments', href: '/vendor/payments' },
+    { label: 'Compliance', href: '/vendor/compliance' },
+];
+
+const adminLinks = [
+    { label: 'Admin Dashboard', href: '/admin/dashboard' },
+    { label: 'Vendor Admin', href: '/admin/vendors' },
+    { label: 'Payments Admin', href: '/admin/payments' },
+    { label: 'Reports Admin', href: '/admin/reports' },
 ];
 
 export default function Footer({ links = defaultLinks, showSocial = true, className = '' }) {
-    const currentYear = new Date().getFullYear();
+    const year = new Date().getFullYear();
 
     return (
         <footer
-            className={`border-t border-(--color-border-primary) bg-(--color-bg-primary) ${className}`}
+            className={`mt-12 border-t border-(--color-border-primary) bg-(--color-bg-primary)/80 backdrop-blur-xl ${className}`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid md:grid-cols-4 gap-8">
-                    {/* Brand */}
-                    <div className="md:col-span-2">
-                        <div className="flex items-center gap-3 mb-4">
-                            <Logo size="2xl" light={true} linkToHome={false} />
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                    <div className="md:col-span-5">
+                        <div className="mb-4">
+                            <Logo size="xl" light={true} linkToHome={false} />
                         </div>
-                        <p className="text-(--color-text-tertiary) text-sm max-w-md">
-                            A comprehensive multi-vendor operations and compliance platform. Manage
-                            vendors, documents, payments, and compliance all in one place.
+                        <p className="max-w-md text-sm text-(--color-text-tertiary)">
+                            VendorFlow keeps vendor onboarding, compliance, documents, and payments
+                            in one clean workspace.
                         </p>
+
                         {showSocial && (
-                            <div className="flex gap-4 mt-4">
-                                {socialLinks.map((social) => (
-                                    <a
-                                        key={social.label}
-                                        href={social.href}
-                                        className="w-10 h-10 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary) flex items-center justify-center text-(--color-text-tertiary) hover:text-(--color-brand-primary) hover:border-(--color-brand-primary-light) transition-all"
-                                        aria-label={social.label}
-                                    >
-                                        {social.icon}
-                                    </a>
-                                ))}
+                            <div className="mt-5 flex items-center gap-2">
+                                <a
+                                    href="mailto:support@vendorflow.com"
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-(--color-border-primary) text-(--color-text-tertiary) hover:text-(--color-brand-primary) hover:border-(--color-border-hover) transition-colors"
+                                    aria-label="Email support"
+                                >
+                                    <AppIcon name="messages" className="h-4 w-4" />
+                                </a>
+                                <a
+                                    href="/contact"
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-(--color-border-primary) text-(--color-text-tertiary) hover:text-(--color-brand-primary) hover:border-(--color-border-hover) transition-colors"
+                                    aria-label="Contact page"
+                                >
+                                    <AppIcon name="profile" className="h-4 w-4" />
+                                </a>
+                                <a
+                                    href="/about"
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-(--color-border-primary) text-(--color-text-tertiary) hover:text-(--color-brand-primary) hover:border-(--color-border-hover) transition-colors"
+                                    aria-label="About page"
+                                >
+                                    <AppIcon name="info" className="h-4 w-4" />
+                                </a>
                             </div>
                         )}
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h3 className="text-(--color-text-primary) font-semibold mb-4">
-                            Quick Links
+                    <div className="md:col-span-2">
+                        <h3 className="text-sm font-semibold text-(--color-text-primary) mb-3">
+                            Company
                         </h3>
-                        <ul className="space-y-2">
-                            {links.slice(0, 5).map((link) => (
-                                <li key={link.href}>
-                                    <Link
-                                        href={link.href}
-                                        className="text-(--color-text-tertiary) hover:text-(--color-brand-primary) text-sm transition-colors"
-                                    >
-                                        {link.label}
-                                    </Link>
-                                </li>
+                        <div className="space-y-2">
+                            {links.slice(0, 5).map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
+                                >
+                                    {item.label}
+                                </Link>
                             ))}
-                        </ul>
+                        </div>
                     </div>
 
-                    {/* Contact */}
-                    <div>
-                        <h3 className="text-(--color-text-primary) font-semibold mb-4">Contact</h3>
-                        <ul className="space-y-2 text-sm text-(--color-text-tertiary)">
-                            <li className="flex items-center gap-2">
-                                <span>📧</span> support@vendorflow.com
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span>📞</span> +91 123 456 7890
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span>📍</span> Mumbai, India
-                            </li>
-                        </ul>
+                    <div className="md:col-span-2">
+                        <h3 className="text-sm font-semibold text-(--color-text-primary) mb-3">
+                            Create Tools
+                        </h3>
+                        <div className="space-y-2">
+                            {toolLinks.map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="md:col-span-3">
+                        <h3 className="text-sm font-semibold text-(--color-text-primary) mb-3">
+                            Admin
+                        </h3>
+                        <div className="space-y-2">
+                            {adminLinks.map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="border-t border-(--color-border-primary) mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <p className="text-(--color-text-muted) text-sm">
-                        © {currentYear} VendorFlow. All rights reserved.
+                <div className="mt-10 pt-6 border-t border-(--color-border-secondary) flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <p className="text-xs text-(--color-text-muted)">
+                        (c) {year} VendorFlow. All rights reserved.
                     </p>
-                    <div className="flex gap-6 text-sm">
-                        <Link
-                            href="/privacy"
-                            className="text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
-                        >
+                    <div className="flex items-center gap-4 text-xs text-(--color-text-tertiary)">
+                        <Link href="/privacy" className="hover:text-(--color-brand-primary)">
                             Privacy
                         </Link>
-                        <Link
-                            href="/terms"
-                            className="text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
-                        >
+                        <Link href="/terms" className="hover:text-(--color-brand-primary)">
                             Terms
-                        </Link>
-                        <Link
-                            href="/cookies"
-                            className="text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
-                        >
-                            Cookies
                         </Link>
                     </div>
                 </div>
@@ -116,12 +139,11 @@ export default function Footer({ links = defaultLinks, showSocial = true, classN
     );
 }
 
-// Minimal footer for internal pages
 export function FooterMinimal() {
     return (
-        <footer className="border-t border-(--color-border-primary) py-4 bg-(--color-bg-primary)">
-            <div className="max-w-7xl mx-auto px-4 text-center text-(--color-text-muted) text-sm">
-                © {new Date().getFullYear()} VendorFlow. Built with ❤️
+        <footer className="border-t border-(--color-border-primary) bg-(--color-bg-primary)/80">
+            <div className="max-w-7xl mx-auto px-4 py-4 text-center text-xs text-(--color-text-muted)">
+                (c) {new Date().getFullYear()} VendorFlow.
             </div>
         </footer>
     );

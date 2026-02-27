@@ -4,7 +4,6 @@ import {
     AdminLayout,
     PageHeader,
     DataTable,
-    Badge,
     Button,
     Modal,
     ModalCancelButton,

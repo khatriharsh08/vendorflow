@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
-import StepCompany from './Steps/StepCompany';
+import { Head, Link } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import { AppIcon } from '@/Components';
 import StepBank from './Steps/StepBank';
+import StepCompany from './Steps/StepCompany';
 import StepDocuments from './Steps/StepDocuments';
 import StepReview from './Steps/StepReview';
+import Logo from '../../../Components/Logo.jsx';
 
 export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, sessionData = {} }) {
     const [step, setStep] = useState(currentStep);
@@ -14,10 +16,10 @@ export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, s
     }, [currentStep]);
 
     const steps = [
-        { number: 1, title: 'Company Details', icon: '🏢' },
-        { number: 2, title: 'Bank Information', icon: '🏦' },
-        { number: 3, title: 'Documents', icon: '📄' },
-        { number: 4, title: 'Review & Submit', icon: '✅' },
+        { number: 1, title: 'Company Details' },
+        { number: 2, title: 'Bank Information' },
+        { number: 3, title: 'Documents' },
+        { number: 4, title: 'Review and Submit' },
     ];
 
     return (
@@ -28,23 +30,11 @@ export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, s
             <nav className="border-b border-(--color-border-primary) bg-(--color-bg-primary)/80 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-(--gradient-primary) flex items-center justify-center shadow-(--shadow-primary)">
-                            <svg
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                                />
-                            </svg>
-                        </div>
+                        <Link href="/" className="flex items-center gap-3">
+                            <Logo size="2xl" light={true} linkToHome={false} />
+                        </Link>
                         <span className="font-bold text-lg text-(--color-text-primary)">
-                            VendorFlow Onboarding
+                            | Vendor Onboarding
                         </span>
                     </div>
                     <div className="text-sm text-(--color-text-tertiary)">
@@ -56,28 +46,49 @@ export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, s
             <main className="max-w-5xl mx-auto px-6 py-12">
                 {/* Progress Steps - Light Theme */}
                 <div className="mb-12">
-                    <div className="flex items-center justify-between relative">
-                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-(--color-bg-muted) -z-10 rounded-full"></div>
+                    <div className="flex items-center justify-between relative" role="list">
+                        <div
+                            className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-(--color-bg-muted) -z-10 rounded-full"
+                            aria-hidden="true"
+                        ></div>
                         <div
                             className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-(--gradient-primary) -z-10 rounded-full transition-all duration-500"
                             style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
+                            aria-hidden="true"
                         ></div>
 
                         {steps.map((s) => (
-                            <div key={s.number} className="flex flex-col items-center gap-2">
+                            <div
+                                key={s.number}
+                                className="flex flex-col items-center gap-2"
+                                role="listitem"
+                                aria-current={step === s.number ? 'step' : undefined}
+                            >
                                 <div
                                     className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold border-4 transition-all duration-300 ${
                                         step >= s.number
                                             ? 'bg-(--color-bg-primary) border-(--color-brand-primary) text-(--color-brand-primary)'
                                             : 'bg-(--color-bg-secondary) border-(--color-border-primary) text-(--color-text-muted)'
                                     } ${step === s.number ? 'shadow-(--shadow-primary) scale-110' : ''}`}
+                                    aria-hidden="true"
                                 >
-                                    {step > s.number ? '✓' : s.number}
+                                    {step > s.number ? (
+                                        <AppIcon name="success" className="h-5 w-5" />
+                                    ) : (
+                                        s.number
+                                    )}
                                 </div>
                                 <span
                                     className={`text-sm font-medium ${step >= s.number ? 'text-(--color-text-primary)' : 'text-(--color-text-muted)'}`}
                                 >
                                     {s.title}
+                                    <span className="sr-only">
+                                        {step > s.number
+                                            ? 'Completed'
+                                            : step === s.number
+                                              ? 'Current Step'
+                                              : 'Pending'}
+                                    </span>
                                 </span>
                             </div>
                         ))}

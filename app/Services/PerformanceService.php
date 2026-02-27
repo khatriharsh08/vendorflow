@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PerformanceMetric;
 use App\Models\PerformanceScore;
+use App\Models\ScoreHistory;
 use App\Models\User;
 use App\Models\Vendor;
 
@@ -36,7 +37,11 @@ class PerformanceService
         ]);
 
         // Recalculate overall vendor performance score
-        $this->recalculateVendorScore($vendor);
+        $this->recalculateVendorScore($vendor, $scoredBy, [
+            'metric_id' => $metric->id,
+            'period_start' => $periodStart,
+            'period_end' => $periodEnd,
+        ]);
 
         return $performanceScore;
     }
@@ -45,7 +50,7 @@ class PerformanceService
      * Recalculate a vendor's overall performance score.
      * Uses weighted average of most recent scores per metric.
      */
-    public function recalculateVendorScore(Vendor $vendor): int
+    public function recalculateVendorScore(Vendor $vendor, ?User $actor = null, array $metadata = []): int
     {
         $metrics = PerformanceMetric::where('is_active', true)->get();
 
@@ -76,6 +81,15 @@ class PerformanceService
             : 0;
 
         $vendor->update(['performance_score' => $overallScore]);
+
+        ScoreHistory::create([
+            'vendor_id' => $vendor->id,
+            'user_id' => $actor?->id,
+            'performance_score' => $overallScore,
+            'source' => $actor ? 'manual_rating' : 'system',
+            'metadata' => $metadata,
+            'recorded_at' => now(),
+        ]);
 
         return $overallScore;
     }

@@ -13,6 +13,8 @@ export { default as Navbar, NavLink } from './Navbar';
 export { default as Footer, FooterMinimal } from './Footer';
 export { default as PageHeader } from './PageHeader';
 export { default as Logo } from './Logo';
+export { default as AppIcon } from './AppIcon';
+export { default as ThemeSwitcher } from './ThemeSwitcher';
 export {
     Tabs,
     Breadcrumb,
@@ -61,6 +63,7 @@ export {
 // BUTTON COMPONENTS
 // =====================================
 import { Link } from '@inertiajs/react';
+import AppIconComponent from './AppIcon';
 
 export function Button({
     children,
@@ -149,7 +152,15 @@ export function IconButton({ icon, onClick, variant = 'ghost', size = 'md', titl
             title={title}
             className={`${sizes[size]} rounded-lg flex items-center justify-center transition-colors ${variants[variant]}`}
         >
-            {icon}
+            {typeof icon === 'string' ? (
+                <AppIconComponent
+                    name={icon}
+                    className={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'}
+                    fallback={<span>{icon}</span>}
+                />
+            ) : (
+                icon
+            )}
         </button>
     );
 }
@@ -175,7 +186,7 @@ export function CopyButton({ text, className = '' }) {
                     : 'bg-slate-800 text-slate-400 hover:text-white'
             } ${className}`}
         >
-            {copied ? '✓ Copied' : '📋 Copy'}
+            {copied ? 'Copied' : 'Copy'}
         </button>
     );
 }

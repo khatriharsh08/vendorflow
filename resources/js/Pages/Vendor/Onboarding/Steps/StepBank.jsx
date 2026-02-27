@@ -35,7 +35,7 @@ export default function StepBank({ vendor, sessionData }) {
                             type="text"
                             value={data.bank_name}
                             onChange={(e) => setData('bank_name', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                             placeholder="e.g., State Bank of India"
                         />
                         {errors.bank_name && (
@@ -51,7 +51,7 @@ export default function StepBank({ vendor, sessionData }) {
                             type="text"
                             value={data.bank_account_number}
                             onChange={(e) => setData('bank_account_number', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                             placeholder="Account Number"
                         />
                         {errors.bank_account_number && (
@@ -69,7 +69,7 @@ export default function StepBank({ vendor, sessionData }) {
                             type="text"
                             value={data.bank_ifsc}
                             onChange={(e) => setData('bank_ifsc', e.target.value.toUpperCase())}
-                            className="input-field w-full uppercase"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all uppercase"
                             placeholder="SBIN0001234"
                         />
                         {errors.bank_ifsc && (
@@ -85,7 +85,7 @@ export default function StepBank({ vendor, sessionData }) {
                             type="text"
                             value={data.bank_branch}
                             onChange={(e) => setData('bank_branch', e.target.value)}
-                            className="input-field w-full"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                             placeholder="Branch Name"
                         />
                     </div>
@@ -102,7 +102,7 @@ export default function StepBank({ vendor, sessionData }) {
                     <button
                         type="submit"
                         disabled={processing}
-                        className="btn-primary flex items-center gap-2 text-lg px-8 py-3"
+                        className="bg-linear-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/25 hover:-translate-y-px hover:shadow-indigo-500/40 transition-all flex items-center gap-2 text-lg px-8 py-3"
                     >
                         {processing ? 'Saving...' : 'Save & Continue'}
                         <svg

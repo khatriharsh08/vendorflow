@@ -68,6 +68,11 @@ class PaymentRequest extends Model
         return $this->hasMany(PaymentApproval::class);
     }
 
+    public function logs(): HasMany
+    {
+        return $this->hasMany(PaymentLog::class);
+    }
+
     public function isPending(): bool
     {
         return in_array($this->status, [

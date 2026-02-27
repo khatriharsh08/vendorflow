@@ -1,9 +1,8 @@
-import { usePage, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { useState } from 'react';
-import { VendorLayout, PageHeader, Card, Button } from '@/Components';
+import { VendorLayout, PageHeader, Card, Button, AppIcon } from '@/Components';
 
 export default function Notifications({ vendor, notifications = { data: [] } }) {
-    const { auth } = usePage().props;
     const [filter, setFilter] = useState('all');
 
     const displayNotifications = notifications.data || [];
@@ -15,15 +14,23 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
             ? displayNotifications
             : filter === 'unread'
               ? displayNotifications.filter((n) => !n.read_at)
-              : displayNotifications.filter((n) => n.type === filter);
+              : displayNotifications.filter((n) => n.data?.type === filter);
 
     const notificationTypes = {
-        document: { icon: '📄', label: 'Document', color: 'bg-blue-100 text-blue-600' },
-        payment: { icon: '💰', label: 'Payment', color: 'bg-green-100 text-green-600' },
-        compliance: { icon: '🛡️', label: 'Compliance', color: 'bg-amber-100 text-amber-600' },
-        performance: { icon: '📈', label: 'Performance', color: 'bg-purple-100 text-purple-600' },
-        system: { icon: '⚙️', label: 'System', color: 'bg-gray-100 text-gray-600' },
-        status: { icon: '📊', label: 'Status', color: 'bg-indigo-100 text-indigo-600' },
+        document: { icon: 'documents', label: 'Document', color: 'bg-blue-100 text-blue-600' },
+        payment: { icon: 'payments', label: 'Payment', color: 'bg-green-100 text-green-600' },
+        compliance: {
+            icon: 'compliance',
+            label: 'Compliance',
+            color: 'bg-amber-100 text-amber-600',
+        },
+        performance: {
+            icon: 'trend',
+            label: 'Performance',
+            color: 'bg-purple-100 text-purple-600',
+        },
+        system: { icon: 'settings', label: 'System', color: 'bg-gray-100 text-gray-600' },
+        status: { icon: 'metrics', label: 'Status', color: 'bg-indigo-100 text-indigo-600' },
     };
 
     const handleMarkAsRead = (id) => {
@@ -65,7 +72,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
             actions={
                 unreadCount > 0 && (
                     <Button variant="outline" onClick={handleMarkAllAsRead}>
-                        ✓ Mark All as Read
+                        Mark All as Read
                     </Button>
                 )
             }
@@ -75,9 +82,9 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
     const filters = [
         { id: 'all', label: 'All', count: displayNotifications.length },
         { id: 'unread', label: 'Unread', count: unreadCount },
-        { id: 'document', label: '📄 Documents' },
-        { id: 'payment', label: '💰 Payments' },
-        { id: 'compliance', label: '🛡️ Compliance' },
+        { id: 'document', label: 'Documents' },
+        { id: 'payment', label: 'Payments' },
+        { id: 'compliance', label: 'Compliance' },
     ];
 
     return (
@@ -118,7 +125,9 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                 <Card>
                     {filteredNotifications.length === 0 ? (
                         <div className="p-12 text-center text-(--color-text-tertiary)">
-                            <div className="text-5xl mb-4">🔔</div>
+                            <div className="text-5xl mb-4 inline-flex justify-center w-full">
+                                <AppIcon name="notifications" className="h-12 w-12" />
+                            </div>
                             <p className="text-lg font-medium">No notifications</p>
                             <p className="text-sm mt-1">
                                 {filter === 'all'
@@ -130,7 +139,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                         <div className="divide-y divide-(--color-border-secondary)">
                             {filteredNotifications.map((notification) => {
                                 const typeInfo =
-                                    notificationTypes[notification.type] ||
+                                    notificationTypes[notification.data?.type] ||
                                     notificationTypes.system;
                                 const isUnread = !notification.read_at;
 
@@ -147,9 +156,9 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                         <div className="flex items-start gap-4">
                                             {/* Icon */}
                                             <div
-                                                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${typeInfo.color}`}
+                                                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${typeInfo.color}`}
                                             >
-                                                {typeInfo.icon}
+                                                <AppIcon name={typeInfo.icon} className="h-5 w-5" />
                                             </div>
 
                                             {/* Content */}
@@ -162,7 +171,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                                                 : 'text-(--color-text-secondary)'
                                                         }`}
                                                     >
-                                                        {notification.title}
+                                                        {notification.data?.title}
                                                     </h3>
                                                     <span className="text-xs text-(--color-text-muted) whitespace-nowrap">
                                                         {formatDate(notification.created_at)}
@@ -175,7 +184,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                                             : 'text-(--color-text-tertiary)'
                                                     }`}
                                                 >
-                                                    {notification.message}
+                                                    {notification.data?.message}
                                                 </p>
 
                                                 {/* Action buttons based on notification data */}
@@ -185,8 +194,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                                         className="inline-flex items-center gap-1 text-sm text-(--color-brand-primary) hover:underline mt-2"
                                                     >
                                                         {notification.data.action_text ||
-                                                            'View Details'}{' '}
-                                                        →
+                                                            'View Details'}
                                                     </a>
                                                 )}
                                             </div>
@@ -212,28 +220,30 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                         <div className="grid md:grid-cols-2 gap-4">
                             {[
                                 {
-                                    icon: '📄',
+                                    icon: 'documents',
                                     title: 'Document Updates',
                                     desc: 'When your documents are verified or need attention',
                                 },
                                 {
-                                    icon: '💰',
+                                    icon: 'payments',
                                     title: 'Payment Status',
                                     desc: 'Updates on your payment requests and approvals',
                                 },
                                 {
-                                    icon: '🛡️',
+                                    icon: 'compliance',
                                     title: 'Compliance Alerts',
                                     desc: 'When compliance status changes or action needed',
                                 },
                                 {
-                                    icon: '📊',
+                                    icon: 'metrics',
                                     title: 'Account Updates',
                                     desc: 'Status changes and important announcements',
                                 },
                             ].map((item, index) => (
                                 <div key={index} className="flex items-start gap-3">
-                                    <span className="text-xl">{item.icon}</span>
+                                    <span className="text-xl inline-flex mt-0.5">
+                                        <AppIcon name={item.icon} className="h-5 w-5" />
+                                    </span>
                                     <div>
                                         <div className="font-medium text-(--color-text-primary)">
                                             {item.title}

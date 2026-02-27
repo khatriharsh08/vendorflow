@@ -27,6 +27,17 @@ class AuditLog extends Model
         'new_values' => 'array',
     ];
 
+    protected static function booted(): void
+    {
+        static::updating(function () {
+            throw new \LogicException('Audit logs are immutable and cannot be updated.');
+        });
+
+        static::deleting(function () {
+            throw new \LogicException('Audit logs are immutable and cannot be deleted.');
+        });
+    }
+
     // Event types
     const EVENT_CREATED = 'created';
 

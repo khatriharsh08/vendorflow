@@ -10,6 +10,12 @@ import {
     DataTable,
     FormInput,
 } from '@/Components';
+const formatPaginationLabel = (label) =>
+    String(label || '')
+        .replace(/&laquo;/g, '<<')
+        .replace(/&raquo;/g, '>>')
+        .replace(/<[^>]*>/g, '')
+        .trim();
 
 export default function DocumentExpiryReport({ documents, stats, filters }) {
     const { auth } = usePage().props;
@@ -81,7 +87,7 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
             subtitle="Documents expiring within selected date range"
             actions={
                 <Link href="/admin/reports">
-                    <Button variant="secondary">← Back to Reports</Button>
+                    <Button variant="secondary">Back to Reports</Button>
                 </Link>
             }
         />
@@ -149,7 +155,7 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                             <Button onClick={handleFilter}>Apply Filter</Button>
                             {can['reports.export'] && (
                                 <Button variant="secondary" onClick={handleExport}>
-                                    📥 Export CSV
+                                    Export CSV
                                 </Button>
                             )}
                         </div>
@@ -176,8 +182,9 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                                             ? 'bg-(--color-brand-primary) text-white'
                                             : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-tertiary)'
                                     }`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
+                                >
+                                    {formatPaginationLabel(link.label)}
+                                </Link>
                             ))}
                         </div>
                     )}

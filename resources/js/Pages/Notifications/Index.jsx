@@ -1,5 +1,13 @@
 import { router, usePage } from '@inertiajs/react';
-import { AdminLayout, VendorLayout, PageHeader, Card, Button, EmptyState } from '@/Components';
+import {
+    AdminLayout,
+    VendorLayout,
+    PageHeader,
+    Card,
+    Button,
+    EmptyState,
+    AppIcon,
+} from '@/Components';
 
 export default function NotificationsIndex({ notifications, unreadCount }) {
     const { auth } = usePage().props;
@@ -21,10 +29,10 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
     };
 
     const severityIcons = {
-        info: '📢',
-        medium: '⚡',
-        high: '⚠️',
-        critical: '🚨',
+        info: 'info',
+        medium: 'running',
+        high: 'warning',
+        critical: 'error',
     };
 
     const displayNotifications = notifications?.data || notifications || [];
@@ -45,15 +53,15 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
     const Layout = isVendor ? VendorLayout : AdminLayout;
     const layoutProps = {
         title: 'Notifications',
-        activeNav: 'Dashboard', // Keep Dashboard active, notifications is in user menu
-        header: header,
+        activeNav: 'Dashboard', // Notifications are in user menu
+        header,
     };
 
     return (
         <Layout {...layoutProps}>
             {displayNotifications.length === 0 ? (
                 <EmptyState
-                    icon="🔔"
+                    icon="notifications"
                     title="No notifications"
                     description="You're all caught up! New notifications will appear here."
                 />
@@ -70,8 +78,14 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                             >
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex items-start gap-4 flex-1">
-                                        <span className="text-2xl mt-0.5">
-                                            {severityIcons[notification.data?.severity] || '📢'}
+                                        <span className="text-2xl mt-0.5 inline-flex">
+                                            <AppIcon
+                                                name={
+                                                    severityIcons[notification.data?.severity] ||
+                                                    'info'
+                                                }
+                                                className="h-6 w-6"
+                                            />
                                         </span>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">

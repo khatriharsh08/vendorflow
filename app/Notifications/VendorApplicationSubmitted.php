@@ -2,23 +2,19 @@
 
 namespace App\Notifications;
 
+use App\Models\Vendor;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class VendorApplicationSubmitted extends Notification
+class VendorApplicationSubmitted extends Notification implements ShouldQueue, \Illuminate\Contracts\Broadcasting\ShouldBroadcast
 {
     use Queueable;
-
-    public $vendor;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($vendor)
-    {
-        $this->vendor = $vendor;
-    }
+    public function __construct(public readonly Vendor $vendor) {}
 
     /**
      * Get the notification's delivery channels.
@@ -27,20 +23,20 @@ class VendorApplicationSubmitted extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database', 'mail', 'broadcast'];
     }
 
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
     {
-        return (new MailMessage)
-            ->subject('New Vendor Application Submitted')
-            ->line('A new vendor application has been submitted by '.$this->vendor->user->name)
-            ->line('Company Name: '.$this->vendor->company_name)
-            ->action('Review Application', url('/admin/vendors/'.$this->vendor->id))
-            ->line('Please review the documents and approve/reject the application.');
+        return (new \Illuminate\Notifications\Messages\MailMessage)
+            ->subject('New Vendor Application: ' . $this->vendor->company_name)
+            ->line('A new vendor application has been submitted.')
+            ->line('Company: ' . $this->vendor->company_name)
+            ->line('Submitted by: ' . $this->vendor->user->name)
+            ->action('Review Application', url('/admin/vendors/' . $this->vendor->id));
     }
 
     /**
@@ -51,7 +47,22 @@ class VendorApplicationSubmitted extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'title' => 'New Vendor Application Submitted',
+            'message' => "A new vendor application has been submitted by {$this->vendor->user->name}.",
+            'vendor_id' => $this->vendor->id,
+            'vendor_name' => $this->vendor->company_name,
+            'submitted_by' => $this->vendor->user->name,
+            'severity' => 'info',
         ];
+    }
+
+
+
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'VendorApplicationSubmitted';
     }
 }

@@ -25,14 +25,15 @@ class PerformanceScore extends Model
         'period_end' => 'date',
     ];
 
-    // Scores are immutable - prevent updates
-    public static function boot()
+    // Scores are immutable and append-only.
+    protected static function booted(): void
     {
-        parent::boot();
+        static::updating(function () {
+            throw new \LogicException('Performance scores are immutable and cannot be updated.');
+        });
 
-        static::updating(function ($model) {
-            // Prevent any updates to existing scores
-            return false;
+        static::deleting(function () {
+            throw new \LogicException('Performance scores are immutable and cannot be deleted.');
         });
     }
 

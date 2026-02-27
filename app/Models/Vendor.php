@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use InvalidArgumentException;
 
 class Vendor extends Model
 {
@@ -90,7 +91,7 @@ class Vendor extends Model
         self::STATUS_ACTIVE => [self::STATUS_SUSPENDED, self::STATUS_TERMINATED],
         self::STATUS_SUSPENDED => [self::STATUS_ACTIVE, self::STATUS_TERMINATED],
         self::STATUS_TERMINATED => [], // Terminal state
-        self::STATUS_REJECTED => [], // Terminal state
+        self::STATUS_REJECTED => [self::STATUS_DRAFT, self::STATUS_SUBMITTED], // Allow re-submission
     ];
 
     // Relationships
@@ -125,9 +126,19 @@ class Vendor extends Model
         return $this->hasMany(ComplianceResult::class);
     }
 
+    public function complianceFlags(): HasMany
+    {
+        return $this->hasMany(ComplianceFlag::class);
+    }
+
     public function performanceScores(): HasMany
     {
         return $this->hasMany(PerformanceScore::class);
+    }
+
+    public function scoreHistory(): HasMany
+    {
+        return $this->hasMany(ScoreHistory::class);
     }
 
     // State Machine Methods
@@ -148,7 +159,11 @@ class Vendor extends Model
     public function transitionTo(string $newStatus, User $user, ?string $comment = null): bool
     {
         if (! $this->canTransitionTo($newStatus)) {
-            return false;
+            throw new InvalidArgumentException("Invalid vendor status transition: {$this->status} -> {$newStatus}");
+        }
+
+        if (in_array($newStatus, [self::STATUS_REJECTED, self::STATUS_SUSPENDED], true) && blank($comment)) {
+            throw new InvalidArgumentException('A comment is required when rejecting or suspending a vendor.');
         }
 
         $oldStatus = $this->status;
@@ -177,6 +192,14 @@ class Vendor extends Model
             'to_status' => $newStatus,
             'comment' => $comment,
         ]);
+
+        AuditLog::log(
+            AuditLog::EVENT_STATE_CHANGED,
+            $this,
+            ['status' => $oldStatus],
+            ['status' => $newStatus],
+            $comment
+        );
 
         return true;
     }

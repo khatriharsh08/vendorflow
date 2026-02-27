@@ -12,8 +12,7 @@ class UpdateComplianceRuleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Add permission check if needed
-        return Auth::check();
+        return Auth::check() && Auth::user()->isSuperAdmin();
     }
 
     /**

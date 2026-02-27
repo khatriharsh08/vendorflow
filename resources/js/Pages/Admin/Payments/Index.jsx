@@ -27,6 +27,18 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
             stage === 'ops'
                 ? `/admin/payments/${paymentId}/validate-ops`
                 : `/admin/payments/${paymentId}/approve-finance`;
+
+        if (action === 'reject') {
+            const comment = window.prompt('Enter rejection reason:');
+            if (!comment) {
+                return;
+            }
+
+            router.post(route, { action, comment });
+
+            return;
+        }
+
         router.post(route, { action });
     };
 
@@ -63,9 +75,16 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
         {
             header: 'Reference',
             render: (row) => (
-                <span className="font-mono text-(--color-text-primary) font-medium">
-                    {row.reference_number}
-                </span>
+                <div className="space-y-1">
+                    <div className="font-mono text-(--color-text-primary) font-medium">
+                        {row.reference_number}
+                    </div>
+                    {row.is_duplicate_flagged && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-100 text-amber-700">
+                            Duplicate Flag
+                        </span>
+                    )}
+                </div>
             ),
         },
         {
@@ -89,7 +108,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
             align: 'right',
             render: (row) => (
                 <div className="flex gap-2 justify-end">
-                    {row.status === 'requested' && can.validate_payments && (
+                    {['requested', 'pending_ops'].includes(row.status) && can.validate_payments && (
                         <>
                             <Button
                                 variant="success"
@@ -137,11 +156,12 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                             Mark Paid
                         </Button>
                     )}
-                    {row.status === 'requested' && !can.validate_payments && (
-                        <span className="text-xs text-(--color-text-tertiary) italic">
-                            Waiting for Ops
-                        </span>
-                    )}
+                    {['requested', 'pending_ops'].includes(row.status) &&
+                        !can.validate_payments && (
+                            <span className="text-xs text-(--color-text-tertiary) italic">
+                                Waiting for Ops
+                            </span>
+                        )}
                     {row.status === 'pending_finance' && !can.approve_payments && (
                         <span className="text-xs text-(--color-text-tertiary) italic">
                             Waiting for Finance

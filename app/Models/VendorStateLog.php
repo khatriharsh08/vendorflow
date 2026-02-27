@@ -23,6 +23,17 @@ class VendorStateLog extends Model
         'metadata' => 'array',
     ];
 
+    protected static function booted(): void
+    {
+        static::updating(function () {
+            throw new \LogicException('Vendor state logs are immutable and cannot be updated.');
+        });
+
+        static::deleting(function () {
+            throw new \LogicException('Vendor state logs are immutable and cannot be deleted.');
+        });
+    }
+
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);

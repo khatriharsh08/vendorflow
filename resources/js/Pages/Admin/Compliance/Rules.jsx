@@ -1,5 +1,5 @@
-import { Link, router, usePage, useForm } from '@inertiajs/react';
-import { AdminLayout, PageHeader, Card, Badge, Button, StatCard, StatGrid } from '@/Components';
+import { router, usePage } from '@inertiajs/react';
+import { AdminLayout, PageHeader, Card, Badge } from '@/Components';
 
 export default function ComplianceRules({ rules = [] }) {
     const { auth } = usePage().props;

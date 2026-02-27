@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { AdminLayout, PageHeader, StatCard, StatGrid, Card, Badge, Button } from '@/Components';
+import { AdminLayout, AppIcon, Card, PageHeader, StatCard, StatGrid } from '@/Components';
 
 export default function AdminDashboard({
     stats = {},
@@ -17,24 +17,45 @@ export default function AdminDashboard({
             minimumFractionDigits: 0,
         }).format(amount);
     };
+
     const user = auth?.user;
     const can = auth?.can || {};
 
     const statCards = [
-        { label: 'Total Vendors', value: stats.total_vendors || 0, icon: '🏢', color: 'primary' },
-        { label: 'Active Vendors', value: stats.active_vendors || 0, icon: '✅', color: 'success' },
-        { label: 'Pending Review', value: stats.pending_review || 0, icon: '⏳', color: 'warning' },
-        { label: 'Non-Compliant', value: stats.non_compliant || 0, icon: '⚠️', color: 'danger' },
+        {
+            label: 'Total Vendors',
+            value: stats.total_vendors || 0,
+            icon: 'vendors',
+            color: 'primary',
+        },
+        {
+            label: 'Active Vendors',
+            value: stats.active_vendors || 0,
+            icon: 'success',
+            color: 'success',
+        },
+        {
+            label: 'Pending Review',
+            value: stats.pending_review || 0,
+            icon: 'clock',
+            color: 'warning',
+        },
+        {
+            label: 'Non-Compliant',
+            value: stats.non_compliant || 0,
+            icon: 'warning',
+            color: 'danger',
+        },
         {
             label: 'Pending Payments',
             value: stats.pending_payments || 0,
-            icon: '💳',
+            icon: 'payments',
             color: 'info',
         },
         {
             label: 'Approved Amount',
-            value: `₹${(stats.approved_payments || 0).toLocaleString('en-IN')}`,
-            icon: '💰',
+            value: `INR ${(stats.approved_payments || 0).toLocaleString('en-IN')}`,
+            icon: 'payments',
             color: 'success',
         },
     ];
@@ -57,7 +78,7 @@ export default function AdminDashboard({
     return (
         <AdminLayout title="Admin Dashboard" activeNav="Dashboard" header={header}>
             <div className="space-y-8">
-                {/* Stats Grid - Larger cards for better visual impact */}
+                {/* Stats Grid */}
                 <StatGrid cols={6}>
                     {statCards.map((stat, idx) => (
                         <StatCard
@@ -74,7 +95,10 @@ export default function AdminDashboard({
                         <Card
                             title={
                                 <>
-                                    <span className="mr-2">📋</span> Pending Vendor Applications
+                                    <span className="mr-2 inline-flex align-middle">
+                                        <AppIcon name="reports" className="h-4 w-4" />
+                                    </span>
+                                    Pending Vendor Applications
                                 </>
                             }
                             actions={
@@ -82,7 +106,7 @@ export default function AdminDashboard({
                                     href="/admin/vendors?status=submitted"
                                     className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
                                 >
-                                    View All →
+                                    View All
                                 </Link>
                             }
                         >
@@ -95,7 +119,7 @@ export default function AdminDashboard({
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-lg">
-                                                    🏢
+                                                    <AppIcon name="vendors" className="h-5 w-5" />
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-(--color-text-primary)">
@@ -115,7 +139,9 @@ export default function AdminDashboard({
                                     ))
                                 ) : (
                                     <div className="py-12 text-center text-(--color-text-tertiary)">
-                                        <span className="text-4xl mb-3 block">🎉</span>
+                                        <span className="text-4xl mb-3 inline-flex justify-center w-full">
+                                            <AppIcon name="success" className="h-10 w-10" />
+                                        </span>
                                         <p className="font-medium">No pending applications</p>
                                     </div>
                                 )}
@@ -128,7 +154,10 @@ export default function AdminDashboard({
                         <Card
                             title={
                                 <>
-                                    <span className="mr-2">📄</span> Documents Pending Verification
+                                    <span className="mr-2 inline-flex align-middle">
+                                        <AppIcon name="documents" className="h-4 w-4" />
+                                    </span>
+                                    Documents Pending Verification
                                 </>
                             }
                             actions={
@@ -136,7 +165,7 @@ export default function AdminDashboard({
                                     href="/admin/documents"
                                     className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
                                 >
-                                    View All →
+                                    View All
                                 </Link>
                             }
                         >
@@ -149,7 +178,7 @@ export default function AdminDashboard({
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center text-lg">
-                                                    📄
+                                                    <AppIcon name="documents" className="h-5 w-5" />
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-(--color-text-primary)">
@@ -167,7 +196,9 @@ export default function AdminDashboard({
                                     ))
                                 ) : (
                                     <div className="py-12 text-center text-(--color-text-tertiary)">
-                                        <span className="text-4xl mb-3 block">✅</span>
+                                        <span className="text-4xl mb-3 inline-flex justify-center w-full">
+                                            <AppIcon name="success" className="h-10 w-10" />
+                                        </span>
                                         <p className="font-medium">All documents verified</p>
                                     </div>
                                 )}
@@ -175,12 +206,15 @@ export default function AdminDashboard({
                         </Card>
                     )}
 
-                    {/* For Finance Manager - Professional List Design */}
+                    {/* Finance manager view */}
                     {!can.approve_vendors && can.approve_payments && (
                         <Card
                             title={
                                 <>
-                                    <span className="mr-2">💰</span> Pending Payment Approvals
+                                    <span className="mr-2 inline-flex align-middle">
+                                        <AppIcon name="payments" className="h-4 w-4" />
+                                    </span>
+                                    Pending Payment Approvals
                                 </>
                             }
                             actions={
@@ -188,7 +222,7 @@ export default function AdminDashboard({
                                     href="/admin/payments?status=pending_finance"
                                     className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
                                 >
-                                    View All →
+                                    View All
                                 </Link>
                             }
                             className="lg:col-span-2 shadow-(--shadow-md) border-(--color-brand-primary-light)"
@@ -202,14 +236,14 @@ export default function AdminDashboard({
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center text-lg">
-                                                    💳
+                                                    <AppIcon name="payments" className="h-5 w-5" />
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-(--color-text-primary)">
                                                         {payment.vendor_name}
                                                     </div>
                                                     <div className="text-sm text-(--color-text-secondary)">
-                                                        {formatCurrency(payment.amount)} •{' '}
+                                                        {formatCurrency(payment.amount)} -{' '}
                                                         <span className="capitalize">
                                                             {payment.status.replace('_', ' ')}
                                                         </span>
@@ -225,7 +259,9 @@ export default function AdminDashboard({
                                     ))
                                 ) : (
                                     <div className="py-12 text-center text-(--color-text-tertiary)">
-                                        <span className="text-4xl mb-3 block">🎉</span>
+                                        <span className="text-4xl mb-3 inline-flex justify-center w-full">
+                                            <AppIcon name="success" className="h-10 w-10" />
+                                        </span>
                                         <p className="font-medium">No pending payments</p>
                                     </div>
                                 )}
@@ -243,8 +279,8 @@ export default function AdminDashboard({
                                     href="/admin/vendors?status=submitted"
                                     className="p-4 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex flex-col items-center justify-center gap-2 group shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-0.5 transition-all"
                                 >
-                                    <span className="text-2xl group-hover:scale-110 transition-transform">
-                                        📋
+                                    <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
+                                        <AppIcon name="reports" className="h-6 w-6" />
                                     </span>
                                     <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
                                         Review Applications
@@ -256,8 +292,8 @@ export default function AdminDashboard({
                                     href="/admin/compliance"
                                     className="p-4 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex flex-col items-center justify-center gap-2 group shadow-lg shadow-emerald-200 hover:shadow-xl hover:-translate-y-0.5 transition-all"
                                 >
-                                    <span className="text-2xl group-hover:scale-110 transition-transform">
-                                        🛡️
+                                    <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
+                                        <AppIcon name="compliance" className="h-6 w-6" />
                                     </span>
                                     <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
                                         Compliance Check
@@ -268,8 +304,8 @@ export default function AdminDashboard({
                                 href="/admin/payments"
                                 className="p-4 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex flex-col items-center justify-center gap-2 group shadow-lg shadow-amber-200 hover:shadow-xl hover:-translate-y-0.5 transition-all"
                             >
-                                <span className="text-2xl group-hover:scale-110 transition-transform">
-                                    💰
+                                <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
+                                    <AppIcon name="payments" className="h-6 w-6" />
                                 </span>
                                 <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
                                     {can.approve_payments ? 'Approve Payments' : 'View Payments'}
@@ -279,8 +315,8 @@ export default function AdminDashboard({
                                 href="/notifications"
                                 className="p-4 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex flex-col items-center justify-center gap-2 group shadow-lg shadow-rose-200 hover:shadow-xl hover:-translate-y-0.5 transition-all"
                             >
-                                <span className="text-2xl group-hover:scale-110 transition-transform">
-                                    🔔
+                                <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
+                                    <AppIcon name="notifications" className="h-6 w-6" />
                                 </span>
                                 <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
                                     Notifications

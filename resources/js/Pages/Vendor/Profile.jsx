@@ -1,38 +1,15 @@
 import { usePage, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { VendorLayout, PageHeader, Card, Button, Badge } from '@/Components';
-
-const InputField = ({
-    label,
-    name,
-    type = 'text',
-    required = false,
-    disabled = false,
-    isEditing,
-    form,
-}) => (
-    <div>
-        <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
-            {label} {required && <span className="text-(--color-danger)">*</span>}
-        </label>
-        {isEditing && !disabled ? (
-            <input
-                type={type}
-                value={form.data[name]}
-                onChange={(e) => form.setData(name, e.target.value)}
-                className="input-field w-full"
-                required={required}
-            />
-        ) : (
-            <div className="px-4 py-3 bg-(--color-bg-secondary) border border-(--color-border-secondary) rounded-xl text-(--color-text-primary)">
-                {form.data[name] || <span className="text-(--color-text-muted)">Not provided</span>}
-            </div>
-        )}
-        {form.errors[name] && (
-            <p className="text-sm text-(--color-danger) mt-1">{form.errors[name]}</p>
-        )}
-    </div>
-);
+import {
+    VendorLayout,
+    PageHeader,
+    Card,
+    Button,
+    Badge,
+    AppIcon,
+    FormInput,
+    FormSelect,
+} from '@/Components';
 
 export default function Profile({ vendor }) {
     const { auth } = usePage().props;
@@ -67,10 +44,10 @@ export default function Profile({ vendor }) {
     };
 
     const tabs = [
-        { id: 'company', label: 'Company Details', icon: '🏢' },
-        { id: 'contact', label: 'Contact Info', icon: '📞' },
-        { id: 'bank', label: 'Bank Details', icon: '🏦' },
-        { id: 'status', label: 'Account Status', icon: '📊' },
+        { id: 'company', label: 'Company Details', icon: 'vendors' },
+        { id: 'contact', label: 'Contact Info', icon: 'messages' },
+        { id: 'bank', label: 'Bank Details', icon: 'payments' },
+        { id: 'status', label: 'Account Status', icon: 'metrics' },
     ];
 
     const header = (
@@ -81,7 +58,7 @@ export default function Profile({ vendor }) {
                 <div className="flex items-center gap-3">
                     <Badge status={vendor?.status || 'draft'} size="lg" />
                     {!isEditing && vendor?.status !== 'draft' && (
-                        <Button onClick={() => setIsEditing(true)}>✏️ Edit Profile</Button>
+                        <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
                     )}
                 </div>
             }
@@ -103,7 +80,9 @@ export default function Profile({ vendor }) {
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary)'
                             }`}
                         >
-                            <span>{tab.icon}</span>
+                            <span className="inline-flex">
+                                <AppIcon name={tab.icon} className="h-4 w-4" />
+                            </span>
                             <span className="hidden sm:inline">{tab.label}</span>
                         </button>
                     ))}
@@ -114,60 +93,51 @@ export default function Profile({ vendor }) {
                     {activeTab === 'company' && (
                         <Card title="Company Details">
                             <div className="grid md:grid-cols-2 gap-6 p-6">
-                                <InputField
+                                <FormInput
                                     label="Company Name"
-                                    name="company_name"
+                                    value={form.data.company_name}
+                                    onChange={(val) => form.setData('company_name', val)}
+                                    error={form.errors.company_name}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="Registration Number"
-                                    name="registration_number"
-                                    isEditing={isEditing}
-                                    form={form}
+                                    value={form.data.registration_number}
+                                    onChange={(val) => form.setData('registration_number', val)}
+                                    error={form.errors.registration_number}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="GST Number"
-                                    name="tax_id"
-                                    isEditing={isEditing}
-                                    form={form}
+                                    value={form.data.tax_id}
+                                    onChange={(val) => form.setData('tax_id', val)}
+                                    error={form.errors.tax_id}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="PAN Number"
-                                    name="pan_number"
+                                    value={form.data.pan_number}
+                                    onChange={(val) => form.setData('pan_number', val)}
+                                    error={form.errors.pan_number}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
-                                        Business Type
-                                    </label>
-                                    {isEditing ? (
-                                        <select
-                                            value={form.data.business_type}
-                                            onChange={(e) =>
-                                                form.setData('business_type', e.target.value)
-                                            }
-                                            className="input-field w-full"
-                                        >
-                                            <option value="">Select business type</option>
-                                            <option value="sole_proprietor">Sole Proprietor</option>
-                                            <option value="partnership">Partnership</option>
-                                            <option value="private_limited">Private Limited</option>
-                                            <option value="public_limited">Public Limited</option>
-                                            <option value="llp">LLP</option>
-                                        </select>
-                                    ) : (
-                                        <div className="px-4 py-3 bg-(--color-bg-secondary) border border-(--color-border-secondary) rounded-xl text-(--color-text-primary) capitalize">
-                                            {form.data.business_type?.replace('_', ' ') || (
-                                                <span className="text-(--color-text-muted)">
-                                                    Not provided
-                                                </span>
-                                            )}
-                                        </div>
-                                    )}
+                                    <FormSelect
+                                        label="Business Type"
+                                        value={form.data.business_type}
+                                        onChange={(val) => form.setData('business_type', val)}
+                                        error={form.errors.business_type}
+                                        options={[
+                                            { value: 'sole_proprietor', label: 'Sole Proprietor' },
+                                            { value: 'partnership', label: 'Partnership' },
+                                            { value: 'private_limited', label: 'Private Limited' },
+                                            { value: 'public_limited', label: 'Public Limited' },
+                                            { value: 'llp', label: 'LLP' },
+                                        ]}
+                                        disabled={!isEditing}
+                                    />
                                 </div>
                             </div>
                         </Card>
@@ -177,56 +147,62 @@ export default function Profile({ vendor }) {
                     {activeTab === 'contact' && (
                         <Card title="Contact Information">
                             <div className="grid md:grid-cols-2 gap-6 p-6">
-                                <InputField
+                                <FormInput
                                     label="Contact Person"
-                                    name="contact_person"
+                                    value={form.data.contact_person}
+                                    onChange={(val) => form.setData('contact_person', val)}
+                                    error={form.errors.contact_person}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="Phone Number"
-                                    name="contact_phone"
+                                    value={form.data.contact_phone}
+                                    onChange={(val) => form.setData('contact_phone', val)}
+                                    error={form.errors.contact_phone}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="Email Address"
-                                    name="contact_email"
                                     type="email"
-                                    disabled
-                                    isEditing={isEditing}
-                                    form={form}
+                                    value={form.data.contact_email}
+                                    onChange={(val) => form.setData('contact_email', val)}
+                                    error={form.errors.contact_email}
+                                    disabled={true} // Always disabled
                                 />
                                 <div className="md:col-span-2">
-                                    <InputField
+                                    <FormInput
                                         label="Address"
-                                        name="address"
+                                        value={form.data.address}
+                                        onChange={(val) => form.setData('address', val)}
+                                        error={form.errors.address}
                                         required
-                                        isEditing={isEditing}
-                                        form={form}
+                                        disabled={!isEditing}
                                     />
                                 </div>
-                                <InputField
+                                <FormInput
                                     label="City"
-                                    name="city"
+                                    value={form.data.city}
+                                    onChange={(val) => form.setData('city', val)}
+                                    error={form.errors.city}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="State"
-                                    name="state"
-                                    isEditing={isEditing}
-                                    form={form}
+                                    value={form.data.state}
+                                    onChange={(val) => form.setData('state', val)}
+                                    error={form.errors.state}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="Pincode"
-                                    name="pincode"
+                                    value={form.data.pincode}
+                                    onChange={(val) => form.setData('pincode', val)}
+                                    error={form.errors.pincode}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
                             </div>
                         </Card>
@@ -236,32 +212,36 @@ export default function Profile({ vendor }) {
                     {activeTab === 'bank' && (
                         <Card title="Bank Details">
                             <div className="grid md:grid-cols-2 gap-6 p-6">
-                                <InputField
+                                <FormInput
                                     label="Bank Name"
-                                    name="bank_name"
+                                    value={form.data.bank_name}
+                                    onChange={(val) => form.setData('bank_name', val)}
+                                    error={form.errors.bank_name}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="Account Number"
-                                    name="bank_account_number"
+                                    value={form.data.bank_account_number}
+                                    onChange={(val) => form.setData('bank_account_number', val)}
+                                    error={form.errors.bank_account_number}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="IFSC Code"
-                                    name="bank_ifsc"
+                                    value={form.data.bank_ifsc}
+                                    onChange={(val) => form.setData('bank_ifsc', val)}
+                                    error={form.errors.bank_ifsc}
                                     required
-                                    isEditing={isEditing}
-                                    form={form}
+                                    disabled={!isEditing}
                                 />
-                                <InputField
+                                <FormInput
                                     label="Branch"
-                                    name="bank_branch"
-                                    isEditing={isEditing}
-                                    form={form}
+                                    value={form.data.bank_branch}
+                                    onChange={(val) => form.setData('bank_branch', val)}
+                                    error={form.errors.bank_branch}
+                                    disabled={!isEditing}
                                 />
                             </div>
                         </Card>

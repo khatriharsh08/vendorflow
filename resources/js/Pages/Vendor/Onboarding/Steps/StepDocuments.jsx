@@ -1,15 +1,28 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 
 export default function StepDocuments({ documentTypes, sessionData }) {
     const [uploadedDocs, setUploadedDocs] = useState([]);
     const [processing, setProcessing] = useState(false);
-    const sessionDocs = sessionData?.step3?.documents || [];
+    const sessionDocs = useMemo(() => sessionData?.step3?.documents || [], [sessionData]);
+    const normalizeTypeId = (typeId) => String(typeId ?? '');
+
+    const sessionDocsByType = useMemo(() => {
+        const docsMap = new Map();
+
+        (Array.isArray(sessionDocs) ? sessionDocs : []).forEach((doc) => {
+            docsMap.set(normalizeTypeId(doc.document_type_id), doc);
+        });
+
+        return docsMap;
+    }, [sessionDocs]);
 
     const handleFileUpload = (typeId, file) => {
+        const normalizedTypeId = normalizeTypeId(typeId);
+
         setUploadedDocs((prev) => {
-            const filtered = prev.filter((d) => d.typeId !== typeId);
-            return [...filtered, { typeId, file, name: file.name }];
+            const filtered = prev.filter((d) => d.typeId !== normalizedTypeId);
+            return [...filtered, { typeId: normalizedTypeId, file, name: file.name }];
         });
     };
 
@@ -28,14 +41,15 @@ export default function StepDocuments({ documentTypes, sessionData }) {
     };
 
     const viewDocument = (typeId) => {
-        const uploaded = uploadedDocs.find((d) => d.typeId === typeId);
+        const normalizedTypeId = normalizeTypeId(typeId);
+        const uploaded = uploadedDocs.find((d) => d.typeId === normalizedTypeId);
         if (uploaded) {
             const url = URL.createObjectURL(uploaded.file);
             window.open(url, '_blank');
         } else {
-            const sessionDoc = sessionDocs.find((d) => d.document_type_id === typeId);
+            const sessionDoc = sessionDocsByType.get(normalizedTypeId);
             if (sessionDoc) {
-                window.open(`/vendor/onboarding/document/${typeId}`, '_blank');
+                window.open(`/vendor/onboarding/document/${sessionDoc.document_type_id}`, '_blank');
             }
         }
     };
@@ -65,18 +79,29 @@ export default function StepDocuments({ documentTypes, sessionData }) {
 
             <form onSubmit={submit} className="space-y-6">
                 <div className="grid gap-4">
+                    {(!documentTypes || documentTypes.length === 0) && (
+                        <div className="p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 text-sm">
+                            No document types are configured yet. Please contact admin to set up
+                            required onboarding documents.
+                        </div>
+                    )}
+
                     {documentTypes?.map((docType) => {
+                        const normalizedTypeId = normalizeTypeId(docType.id);
+                        const uploadedDoc =
+                            uploadedDocs.find((d) => d.typeId === normalizedTypeId) || null;
                         const uploadedIndex = uploadedDocs.findIndex(
-                            (d) => d.typeId === docType.id
+                            (d) => d.typeId === normalizedTypeId
                         );
+                        const sessionDoc = sessionDocsByType.get(normalizedTypeId);
+                        const hasUploadedDoc = Boolean(uploadedDoc || sessionDoc);
                         const error = uploadedIndex !== -1 ? getFileError(uploadedIndex) : null;
 
                         return (
                             <div
                                 key={docType.id}
                                 className={`p-4 rounded-xl border transition-all ${
-                                    uploadedDocs.find((d) => d.typeId === docType.id) ||
-                                    sessionDocs.find((d) => d.document_type_id === docType.id)
+                                    hasUploadedDoc
                                         ? 'border-(--color-success) bg-(--color-success-light)'
                                         : 'border-(--color-border-primary) bg-(--color-bg-secondary)'
                                 } ${error ? 'border-(--color-danger) bg-red-50' : ''}`}
@@ -96,10 +121,7 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                                 {docType.description}
                                             </p>
                                         )}
-                                        {(uploadedDocs.find((d) => d.typeId === docType.id) ||
-                                            sessionDocs.find(
-                                                (d) => d.document_type_id === docType.id
-                                            )) && (
+                                        {hasUploadedDoc && (
                                             <p className="text-sm text-(--color-success) mt-2 flex items-center gap-1">
                                                 <svg
                                                     className="w-4 h-4"
@@ -112,11 +134,7 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                                         clipRule="evenodd"
                                                     />
                                                 </svg>
-                                                {uploadedDocs.find((d) => d.typeId === docType.id)
-                                                    ?.name ||
-                                                    sessionDocs.find(
-                                                        (d) => d.document_type_id === docType.id
-                                                    )?.file_name}
+                                                {uploadedDoc?.name || sessionDoc?.file_name}
                                             </p>
                                         )}
                                         {error && (
@@ -126,10 +144,7 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                         )}
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        {(uploadedDocs.find((d) => d.typeId === docType.id) ||
-                                            sessionDocs.find(
-                                                (d) => d.document_type_id === docType.id
-                                            )) && (
+                                        {hasUploadedDoc && (
                                             <button
                                                 type="button"
                                                 onClick={() => viewDocument(docType.id)}
@@ -146,20 +161,13 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                                 onChange={(e) => {
                                                     if (e.target.files[0])
                                                         handleFileUpload(
-                                                            docType.id,
+                                                            normalizedTypeId,
                                                             e.target.files[0]
                                                         );
                                                 }}
                                             />
                                             <span className="px-4 py-2 rounded-lg bg-(--color-bg-primary) border border-(--color-border-primary) hover:border-(--color-brand-primary) text-(--color-text-secondary) text-sm font-medium transition-colors">
-                                                {uploadedDocs.find(
-                                                    (d) => d.typeId === docType.id
-                                                ) ||
-                                                sessionDocs.find(
-                                                    (d) => d.document_type_id === docType.id
-                                                )
-                                                    ? 'Replace'
-                                                    : 'Upload'}
+                                                {hasUploadedDoc ? 'Replace' : 'Upload'}
                                             </span>
                                         </label>
                                     </div>
@@ -180,7 +188,7 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                     <button
                         type="submit"
                         disabled={processing}
-                        className="btn-primary flex items-center gap-2 text-lg px-8 py-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="bg-linear-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/25 hover:-translate-y-px hover:shadow-indigo-500/40 transition-all flex items-center gap-2 text-lg px-8 py-3 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {processing ? 'Saving...' : 'Save & Continue'}
                         {!processing && (

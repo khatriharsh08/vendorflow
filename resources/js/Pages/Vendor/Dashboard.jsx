@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { VendorLayout, PageHeader, Card, Badge } from '@/Components';
+import { VendorLayout, PageHeader, Card, Badge, LinkButton } from '@/Components';
 
 export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) {
     const { auth } = usePage().props;
@@ -78,9 +78,10 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                     </h3>
                     <p className="text-(--color-text-tertiary) mb-4">{currentStatus.message}</p>
                     {currentStatus.action && (
-                        <Link
+                        <LinkButton
                             href={currentStatus.link}
-                            className="btn-primary inline-flex items-center gap-2"
+                            variant="primary"
+                            className="inline-flex items-center gap-2"
                         >
                             {currentStatus.action}
                             <svg
@@ -96,7 +97,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                     d="M17 8l4 4m0 0l-4 4m4-4H3"
                                 />
                             </svg>
-                        </Link>
+                        </LinkButton>
                     )}
                 </div>
 
@@ -164,12 +165,13 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                 ₹{Number(stats.pending_payments || 0).toLocaleString('en-IN')}
                             </div>
                             {displayVendor.status === 'active' && (
-                                <Link
+                                <LinkButton
                                     href="/vendor/payments"
-                                    className="btn-primary w-full mt-4 text-sm text-center block"
+                                    variant="primary"
+                                    className="w-full mt-4 text-center justify-center block"
                                 >
                                     Request Payment
-                                </Link>
+                                </LinkButton>
                             )}
                         </div>
                     </div>

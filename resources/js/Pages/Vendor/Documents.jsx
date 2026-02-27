@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import { VendorLayout, PageHeader, Card, Badge, Button } from '@/Components';
+import { VendorLayout, PageHeader, Card, Badge, Button, FormSelect } from '@/Components';
 import { DocumentViewer } from '@/Components/DocumentViewer';
 
 export default function Documents({ vendor, documents = [], documentTypes = [] }) {
@@ -63,7 +63,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                         <div className="text-3xl mb-2">✅</div>
                         <div className="text-2xl font-bold text-(--color-success)">
                             {
-                                displayDocuments.filter((d) => d.verification_status === 'approved')
+                                displayDocuments.filter((d) => d.verification_status === 'verified')
                                     .length
                             }
                         </div>
@@ -162,26 +162,18 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                         </h3>
                         <form onSubmit={handleUpload}>
                             <div className="space-y-4">
-                                <div>
-                                    <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                                        Document Type
-                                    </label>
-                                    <select
-                                        value={uploadForm.data.document_type_id}
-                                        onChange={(e) =>
-                                            uploadForm.setData('document_type_id', e.target.value)
-                                        }
-                                        className="input-field w-full"
-                                        required
-                                    >
-                                        <option value="">Select document type</option>
-                                        {documentTypes.map((type) => (
-                                            <option key={type.id} value={type.id}>
-                                                {type.display_name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <FormSelect
+                                    label="Document Type"
+                                    value={uploadForm.data.document_type_id}
+                                    onChange={(val) => uploadForm.setData('document_type_id', val)}
+                                    options={documentTypes.map((type) => ({
+                                        value: type.id,
+                                        label: type.display_name,
+                                    }))}
+                                    placeholder="Select document type"
+                                    required
+                                />
+
                                 <div>
                                     <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
                                         File
@@ -192,7 +184,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                         onChange={(e) =>
                                             uploadForm.setData('file', e.target.files[0])
                                         }
-                                        className="input-field w-full"
+                                        className="w-full bg-(--color-bg-primary) border-2 border-(--color-border-primary) rounded-xl px-4 py-3 text-(--color-text-primary) file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-(--color-brand-primary)/10 file:text-(--color-brand-primary) hover:file:bg-(--color-brand-primary)/20 transition-all"
                                         accept=".pdf,.jpg,.jpeg,.png"
                                         required
                                     />
@@ -202,20 +194,20 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                 </div>
                             </div>
                             <div className="flex justify-end gap-3 mt-6">
-                                <button
+                                <Button
                                     type="button"
+                                    variant="secondary"
                                     onClick={() => setShowUploadModal(false)}
-                                    className="px-4 py-2 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) hover:bg-(--color-bg-hover) transition-colors font-medium"
                                 >
                                     Cancel
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     type="submit"
                                     disabled={uploadForm.processing}
-                                    className="btn-primary"
+                                    variant="primary"
                                 >
                                     {uploadForm.processing ? 'Uploading...' : 'Upload'}
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>

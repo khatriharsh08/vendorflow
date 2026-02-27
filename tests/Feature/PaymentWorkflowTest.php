@@ -70,8 +70,28 @@ class PaymentWorkflowTest extends TestCase
         $this->assertDatabaseHas('payment_requests', [
             'vendor_id' => $this->vendor->id,
             'amount' => 5000,
-            'status' => 'requested',
+            'status' => 'pending_ops',
             'invoice_number' => 'INV-001',
+        ]);
+    }
+
+    public function test_duplicate_payment_request_is_flagged_for_review()
+    {
+        $payload = [
+            'amount' => 7500,
+            'description' => 'Monthly maintenance invoice',
+            'invoice_number' => 'INV-DUP-001',
+        ];
+
+        $this->actingAs($this->vendorUser)->post(route('vendor.payments.request'), $payload);
+        $response = $this->actingAs($this->vendorUser)->post(route('vendor.payments.request'), $payload);
+
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('payment_requests', [
+            'vendor_id' => $this->vendor->id,
+            'invoice_number' => 'INV-DUP-001',
+            'is_duplicate_flagged' => 1,
         ]);
     }
 

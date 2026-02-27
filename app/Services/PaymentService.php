@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\PaymentRepositoryInterface;
 use App\Models\AuditLog;
 use App\Models\PaymentApproval;
+use App\Models\PaymentLog;
 use App\Models\PaymentRequest;
 use App\Models\User;
 use App\Models\Vendor;
@@ -35,8 +36,8 @@ class PaymentService
         // Check if vendor can request payments
         $this->validateVendorCanRequestPayment($vendor);
 
-        // Check for duplicate requests
-        $this->checkForDuplicates($vendor, $amount, $invoiceNumber);
+        // Flag potential duplicate requests for manual review.
+        $isDuplicate = $this->checkForDuplicates($vendor, $amount, $invoiceNumber);
 
         $request = $this->paymentRepository->createRequest([
             'vendor_id' => $vendor->id,
@@ -46,7 +47,8 @@ class PaymentService
             'amount' => $amount,
             'description' => $description,
             'due_date' => $dueDate,
-            'status' => PaymentRequest::STATUS_REQUESTED,
+            'status' => PaymentRequest::STATUS_PENDING_OPS,
+            'is_duplicate_flagged' => $isDuplicate,
             'is_compliance_blocked' => ! $vendor->isCompliant(),
         ]);
 
@@ -62,7 +64,14 @@ class PaymentService
         AuditLog::log(AuditLog::EVENT_CREATED, $request, null, [
             'amount' => $amount,
             'vendor' => $vendor->company_name,
+            'is_duplicate_flagged' => $isDuplicate,
         ]);
+        $this->recordPaymentLog(
+            $request,
+            PaymentRequest::STATUS_PENDING_OPS,
+            $requestedBy,
+            $isDuplicate ? 'Payment request submitted (duplicate flagged for review)' : 'Payment request submitted'
+        );
 
         return $request;
     }
@@ -72,8 +81,12 @@ class PaymentService
      */
     public function validateByOps(PaymentRequest $request, User $opsManager, bool $approve, ?string $comment = null): bool
     {
-        if ($request->status !== PaymentRequest::STATUS_REQUESTED) {
+        if (! in_array($request->status, [PaymentRequest::STATUS_REQUESTED, PaymentRequest::STATUS_PENDING_OPS], true)) {
             throw new \Exception('Payment is not in the correct state for ops validation.');
+        }
+
+        if (! $approve && blank($comment)) {
+            throw new \Exception('A rejection reason is required.');
         }
 
         // Update or create the approval record
@@ -91,6 +104,7 @@ class PaymentService
 
         if ($approve) {
             $this->paymentRepository->updateRequest($request, ['status' => PaymentRequest::STATUS_PENDING_FINANCE]);
+            $this->recordPaymentLog($request, PaymentRequest::STATUS_PENDING_FINANCE, $opsManager, $comment ?? 'Validated by operations');
 
             // Create finance approval record
             $this->paymentRepository->createApproval([
@@ -109,6 +123,7 @@ class PaymentService
                 'status' => PaymentRequest::STATUS_REJECTED,
                 'rejection_reason' => $comment,
             ]);
+            $this->recordPaymentLog($request, PaymentRequest::STATUS_REJECTED, $opsManager, $comment);
 
             AuditLog::log(AuditLog::EVENT_REJECTED, $request, null, [
                 'stage' => 'ops_validation',
@@ -128,9 +143,20 @@ class PaymentService
             throw new \Exception('Payment is not pending finance approval.');
         }
 
-        // Check compliance before approval
-        if ($approve && $request->is_compliance_blocked) {
-            throw new \Exception('Cannot approve payment for non-compliant vendor.');
+        // Check compliance before approval - REALTIME CHECK
+        if ($approve) {
+            if ($request->is_compliance_blocked) {
+                throw new \Exception('Cannot approve payment: Request is flagged as non-compliant.');
+            }
+
+            // Critical: Re-check current vendor compliance status
+            if (! $request->vendor->isCompliant()) {
+                throw new \Exception('Cannot approve payment: Vendor is currently Non-Compliant (Status changed after request).');
+            }
+        }
+
+        if (! $approve && blank($comment)) {
+            throw new \Exception('A rejection reason is required.');
         }
 
         // Update the approval record
@@ -148,6 +174,7 @@ class PaymentService
 
         if ($approve) {
             $this->paymentRepository->updateRequest($request, ['status' => PaymentRequest::STATUS_APPROVED]);
+            $this->recordPaymentLog($request, PaymentRequest::STATUS_APPROVED, $financeManager, $comment ?? 'Approved by finance');
 
             AuditLog::log(AuditLog::EVENT_APPROVED, $request, null, [
                 'stage' => 'finance_approval',
@@ -159,6 +186,7 @@ class PaymentService
                 'status' => PaymentRequest::STATUS_REJECTED,
                 'rejection_reason' => $comment,
             ]);
+            $this->recordPaymentLog($request, PaymentRequest::STATUS_REJECTED, $financeManager, $comment);
 
             AuditLog::log(AuditLog::EVENT_REJECTED, $request, null, [
                 'stage' => 'finance_approval',
@@ -184,6 +212,7 @@ class PaymentService
             'payment_reference' => $paymentReference,
             'payment_method' => $paymentMethod,
         ]);
+        $this->recordPaymentLog($request, PaymentRequest::STATUS_PAID, $user, 'Marked as paid');
 
         AuditLog::log(AuditLog::EVENT_UPDATED, $request, null, [
             'action' => 'marked_as_paid',
@@ -199,23 +228,21 @@ class PaymentService
      */
     protected function validateVendorCanRequestPayment(Vendor $vendor): void
     {
-        if (! $vendor->isActive()) {
-            throw new \Exception('Only active vendors can request payments.');
+        if (! $vendor->isActive() && $vendor->status !== Vendor::STATUS_APPROVED) {
+            throw new \Exception('Only approved or active vendors can request payments.');
         }
 
-        if (! $vendor->isCompliant()) {
-            throw new \Exception('Vendor is not compliant. Please resolve compliance issues first.');
+        if (! $vendor->isCompliant() && $vendor->compliance_status !== Vendor::COMPLIANCE_PENDING) {
+            throw new \Exception('Vendor is not compliant (Status: ' . $vendor->compliance_status . '). Please resolve compliance issues first.');
         }
     }
 
     /**
      * Check for duplicate payment requests.
      */
-    protected function checkForDuplicates(Vendor $vendor, float $amount, ?string $invoiceNumber): void
+    protected function checkForDuplicates(Vendor $vendor, float $amount, ?string $invoiceNumber): bool
     {
-        if ($this->paymentRepository->existsRecentDuplicate($vendor->id, $amount, $invoiceNumber)) {
-            throw new \Exception('A similar payment request already exists within the last 30 days.');
-        }
+        return $this->paymentRepository->existsRecentDuplicate($vendor->id, $amount, $invoiceNumber);
     }
 
     /**
@@ -223,6 +250,20 @@ class PaymentService
      */
     protected function generateReferenceNumber(): string
     {
-        return 'PAY-'.strtoupper(uniqid()).'-'.date('Ymd');
+        return 'PAY-' . strtoupper(uniqid()) . '-' . date('Ymd');
+    }
+
+    protected function recordPaymentLog(PaymentRequest $request, string $status, User $actor, ?string $comment = null): void
+    {
+        PaymentLog::create([
+            'payment_request_id' => $request->id,
+            'user_id' => $actor->id,
+            'status' => $status,
+            'comment' => $comment,
+            'metadata' => [
+                'reference_number' => $request->reference_number,
+                'amount' => $request->amount,
+            ],
+        ]);
     }
 }

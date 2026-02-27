@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Services\UserNotificationService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
+    public function __construct(protected UserNotificationService $notificationService) {}
+
     /**
      * Show notification center.
      */
     public function index()
     {
-        $notifications = Auth::user()
-            ->notifications()
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        $unreadCount = Auth::user()->unreadNotifications()->count();
+        /** @var User $user */
+        $user = Auth::user();
+        $data = $this->notificationService->indexData($user);
 
         return Inertia::render('Notifications/Index', [
-            'notifications' => $notifications,
-            'unreadCount' => $unreadCount,
+            'notifications' => $data['notifications'],
+            'unreadCount' => $data['unreadCount'],
         ]);
     }
 
@@ -30,14 +31,9 @@ class NotificationController extends Controller
      */
     public function markAsRead(string $id)
     {
-        $notification = Auth::user()
-            ->notifications()
-            ->where('id', $id)
-            ->first();
-
-        if ($notification) {
-            $notification->markAsRead();
-        }
+        /** @var User $user */
+        $user = Auth::user();
+        $this->notificationService->markAsRead($user, $id);
 
         return back();
     }
@@ -47,7 +43,9 @@ class NotificationController extends Controller
      */
     public function markAllAsRead()
     {
-        Auth::user()->unreadNotifications->markAsRead();
+        /** @var User $user */
+        $user = Auth::user();
+        $this->notificationService->markAllAsRead($user);
 
         return back()->with('success', 'All notifications marked as read.');
     }
@@ -57,8 +55,11 @@ class NotificationController extends Controller
      */
     public function getUnreadCount()
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         return response()->json([
-            'count' => Auth::user()->unreadNotifications()->count(),
+            'count' => $this->notificationService->unreadCount($user),
         ]);
     }
 }

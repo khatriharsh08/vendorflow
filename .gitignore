@@ -4,26 +4,24 @@
 ### Dependencies ----------------------------------------------------------
 /vendor/
 /node_modules/
-
-# lock files
 package-lock.json
 npm-shrinkwrap.json
 yarn.lock
 pnpm-lock.yaml
-
-### Environment & Secrets --------------------------------------------------
-.env
-.env.*
-!.env.testing         # keep testing config in repo; it contains no secrets
 auth.json
 
-### Build artifacts & output ---------------------------------------------
+### Environment & Secrets --------------------------------------------------
+.env*
+!.env.testing
+
+### Build artifacts & output ------------------------------------------------
 /public/build/
 /public/hot
 /public/storage
 /public/mix-manifest.json
+.vite/
 
-### Laravel storage and cache -------------------------------------------
+### Laravel storage & cache -------------------------------------------------
 /storage/*.key
 /storage/app/public/*
 /storage/framework/cache/data/*
@@ -31,45 +29,93 @@ auth.json
 /storage/framework/testing/*
 /storage/framework/views/*
 /storage/logs/*
-
-# keep empty directories
 !*/.gitkeep
 
-### Testing / QA artefacts -----------------------------------------------
+### Testing / QA artefacts --------------------------------------------------
 /coverage/
 .phpunit.cache/
 .phpunit.result.cache
 .php-cs-fixer.cache
 .phpactor.json
 .phpstan.cache/
-junit.xml
-clover.xml
 .pest/
-
-# phpunit.xml should generally be committed; ignore if generated locally
-# but allow the distributed copy
+clover.xml
+junit.xml
 phpunit.xml
 !phpunit.xml.dist
 
-### IDEs & Editors --------------------------------------------------------
-/.idea/
-/.vscode/
+### IDEs & Editors ----------------------------------------------------------
+.idea/
+.vscode/
+.editorconfig.bak
 *.swp
 *.swo
 *.iml
 *.sublime-workspace
+*.sublime-project
 
-### OS generated files ----------------------------------------------------
+### OS generated files -------------------------------------------------------
 .DS_Store
 Thumbs.db
 desktop.ini
 
-### Logs ------------------------------------------------------------------
+### Logs -------------------------------------------------------------------
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-### Project-specific ------------------------------------------------------
+### Project-specific --------------------------------------------------------
 /database/*.sqlite
 /database/*.sqlite-journal
+/manual_test_data.txt
+test_output.txt
+
+### Temporary & backup files ------------------------------------------------
+*.tmp
+*.bak
+*.orig
+*.rej
+*~
+*.swn
+
+### Local environment & machine-specific -----------------------------------
+.env.local
+.env.*.local
+.vault
+Homestead.yaml
+Homestead.json
+.vagrant/
+.php-version
+
+### Temporary directories ---------------------------------------------------
+.cache/
+.tmp/
+tmp/
+temp/
+.turbo/
+.DS_Store/
+
+### macOS specific ----------------------------------------------------------
+._*
+.AppleDouble
+.LSOverride
+.TemporaryItems
+Icon?
+.Spotlight-V100
+.Trashes
+
+### Windows specific --------------------------------------------------------
+$RECYCLE.BIN/
+ehthumbs.db
+[Dd]esktop.ini
+
+### Dusk & Testing artifacts ------------------------------------------------
+/tests/Browser/screenshots/
+/tests/Browser/console/
+
+### Miscellaneous temporary files -------------------------------------------
+*.pid
+*.seed
+.vscode-test/
+.nyc_output/

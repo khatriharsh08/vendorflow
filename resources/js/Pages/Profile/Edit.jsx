@@ -11,6 +11,7 @@ import {
     ModalCancelButton,
     ModalPrimaryButton,
     Alert,
+    AppIcon,
 } from '@/Components';
 
 export default function ProfileEdit() {
@@ -63,9 +64,9 @@ export default function ProfileEdit() {
     const header = <PageHeader title="Profile Settings" subtitle="Manage your account settings" />;
 
     const sections = [
-        { id: 'profile', label: 'Profile', icon: '👤' },
-        { id: 'password', label: 'Password', icon: '🔐' },
-        { id: 'danger', label: 'Danger Zone', icon: '⚠️' },
+        { id: 'profile', label: 'Profile', icon: 'profile' },
+        { id: 'password', label: 'Password', icon: 'settings' },
+        { id: 'danger', label: 'Danger Zone', icon: 'warning' },
     ];
 
     return (
@@ -83,7 +84,9 @@ export default function ProfileEdit() {
                                     : 'bg-white text-(--color-text-secondary) hover:text-(--color-brand-primary) border border-(--color-border-primary) shadow-sm'
                             }`}
                         >
-                            <span>{section.icon}</span>
+                            <span className="inline-flex">
+                                <AppIcon name={section.icon} className="h-4 w-4" />
+                            </span>
                             {section.label}
                         </button>
                     ))}

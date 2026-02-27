@@ -1,4 +1,4 @@
-import { VendorLayout, PageHeader, Card } from '@/Components';
+import { AppIcon, Card, PageHeader, VendorLayout } from '@/Components';
 
 export default function Performance({ vendor, performanceScores = [], metrics = [] }) {
     const overallScore = vendor?.performance_score || 0;
@@ -96,7 +96,9 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                     <div className="divide-y divide-(--color-border-secondary)">
                         {!hasMetrics ? (
                             <div className="p-8 text-center text-(--color-text-tertiary)">
-                                <div className="text-4xl mb-4">📊</div>
+                                <div className="text-4xl mb-4 inline-flex justify-center w-full">
+                                    <AppIcon name="metrics" className="h-10 w-10" />
+                                </div>
                                 <p>No performance metrics defined yet.</p>
                                 <p className="text-sm mt-2">
                                     Performance metrics will appear here once configured by admin.
@@ -147,7 +149,9 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                     <div className="p-6">
                         {performanceScores.length === 0 ? (
                             <div className="text-center text-(--color-text-tertiary) py-8">
-                                <div className="text-4xl mb-4">📈</div>
+                                <div className="text-4xl mb-4 inline-flex justify-center w-full">
+                                    <AppIcon name="trend" className="h-10 w-10" />
+                                </div>
                                 <p>No performance history available yet.</p>
                                 <p className="text-sm mt-2">
                                     Performance scores will appear here once evaluated.
@@ -188,22 +192,22 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                         <div className="grid md:grid-cols-2 gap-4">
                             {[
                                 {
-                                    icon: '⚡',
+                                    icon: 'running',
                                     title: 'Deliver on Time',
                                     desc: 'Meeting deadlines consistently improves your reliability score',
                                 },
                                 {
-                                    icon: '💬',
+                                    icon: 'messages',
                                     title: 'Communicate Clearly',
                                     desc: 'Prompt and clear communication builds trust',
                                 },
                                 {
-                                    icon: '✅',
+                                    icon: 'success',
                                     title: 'Quality First',
                                     desc: 'High-quality work reduces revisions and increases satisfaction',
                                 },
                                 {
-                                    icon: '📋',
+                                    icon: 'reports',
                                     title: 'Stay Compliant',
                                     desc: 'Keep all documents updated and follow policies',
                                 },
@@ -212,7 +216,9 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                     key={index}
                                     className="flex items-start gap-3 p-4 bg-(--color-bg-secondary) rounded-xl"
                                 >
-                                    <span className="text-2xl">{tip.icon}</span>
+                                    <span className="text-2xl inline-flex">
+                                        <AppIcon name={tip.icon} className="h-6 w-6" />
+                                    </span>
                                     <div>
                                         <h4 className="font-semibold text-(--color-text-primary)">
                                             {tip.title}

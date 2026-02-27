@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Admin\UpdateComplianceRuleRequest;
-use App\Models\ComplianceResult;
 use App\Models\ComplianceRule;
 use App\Models\Vendor;
+use App\Services\ComplianceDashboardService;
 use App\Services\ComplianceService;
 use Inertia\Inertia;
 
@@ -13,9 +13,12 @@ class ComplianceController extends Controller
 {
     protected ComplianceService $complianceService;
 
-    public function __construct(ComplianceService $complianceService)
+    protected ComplianceDashboardService $dashboardService;
+
+    public function __construct(ComplianceService $complianceService, ComplianceDashboardService $dashboardService)
     {
         $this->complianceService = $complianceService;
+        $this->dashboardService = $dashboardService;
     }
 
     /**
@@ -23,39 +26,15 @@ class ComplianceController extends Controller
      */
     public function dashboard()
     {
-        $stats = [
-            'compliant' => Vendor::where('compliance_status', Vendor::COMPLIANCE_COMPLIANT)->count(),
-            'at_risk' => Vendor::where('compliance_status', Vendor::COMPLIANCE_AT_RISK)->count(),
-            'non_compliant' => Vendor::where('compliance_status', Vendor::COMPLIANCE_NON_COMPLIANT)->count(),
-            'blocked' => Vendor::where('compliance_status', Vendor::COMPLIANCE_BLOCKED)->count(),
-        ];
+        $this->authorize('viewCompliance');
 
-        $atRiskVendors = Vendor::whereIn('compliance_status', [
-            Vendor::COMPLIANCE_AT_RISK,
-            Vendor::COMPLIANCE_NON_COMPLIANT,
-            Vendor::COMPLIANCE_BLOCKED,
-        ])
-            ->with('user')
-            ->orderBy('compliance_score', 'asc')
-            ->take(10)
-            ->get();
-
-        $recentResults = ComplianceResult::with(['vendor', 'rule'])
-            ->where('status', ComplianceResult::STATUS_FAIL)
-            ->whereNull('resolved_at')
-            ->latest()
-            ->take(10)
-            ->get();
-
-        $rules = ComplianceRule::withCount([
-            'results as failures_count' => fn ($q) => $q->where('status', 'fail')->whereNull('resolved_at'),
-        ])->get();
+        $data = $this->dashboardService->dashboardData();
 
         return Inertia::render('Admin/Compliance/Dashboard', [
-            'stats' => $stats,
-            'atRiskVendors' => $atRiskVendors,
-            'recentResults' => $recentResults,
-            'rules' => $rules,
+            'stats' => $data['stats'],
+            'atRiskVendors' => $data['atRiskVendors'],
+            'recentResults' => $data['recentResults'],
+            'rules' => $data['rules'],
         ]);
     }
 
@@ -64,21 +43,14 @@ class ComplianceController extends Controller
      */
     public function vendorCompliance(Vendor $vendor)
     {
-        $results = ComplianceResult::with('rule')
-            ->where('vendor_id', $vendor->id)
-            ->orderBy('evaluated_at', 'desc')
-            ->get();
+        $this->authorize('viewCompliance');
 
-        $grouped = $results->groupBy('status');
+        $data = $this->dashboardService->vendorDetailData($vendor);
 
         return Inertia::render('Admin/Compliance/VendorDetail', [
-            'vendor' => $vendor->load('user'),
-            'results' => $results,
-            'summary' => [
-                'passing' => $grouped->get('pass', collect())->count(),
-                'failing' => $grouped->get('fail', collect())->count(),
-                'warnings' => $grouped->get('warning', collect())->count(),
-            ],
+            'vendor' => $data['vendor'],
+            'results' => $data['results'],
+            'summary' => $data['summary'],
         ]);
     }
 
@@ -87,6 +59,8 @@ class ComplianceController extends Controller
      */
     public function evaluate(Vendor $vendor)
     {
+        $this->authorize('runCompliance');
+
         $result = $this->complianceService->evaluateVendor($vendor);
 
         return back()->with('success', "Compliance evaluated. Score: {$result['score']}, Status: {$result['status']}");
@@ -97,6 +71,8 @@ class ComplianceController extends Controller
      */
     public function evaluateAll()
     {
+        $this->authorize('runCompliance');
+
         $results = $this->complianceService->evaluateAllVendors();
 
         return back()->with('success', 'Compliance evaluation completed for '.count($results).' vendors.');
@@ -107,6 +83,8 @@ class ComplianceController extends Controller
      */
     public function rules()
     {
+        $this->authorize('viewCompliance');
+
         $rules = ComplianceRule::all();
 
         return Inertia::render('Admin/Compliance/Rules', [
@@ -119,6 +97,8 @@ class ComplianceController extends Controller
      */
     public function updateRule(UpdateComplianceRuleRequest $request, ComplianceRule $rule)
     {
+        $this->authorize('manageComplianceRules');
+
         $validated = $request->validated();
 
         $rule->update($validated);

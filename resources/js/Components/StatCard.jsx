@@ -1,3 +1,5 @@
+import AppIcon from './AppIcon';
+
 // Professional StatCard Component with refined styling
 export default function StatCard({
     label,
@@ -40,11 +42,26 @@ export default function StatCard({
                     <div className="text-xs font-medium text-(--color-text-tertiary) truncate">
                         {label}
                     </div>
+                    {trend && (
+                        <div
+                            className={`text-xs font-medium mt-1 ${
+                                trend.positive ? 'text-(--color-success)' : 'text-(--color-danger)'
+                            }`}
+                        >
+                            {trend.value}
+                        </div>
+                    )}
                 </div>
                 <div
                     className={`p-2 rounded-lg flex-shrink-0 ${iconStyles[color]} opacity-80 group-hover:opacity-100 transition-opacity`}
                 >
-                    <span className="text-lg leading-none block">{icon}</span>
+                    <AppIcon
+                        name={icon}
+                        className="h-5 w-5"
+                        fallback={
+                            <span className="text-sm leading-none block font-semibold">{icon}</span>
+                        }
+                    />
                 </div>
             </div>
 

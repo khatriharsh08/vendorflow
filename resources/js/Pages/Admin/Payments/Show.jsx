@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     AdminLayout,
@@ -122,6 +122,12 @@ export default function PaymentsShow({ payment }) {
                                     {payment.description}
                                 </div>
                             </div>
+                            {payment.is_duplicate_flagged && (
+                                <div className="md:col-span-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                                    Duplicate request pattern detected. Ops/Finance review is
+                                    required before approval.
+                                </div>
+                            )}
                             {payment.paid_date && (
                                 <>
                                     <div>
@@ -212,27 +218,28 @@ export default function PaymentsShow({ payment }) {
                     <Card title="Actions">
                         <div className="space-y-3">
                             {/* Ops Actions */}
-                            {payment.status === 'requested' && can.validate_payments && (
-                                <>
-                                    <p className="text-sm text-(--color-text-tertiary) mb-2">
-                                        Ops Validation Required
-                                    </p>
-                                    <Button
-                                        variant="success"
-                                        className="w-full justify-center"
-                                        onClick={() => handleApprove('ops')}
-                                    >
-                                        Validate Request
-                                    </Button>
-                                    <Button
-                                        variant="danger"
-                                        className="w-full justify-center"
-                                        onClick={() => openRejectModal('ops')}
-                                    >
-                                        Reject Request
-                                    </Button>
-                                </>
-                            )}
+                            {['requested', 'pending_ops'].includes(payment.status) &&
+                                can.validate_payments && (
+                                    <>
+                                        <p className="text-sm text-(--color-text-tertiary) mb-2">
+                                            Ops Validation Required
+                                        </p>
+                                        <Button
+                                            variant="success"
+                                            className="w-full justify-center"
+                                            onClick={() => handleApprove('ops')}
+                                        >
+                                            Validate Request
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            className="w-full justify-center"
+                                            onClick={() => openRejectModal('ops')}
+                                        >
+                                            Reject Request
+                                        </Button>
+                                    </>
+                                )}
 
                             {/* Finance Actions */}
                             {payment.status === 'pending_finance' && can.approve_payments && (
@@ -269,11 +276,12 @@ export default function PaymentsShow({ payment }) {
                             )}
 
                             {/* Status Indicators if no action */}
-                            {payment.status === 'requested' && !can.validate_payments && (
-                                <div className="text-center text-(--color-text-tertiary) italic py-2">
-                                    Waiting for Ops Validation
-                                </div>
-                            )}
+                            {['requested', 'pending_ops'].includes(payment.status) &&
+                                !can.validate_payments && (
+                                    <div className="text-center text-(--color-text-tertiary) italic py-2">
+                                        Waiting for Ops Validation
+                                    </div>
+                                )}
                             {payment.status === 'pending_finance' && !can.approve_payments && (
                                 <div className="text-center text-(--color-text-tertiary) italic py-2">
                                     Waiting for Finance Approval

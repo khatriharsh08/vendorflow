@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { VendorLayout, PageHeader, Card, Button } from '@/Components';
+import { VendorLayout, PageHeader, Card, Button, FormInput, FormTextarea } from '@/Components';
 
 export default function Payments({ vendor, payments = { data: [] } }) {
     const [showRequestModal, setShowRequestModal] = useState(false);
@@ -48,7 +48,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
             title="Payments"
             subtitle="Track and request payments"
             actions={
-                vendor?.status === 'active' && (
+                ['active', 'approved'].includes(vendor?.status) && (
                     <Button onClick={() => setShowRequestModal(true)}>
                         <svg
                             className="w-4 h-4"
@@ -73,9 +73,9 @@ export default function Payments({ vendor, payments = { data: [] } }) {
     return (
         <VendorLayout title="Payments" activeNav="Payments" header={header} vendor={vendor}>
             <div className="space-y-8 animate-fade-in">
-                {/* Summary Cards - Glass Theme */}
+                {/* Summary Cards */}
                 <div className="grid md:grid-cols-3 gap-6">
-                    <div className="glass-card p-6 relative overflow-hidden group">
+                    <div className="bg-white rounded-2xl p-6 border border-yellow-100 shadow-lg shadow-yellow-100/50 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all duration-500 group-hover:bg-yellow-400/20"></div>
                         <div className="flex items-center justify-between mb-4 relative z-10">
                             <span className="text-sm font-medium text-slate-500">
@@ -90,7 +90,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                         </div>
                     </div>
 
-                    <div className="glass-card p-6 relative overflow-hidden group">
+                    <div className="bg-white rounded-2xl p-6 border border-emerald-100 shadow-lg shadow-emerald-100/50 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all duration-500 group-hover:bg-emerald-400/20"></div>
                         <div className="flex items-center justify-between mb-4 relative z-10">
                             <span className="text-sm font-medium text-slate-500">Total Paid</span>
@@ -103,7 +103,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                         </div>
                     </div>
 
-                    <div className="glass-card p-6 relative overflow-hidden group">
+                    <div className="bg-white rounded-2xl p-6 border border-indigo-100 shadow-lg shadow-indigo-100/50 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-400/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all duration-500 group-hover:bg-indigo-400/20"></div>
                         <div className="flex items-center justify-between mb-4 relative z-10">
                             <span className="text-sm font-medium text-slate-500">
@@ -132,7 +132,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                             <p className="mb-6">
                                 Create your first payment request to get started.
                             </p>
-                            {vendor?.status === 'active' && (
+                            {['active', 'approved'].includes(vendor?.status) && (
                                 <Button onClick={() => setShowRequestModal(true)}>
                                     Request Payment
                                 </Button>
@@ -202,7 +202,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                 </Card>
             </div>
 
-            {/* Request Payment Modal - Premium */}
+            {/* Request Payment Modal */}
             {showRequestModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div
@@ -210,8 +210,8 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                         onClick={() => setShowRequestModal(false)}
                     />
 
-                    <div className="relative glass-modal w-full max-w-lg rounded-2xl p-0 overflow-hidden shadow-2xl animate-scale-in">
-                        <div className="p-6 border-b border-slate-100 bg-white/50">
+                    <div className="relative bg-white w-full max-w-lg rounded-2xl p-0 overflow-hidden shadow-2xl animate-scale-in">
+                        <div className="p-6 border-b border-slate-100 bg-slate-50/50">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h3 className="text-xl font-bold text-slate-900">
@@ -240,85 +240,55 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                         </div>
 
                         <form onSubmit={handleSubmitRequest} className="p-6 space-y-5">
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    Amount (₹) <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
-                                        ₹
-                                    </span>
-                                    <input
-                                        type="number"
-                                        value={requestForm.data.amount}
-                                        onChange={(e) =>
-                                            requestForm.setData('amount', e.target.value)
-                                        }
-                                        className="input-field w-full pl-8 font-medium text-lg"
-                                        placeholder="0.00"
-                                        min="1"
-                                        required
-                                        autoFocus
-                                    />
+                            {requestForm.errors.submit && (
+                                <div className="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm font-medium">
+                                    {requestForm.errors.submit}
                                 </div>
-                                {requestForm.errors.amount && (
-                                    <p className="text-sm text-red-500 mt-1">
-                                        {requestForm.errors.amount}
-                                    </p>
-                                )}
-                            </div>
+                            )}
+                            <FormInput
+                                label="Amount (₹)"
+                                type="number"
+                                value={requestForm.data.amount}
+                                onChange={(val) => requestForm.setData('amount', val)}
+                                error={requestForm.errors.amount}
+                                placeholder="0.00"
+                                required
+                                autoFocus
+                            />
 
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    Invoice Number
-                                </label>
-                                <input
-                                    type="text"
-                                    value={requestForm.data.invoice_number}
-                                    onChange={(e) =>
-                                        requestForm.setData('invoice_number', e.target.value)
-                                    }
-                                    className="input-field w-full"
-                                    placeholder="INV-2024-001"
-                                />
-                            </div>
+                            <FormInput
+                                label="Invoice Number"
+                                value={requestForm.data.invoice_number}
+                                onChange={(val) => requestForm.setData('invoice_number', val)}
+                                error={requestForm.errors.invoice_number}
+                                placeholder="INV-2024-001"
+                            />
 
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    Description <span className="text-red-500">*</span>
-                                </label>
-                                <textarea
-                                    value={requestForm.data.description}
-                                    onChange={(e) =>
-                                        requestForm.setData('description', e.target.value)
-                                    }
-                                    className="input-field w-full resize-none"
-                                    rows="3"
-                                    placeholder="Brief description of services or products..."
-                                    required
-                                ></textarea>
-                                {requestForm.errors.description && (
-                                    <p className="text-sm text-red-500 mt-1">
-                                        {requestForm.errors.description}
-                                    </p>
-                                )}
-                            </div>
+                            <FormTextarea
+                                label="Description"
+                                value={requestForm.data.description}
+                                onChange={(val) => requestForm.setData('description', val)}
+                                error={requestForm.errors.description}
+                                placeholder="Brief description of services or products..."
+                                required
+                                rows={3}
+                            />
 
                             <div className="flex gap-3 pt-2">
-                                <button
-                                    type="button"
+                                <Button
+                                    variant="outline"
                                     onClick={() => setShowRequestModal(false)}
-                                    className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all font-semibold"
+                                    className="flex-1 justify-center py-2.5"
                                 >
                                     Cancel
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     type="submit"
                                     disabled={requestForm.processing}
-                                    className="flex-1 btn-primary py-2.5 text-base shadow-lg shadow-indigo-500/20"
+                                    className="flex-1 justify-center py-2.5 text-base shadow-lg shadow-indigo-500/20"
                                 >
                                     {requestForm.processing ? 'Submitting...' : 'Submit Request'}
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>

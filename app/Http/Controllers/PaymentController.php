@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PaymentRequest;
 use App\Services\PaymentService;
+use App\Services\PaymentQueryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -12,9 +13,12 @@ class PaymentController extends Controller
 {
     protected PaymentService $paymentService;
 
-    public function __construct(PaymentService $paymentService)
+    protected PaymentQueryService $paymentQueryService;
+
+    public function __construct(PaymentService $paymentService, PaymentQueryService $paymentQueryService)
     {
         $this->paymentService = $paymentService;
+        $this->paymentQueryService = $paymentQueryService;
     }
 
     /**
@@ -22,28 +26,12 @@ class PaymentController extends Controller
      */
     public function index(Request $request)
     {
-        $status = $request->query('status', 'all');
-
-        $query = PaymentRequest::with(['vendor', 'requester'])
-            ->orderBy('created_at', 'desc');
-
-        if ($status !== 'all') {
-            $query->where('status', $status);
-        }
-
-        $payments = $query->paginate(15);
-
-        $stats = [
-            'pending' => PaymentRequest::whereIn('status', ['requested', 'pending_ops', 'pending_finance'])->count(),
-            'approved' => PaymentRequest::where('status', 'approved')->count(),
-            'paid' => PaymentRequest::where('status', 'paid')->sum('amount'),
-            'total' => PaymentRequest::count(),
-        ];
+        $data = $this->paymentQueryService->adminIndexData($request);
 
         return Inertia::render('Admin/Payments/Index', [
-            'payments' => $payments,
-            'stats' => $stats,
-            'currentStatus' => $status,
+            'payments' => $data['payments'],
+            'stats' => $data['stats'],
+            'currentStatus' => $data['currentStatus'],
         ]);
     }
 
@@ -52,6 +40,8 @@ class PaymentController extends Controller
      */
     public function show(PaymentRequest $payment)
     {
+        $this->authorize('view', $payment);
+
         $payment->load(['vendor', 'requester', 'approvals.user']);
 
         return Inertia::render('Admin/Payments/Show', [
@@ -64,9 +54,11 @@ class PaymentController extends Controller
      */
     public function validateOps(Request $request, PaymentRequest $payment)
     {
+        $this->authorize('validateOps', $payment);
+
         $request->validate([
             'action' => 'required|in:approve,reject',
-            'comment' => 'nullable|string|max:500',
+            'comment' => 'required_if:action,reject|nullable|string|max:500',
         ]);
 
         try {
@@ -84,9 +76,11 @@ class PaymentController extends Controller
      */
     public function approveFinance(Request $request, PaymentRequest $payment)
     {
+        $this->authorize('approveFinance', $payment);
+
         $request->validate([
             'action' => 'required|in:approve,reject',
-            'comment' => 'nullable|string|max:500',
+            'comment' => 'required_if:action,reject|nullable|string|max:500',
         ]);
 
         try {
@@ -104,6 +98,8 @@ class PaymentController extends Controller
      */
     public function markPaid(Request $request, PaymentRequest $payment)
     {
+        $this->authorize('markPaid', $payment);
+
         $request->validate([
             'payment_reference' => 'required|string|max:100',
             'payment_method' => 'nullable|string|max:50',

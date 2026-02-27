@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleAndPermissionSeeder::class,
+            VendorStateSeeder::class,
             DocumentTypeSeeder::class,
             ComplianceRuleSeeder::class,
             PerformanceMetricSeeder::class,

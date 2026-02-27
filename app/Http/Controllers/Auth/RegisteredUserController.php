@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -34,7 +36,7 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:vendor,ops_manager,finance_manager',
+            'role' => 'nullable|in:vendor',
         ]);
 
         $user = User::create([
@@ -43,10 +45,10 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Assign role
-        // Assign role
-        $roleName = $request->role;
+        // Public registration is restricted to vendor role only.
+        $roleName = Role::VENDOR;
         $user->assignRole($roleName);
+        HandleInertiaRequests::clearAuthCache($user->id);
 
         // Verify role assignment
         if (! $user->hasRole($roleName)) {

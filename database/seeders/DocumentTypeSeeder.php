@@ -8,11 +8,11 @@ use Illuminate\Database\Seeder;
 class DocumentTypeSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Default document type definitions.
      */
-    public function run(): void
+    public static function defaults(): array
     {
-        $documentTypes = [
+        return [
             [
                 'name' => 'company_registration',
                 'display_name' => 'Company Registration Certificate',
@@ -73,19 +73,30 @@ class DocumentTypeSeeder extends Seeder
                 'allowed_extensions' => ['pdf'],
             ],
         ];
+    }
+
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $documentTypes = self::defaults();
 
         foreach ($documentTypes as $docType) {
-            DocumentType::create([
+            DocumentType::updateOrCreate([
                 'name' => $docType['name'],
+            ], [
                 'display_name' => $docType['display_name'],
                 'description' => $docType['description'] ?? null,
                 'is_mandatory' => $docType['is_mandatory'] ?? false,
                 'has_expiry' => $docType['has_expiry'] ?? false,
                 'expiry_warning_days' => $docType['expiry_warning_days'] ?? 30,
-                'allowed_extensions' => json_encode($docType['allowed_extensions'] ?? ['pdf']),
+                'allowed_extensions' => $docType['allowed_extensions'] ?? ['pdf'],
             ]);
         }
 
-        $this->command->info('Document types seeded successfully!');
+        if ($this->command) {
+            $this->command->info('Document types seeded successfully!');
+        }
     }
 }

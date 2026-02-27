@@ -28,8 +28,15 @@ export default function VendorShow({ vendor }) {
             reject: `/admin/vendors/${vendor.id}/reject`,
             activate: `/admin/vendors/${vendor.id}/activate`,
             suspend: `/admin/vendors/${vendor.id}/suspend`,
+            terminate: `/admin/vendors/${vendor.id}/terminate`,
         };
-        actionForm.post(routes[action], {
+
+        const route = routes[action];
+        if (!route) {
+            return;
+        }
+
+        actionForm.post(route, {
             onSuccess: () => {
                 setShowActionModal(null);
                 actionForm.reset();
@@ -50,10 +57,24 @@ export default function VendorShow({ vendor }) {
         ...(can.edit_vendor_notes ? [{ id: 'notes', label: 'Internal Notes' }] : []),
     ];
 
-    const canApprove = vendor?.status === 'submitted' || vendor?.status === 'under_review';
-    const canReject = vendor?.status === 'submitted' || vendor?.status === 'under_review';
-    const canActivate = vendor?.status === 'approved';
-    const canSuspend = vendor?.status === 'active';
+    const canApprove =
+        can.approve_vendors &&
+        (vendor?.status === 'submitted' || vendor?.status === 'under_review');
+    const canReject =
+        can.reject_vendors && (vendor?.status === 'submitted' || vendor?.status === 'under_review');
+    const canActivate = can.activate_vendors && vendor?.status === 'approved';
+    const canSuspend = can.suspend_vendors && vendor?.status === 'active';
+    const canTerminate = can.terminate_vendors && ['active', 'suspended'].includes(vendor?.status);
+
+    const actionLabels = {
+        approve: 'Approve',
+        reject: 'Reject',
+        activate: 'Activate',
+        suspend: 'Suspend',
+        terminate: 'Terminate',
+    };
+
+    const isCommentRequired = ['reject', 'suspend', 'terminate'].includes(showActionModal);
 
     const headerActions = (
         <div className="flex gap-2">
@@ -73,6 +94,11 @@ export default function VendorShow({ vendor }) {
             {canSuspend && (
                 <Button variant="warning" onClick={() => setShowActionModal('suspend')}>
                     Suspend
+                </Button>
+            )}
+            {canTerminate && (
+                <Button variant="danger" onClick={() => setShowActionModal('terminate')}>
+                    Terminate
                 </Button>
             )}
         </div>
@@ -396,7 +422,7 @@ export default function VendorShow({ vendor }) {
             <Modal
                 isOpen={!!showActionModal}
                 onClose={() => setShowActionModal(null)}
-                title={`${showActionModal} Vendor`}
+                title={`${actionLabels[showActionModal] ?? 'Update'} Vendor`}
                 footer={
                     <>
                         <ModalCancelButton onClick={() => setShowActionModal(null)} />
@@ -409,17 +435,19 @@ export default function VendorShow({ vendor }) {
                             onClick={() => handleAction(showActionModal)}
                             disabled={actionForm.processing}
                         >
-                            {actionForm.processing ? 'Processing...' : showActionModal}
+                            {actionForm.processing
+                                ? 'Processing...'
+                                : (actionLabels[showActionModal] ?? 'Submit')}
                         </ModalPrimaryButton>
                     </>
                 }
             >
                 <FormTextarea
-                    label={`Comment ${['reject', 'suspend'].includes(showActionModal) ? '*' : '(optional)'}`}
+                    label={`Comment ${isCommentRequired ? '*' : '(optional)'}`}
                     value={actionForm.data.comment}
                     onChange={(val) => actionForm.setData('comment', val)}
                     placeholder="Add a comment..."
-                    required={['reject', 'suspend'].includes(showActionModal)}
+                    required={isCommentRequired}
                 />
             </Modal>
         </AdminLayout>

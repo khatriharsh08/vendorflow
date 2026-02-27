@@ -1,6 +1,6 @@
 import { Link, useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
-import { Logo } from '@/Components';
+import Logo from '@/Components/Logo';
 
 export default function Register() {
     const form = useForm({
@@ -36,7 +36,7 @@ export default function Register() {
                                     'linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 27%, rgba(255,255,255,0) 100%)',
                             }}
                         >
-                            <Logo size="2xl" light={false} />
+                            <Logo size="2xl" light={false} linkToHome={false} />
                         </Link>
 
                         {/* Content */}

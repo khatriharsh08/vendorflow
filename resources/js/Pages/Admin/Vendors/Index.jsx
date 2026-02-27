@@ -66,6 +66,8 @@ export default function VendorsIndex({ vendors = [], currentStatus = 'all', sear
         'approved',
         'active',
         'suspended',
+        'terminated',
+        'rejected',
     ];
 
     const header = (

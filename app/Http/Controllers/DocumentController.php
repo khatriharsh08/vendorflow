@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\VendorDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class DocumentController extends Controller
@@ -18,6 +19,8 @@ class DocumentController extends Controller
      */
     public function adminIndex(Request $request)
     {
+        $this->authorize('viewCompliance');
+
         $query = VendorDocument::with(['vendor', 'documentType']);
 
         // Filter by status
@@ -28,7 +31,7 @@ class DocumentController extends Controller
         // Search by vendor name
         if ($request->has('search') && $request->search) {
             $query->whereHas('vendor', function ($q) use ($request) {
-                $q->where('business_name', 'like', '%'.$request->search.'%');
+                $q->where('company_name', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -47,6 +50,8 @@ class DocumentController extends Controller
      */
     public function pendingVerification()
     {
+        $this->authorize('viewCompliance');
+
         $documents = VendorDocument::with(['vendor', 'documentType'])
             ->where('verification_status', 'pending')
             ->latest()
@@ -62,6 +67,8 @@ class DocumentController extends Controller
      */
     public function verify(Request $request, VendorDocument $document)
     {
+        $this->authorize('verify', $document);
+
         $request->validate([
             'notes' => 'nullable|string|max:500',
         ]);
@@ -92,6 +99,8 @@ class DocumentController extends Controller
      */
     public function reject(Request $request, VendorDocument $document)
     {
+        $this->authorize('reject', $document);
+
         $request->validate([
             'reason' => 'required|string|max:500',
         ]);
@@ -120,19 +129,20 @@ class DocumentController extends Controller
     /**
      * Download a document.
      */
+    public function preview(VendorDocument $document)
+    {
+        return $this->view($document);
+    }
+
+    /**
+     * Download a document.
+     */
     public function download(VendorDocument $document)
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+        $this->authorize('download', $document);
 
-        // Check if user can access this document
-        if ($user->isVendor() && $document->vendor->user_id !== $user->id) {
-            abort(403);
-        }
-
-        $path = storage_path('app/private/'.$document->file_path);
-
-        if (! file_exists($path)) {
+        $path = $this->resolvePrivateDocumentPath($document);
+        if ($path === null) {
             abort(404, 'Document not found.');
         }
 
@@ -144,19 +154,11 @@ class DocumentController extends Controller
      */
     public function view(VendorDocument $document)
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+        $this->authorize('view', $document);
 
-        // Check if user can access this document
-        // Vendors can only see their own documents, staff can see all
-        if ($user->isVendor() && $document->vendor->user_id !== $user->id) {
-            abort(403, 'You do not have permission to view this document.');
-        }
+        $path = $this->resolvePrivateDocumentPath($document);
 
-        $path = storage_path('app/private/'.$document->file_path);
-
-        // If file doesn't exist, return a placeholder response
-        if (! file_exists($path)) {
+        if ($path === null) {
             // Return a simple HTML page indicating file not found
             return response()->view('errors.document-not-found', [
                 'document' => $document,
@@ -169,5 +171,36 @@ class DocumentController extends Controller
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="'.$document->file_name.'"',
         ]);
+    }
+
+    /**
+     * Resolve a vendor document path safely inside the private disk root.
+     */
+    private function resolvePrivateDocumentPath(VendorDocument $document): ?string
+    {
+        $disk = Storage::disk('private');
+
+        try {
+            if (! $disk->exists($document->file_path)) {
+                return null;
+            }
+
+            $absolutePath = $disk->path($document->file_path);
+            $resolvedPath = realpath($absolutePath);
+            $privateRoot = realpath($disk->path(''));
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if (! $resolvedPath || ! $privateRoot) {
+            return null;
+        }
+
+        // Prevent path traversal outside the private storage root.
+        if (! str_starts_with($resolvedPath, $privateRoot.DIRECTORY_SEPARATOR) && $resolvedPath !== $privateRoot) {
+            return null;
+        }
+
+        return $resolvedPath;
     }
 }

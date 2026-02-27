@@ -64,7 +64,7 @@ class HandleInertiaRequests extends Middleware
         }
 
         // Cache user roles for 5 minutes to reduce DB queries
-        $cacheKey = "user_{$user->id}_auth_data";
+        $cacheKey = "user_{$user->id}_auth_data_v2";
 
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($user) {
             // Eager load roles and permissions in ONE query
@@ -102,6 +102,7 @@ class HandleInertiaRequests extends Middleware
                     'reject_vendors' => $isOpsManager || $isSuperAdmin,
                     'activate_vendors' => $isOpsManager || $isSuperAdmin,
                     'suspend_vendors' => $isOpsManager || $isSuperAdmin,
+                    'terminate_vendors' => $isOpsManager || $isSuperAdmin,
                     'edit_vendor_notes' => $isOpsManager || $isSuperAdmin,
 
                     // Document actions
@@ -119,6 +120,7 @@ class HandleInertiaRequests extends Middleware
                     // Compliance actions
                     'run_compliance' => $isOpsManager || $isSuperAdmin,
                     'edit_rules' => $isSuperAdmin,
+                    'view_messages' => $isOpsManager || $isSuperAdmin,
 
                     // Admin access
                     'view_audit' => $isSuperAdmin,
@@ -143,5 +145,6 @@ class HandleInertiaRequests extends Middleware
     public static function clearAuthCache($userId): void
     {
         Cache::forget("user_{$userId}_auth_data");
+        Cache::forget("user_{$userId}_auth_data_v2");
     }
 }

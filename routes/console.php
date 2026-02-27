@@ -29,3 +29,15 @@ Schedule::command('vendors:weekly-summary')
     ->weeklyOn(1, '09:00')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/summary.log'));
+
+// Monthly performance score generation on the 1st at 3:00 AM
+Schedule::command('vendors:generate-performance-scores')
+    ->monthlyOn(1, '03:00')
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/performance.log'));
+
+// Daily payment workflow alerts (approval backlog + payment delays) at 10:00 AM
+Schedule::command('vendors:payment-alerts')
+    ->dailyAt('10:00')
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/payment-alerts.log'));

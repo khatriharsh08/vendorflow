@@ -1,4 +1,4 @@
-import { VendorLayout, PageHeader, Card, Badge } from '@/Components';
+import { VendorLayout, PageHeader, Card, Badge, AppIcon } from '@/Components';
 
 export default function Compliance({ vendor, complianceResults = [], rules = [] }) {
     const complianceScore = vendor?.compliance_score || 0;
@@ -23,10 +23,8 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
     return (
         <VendorLayout title="Compliance" activeNav="Compliance" header={header} vendor={vendor}>
             <div className="space-y-8">
-                {/* Compliance Score Card */}
-                <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 shadow-(--shadow-sm)">
+                <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 shadow-token-sm">
                     <div className="flex flex-col md:flex-row items-center gap-8">
-                        {/* Score Circle */}
                         <div className="relative w-40 h-40 flex-shrink-0">
                             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                                 <circle
@@ -44,10 +42,10 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                     fill="none"
                                     stroke={
                                         complianceScore >= 80
-                                            ? '#10b981'
+                                            ? 'var(--color-success)'
                                             : complianceScore >= 50
-                                              ? '#f59e0b'
-                                              : '#ef4444'
+                                              ? 'var(--color-warning)'
+                                              : 'var(--color-danger)'
                                     }
                                     strokeWidth="8"
                                     strokeLinecap="round"
@@ -64,48 +62,52 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                             </div>
                         </div>
 
-                        {/* Score Details */}
                         <div className="flex-1 text-center md:text-left">
                             <h2 className="text-2xl font-bold text-(--color-text-primary) mb-2">
                                 Compliance Score
                             </h2>
                             <p className="text-(--color-text-tertiary) mb-4">
                                 {complianceScore >= 80
-                                    ? 'Excellent! Your compliance is in good standing.'
+                                    ? 'Excellent. Your compliance is in good standing.'
                                     : complianceScore >= 50
                                       ? 'Needs attention. Please review failed requirements.'
-                                      : 'Critical! Immediate action required.'}
+                                      : 'Critical. Immediate action required.'}
                             </p>
                             <div className="flex justify-center md:justify-start gap-4">
-                                <div className="text-center px-4 py-2 bg-emerald-50 rounded-lg">
-                                    <div className="text-2xl font-bold text-emerald-600">
+                                <div className="text-center px-4 py-2 bg-(--color-success-light) rounded-lg">
+                                    <div className="text-2xl font-bold text-(--color-success)">
                                         {passedRules}
                                     </div>
-                                    <div className="text-xs text-emerald-700">Passed</div>
+                                    <div className="text-xs text-(--color-success-dark)">
+                                        Passed
+                                    </div>
                                 </div>
-                                <div className="text-center px-4 py-2 bg-red-50 rounded-lg">
-                                    <div className="text-2xl font-bold text-red-600">
+                                <div className="text-center px-4 py-2 bg-(--color-danger-light) rounded-lg">
+                                    <div className="text-2xl font-bold text-(--color-danger)">
                                         {failedRules}
                                     </div>
-                                    <div className="text-xs text-red-700">Failed</div>
+                                    <div className="text-xs text-(--color-danger-dark)">Failed</div>
                                 </div>
-                                <div className="text-center px-4 py-2 bg-gray-50 rounded-lg">
-                                    <div className="text-2xl font-bold text-gray-600">
+                                <div className="text-center px-4 py-2 bg-(--color-bg-secondary) rounded-lg">
+                                    <div className="text-2xl font-bold text-(--color-text-tertiary)">
                                         {pendingRules}
                                     </div>
-                                    <div className="text-xs text-gray-700">Pending</div>
+                                    <div className="text-xs text-(--color-text-secondary)">
+                                        Pending
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Compliance Rules */}
                 <Card title="Compliance Requirements">
                     <div className="divide-y divide-(--color-border-secondary)">
                         {rules.length === 0 ? (
                             <div className="p-8 text-center text-(--color-text-tertiary)">
-                                <div className="text-4xl mb-4">🛡️</div>
+                                <div className="text-4xl mb-4 inline-flex justify-center w-full">
+                                    <AppIcon name="compliance" className="h-10 w-10" />
+                                </div>
                                 <p>No compliance rules defined yet.</p>
                             </div>
                         ) : (
@@ -124,17 +126,22 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                             <div
                                                 className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
                                                     status === 'pass'
-                                                        ? 'bg-emerald-100 text-emerald-600'
+                                                        ? 'bg-(--color-success-light) text-(--color-success)'
                                                         : status === 'fail'
-                                                          ? 'bg-red-100 text-red-600'
-                                                          : 'bg-gray-100 text-gray-500'
+                                                          ? 'bg-(--color-danger-light) text-(--color-danger)'
+                                                          : 'bg-(--color-bg-tertiary) text-(--color-text-tertiary)'
                                                 }`}
                                             >
-                                                {status === 'pass'
-                                                    ? '✓'
-                                                    : status === 'fail'
-                                                      ? '✗'
-                                                      : '○'}
+                                                <AppIcon
+                                                    name={
+                                                        status === 'pass'
+                                                            ? 'success'
+                                                            : status === 'fail'
+                                                              ? 'error'
+                                                              : 'clock'
+                                                    }
+                                                    className="h-5 w-5"
+                                                />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
@@ -160,10 +167,10 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                             <div
                                                 className={`px-3 py-1 rounded-full text-xs font-medium ${
                                                     status === 'pass'
-                                                        ? 'bg-emerald-100 text-emerald-700'
+                                                        ? 'bg-(--color-success-light) text-(--color-success-dark)'
                                                         : status === 'fail'
-                                                          ? 'bg-red-100 text-red-700'
-                                                          : 'bg-gray-100 text-gray-600'
+                                                          ? 'bg-(--color-danger-light) text-(--color-danger-dark)'
+                                                          : 'bg-(--color-bg-tertiary) text-(--color-text-tertiary)'
                                                 }`}
                                             >
                                                 {status === 'pass'
@@ -180,17 +187,18 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                     </div>
                 </Card>
 
-                {/* Tips Card */}
                 {failedRules > 0 && (
                     <Card title="How to Improve">
                         <div className="p-6">
-                            <div className="flex items-start gap-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                                <span className="text-2xl">💡</span>
+                            <div className="flex items-start gap-4 p-4 bg-(--color-warning-light) border border-(--color-warning) rounded-xl">
+                                <span className="text-2xl inline-flex">
+                                    <AppIcon name="info" className="h-6 w-6" />
+                                </span>
                                 <div>
-                                    <h4 className="font-semibold text-amber-800 mb-2">
+                                    <h4 className="font-semibold text-(--color-warning-dark) mb-2">
                                         Tips to improve your compliance score:
                                     </h4>
-                                    <ul className="text-sm text-amber-700 space-y-1 list-disc list-inside">
+                                    <ul className="text-sm text-(--color-warning-dark) space-y-1 list-disc list-inside">
                                         <li>
                                             Ensure all mandatory documents are uploaded and verified
                                         </li>

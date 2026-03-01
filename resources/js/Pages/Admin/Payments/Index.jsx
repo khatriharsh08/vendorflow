@@ -35,7 +35,6 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
             }
 
             router.post(route, { action, comment });
-
             return;
         }
 
@@ -54,21 +53,22 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                     setShowMarkPaidModal(false);
                     setSelectedPayment(null);
                     setPaymentRef('');
+                    setPaymentMethod('');
                 },
             }
         );
     };
 
     const statCards = [
-        { label: 'Pending Requests', value: stats?.pending || 0, icon: '⏳', color: 'warning' },
-        { label: 'Approved', value: stats?.approved || 0, icon: '✅', color: 'success' },
+        { label: 'Pending Requests', value: stats?.pending || 0, icon: 'clock', color: 'warning' },
+        { label: 'Approved', value: stats?.approved || 0, icon: 'success', color: 'success' },
         {
             label: 'Total Paid',
-            value: `₹${(stats?.paid || 0).toLocaleString('en-IN')}`,
-            icon: '💰',
+            value: `INR ${(stats?.paid || 0).toLocaleString('en-IN')}`,
+            icon: 'payments',
             color: 'primary',
         },
-        { label: 'Total Transactions', value: stats?.total || 0, icon: '📋', color: 'info' },
+        { label: 'Total Transactions', value: stats?.total || 0, icon: 'reports', color: 'info' },
     ];
 
     const columns = [
@@ -80,7 +80,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                         {row.reference_number}
                     </div>
                     {row.is_duplicate_flagged && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-100 text-amber-700">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-(--color-warning-light) text-(--color-warning-dark)">
                             Duplicate Flag
                         </span>
                     )}
@@ -98,7 +98,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
             align: 'right',
             render: (row) => (
                 <span className="text-(--color-text-primary) font-bold">
-                    ₹{parseFloat(row.amount).toLocaleString('en-IN')}
+                    INR {parseFloat(row.amount).toLocaleString('en-IN')}
                 </span>
             ),
         },
@@ -106,74 +106,91 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
         {
             header: 'Actions',
             align: 'right',
-            render: (row) => (
-                <div className="flex gap-2 justify-end">
-                    {['requested', 'pending_ops'].includes(row.status) && can.validate_payments && (
-                        <>
-                            <Button
-                                variant="success"
-                                size="sm"
-                                onClick={() => handleAction(row.id, 'ops', 'approve')}
-                            >
-                                Validate
-                            </Button>
-                            <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => handleAction(row.id, 'ops', 'reject')}
-                            >
-                                Reject
-                            </Button>
-                        </>
-                    )}
-                    {row.status === 'pending_finance' && can.approve_payments && (
-                        <>
-                            <Button
-                                variant="success"
-                                size="sm"
-                                onClick={() => handleAction(row.id, 'finance', 'approve')}
-                            >
-                                Approve
-                            </Button>
-                            <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => handleAction(row.id, 'finance', 'reject')}
-                            >
-                                Reject
-                            </Button>
-                        </>
-                    )}
-                    {row.status === 'approved' && can.mark_paid && (
+            render: (row) => {
+                const vendorIsCompliant = row.vendor?.compliance_status === 'compliant';
+                const isFinanceApprovalBlocked =
+                    row.status === 'pending_finance' &&
+                    Boolean(row.is_compliance_blocked) &&
+                    !vendorIsCompliant;
+
+                return (
+                    <div className="flex gap-2 justify-end items-center">
                         <Button
-                            variant="primary"
+                            variant="secondary"
                             size="sm"
-                            onClick={() => {
-                                setSelectedPayment(row.id);
-                                setShowMarkPaidModal(true);
-                            }}
+                            onClick={() => router.get(`/admin/payments/${row.id}`)}
                         >
-                            Mark Paid
+                            Review
                         </Button>
-                    )}
-                    {['requested', 'pending_ops'].includes(row.status) &&
-                        !can.validate_payments && (
+                        {['requested', 'pending_ops'].includes(row.status) &&
+                            can.validate_payments && (
+                                <>
+                                    <Button
+                                        variant="success"
+                                        size="sm"
+                                        onClick={() => handleAction(row.id, 'ops', 'approve')}
+                                    >
+                                        Validate
+                                    </Button>
+                                    <Button
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={() => handleAction(row.id, 'ops', 'reject')}
+                                    >
+                                        Reject
+                                    </Button>
+                                </>
+                            )}
+                        {row.status === 'pending_finance' && can.approve_payments && (
+                            <>
+                                <Button
+                                    variant="success"
+                                    size="sm"
+                                    disabled={isFinanceApprovalBlocked}
+                                    onClick={() => handleAction(row.id, 'finance', 'approve')}
+                                >
+                                    {isFinanceApprovalBlocked ? 'Blocked' : 'Approve'}
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    onClick={() => handleAction(row.id, 'finance', 'reject')}
+                                >
+                                    Reject
+                                </Button>
+                            </>
+                        )}
+                        {row.status === 'approved' && can.mark_paid && (
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => {
+                                    setSelectedPayment(row.id);
+                                    setShowMarkPaidModal(true);
+                                }}
+                            >
+                                Mark Paid
+                            </Button>
+                        )}
+                        {['requested', 'pending_ops'].includes(row.status) &&
+                            !can.validate_payments && (
+                                <span className="text-xs text-(--color-text-tertiary) italic">
+                                    Waiting for Ops
+                                </span>
+                            )}
+                        {row.status === 'pending_finance' && !can.approve_payments && (
                             <span className="text-xs text-(--color-text-tertiary) italic">
-                                Waiting for Ops
+                                Waiting for Finance
                             </span>
                         )}
-                    {row.status === 'pending_finance' && !can.approve_payments && (
-                        <span className="text-xs text-(--color-text-tertiary) italic">
-                            Waiting for Finance
-                        </span>
-                    )}
-                    {row.status === 'approved' && !can.mark_paid && (
-                        <span className="text-xs text-(--color-text-tertiary) italic">
-                            Ready for Payment
-                        </span>
-                    )}
-                </div>
-            ),
+                        {row.status === 'approved' && !can.mark_paid && (
+                            <span className="text-xs text-(--color-text-tertiary) italic">
+                                Ready for Payment
+                            </span>
+                        )}
+                    </div>
+                );
+            },
         },
     ];
 
@@ -194,14 +211,12 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
     return (
         <AdminLayout title="Payment Requests" activeNav="Payments" header={header}>
             <div className="space-y-8">
-                {/* Stats */}
                 <StatGrid cols={6}>
                     {statCards.map((stat, idx) => (
                         <StatCard key={idx} {...stat} className="h-full" />
                     ))}
                 </StatGrid>
 
-                {/* Status Filters */}
                 <div className="flex gap-2 flex-wrap p-1 bg-(--color-bg-tertiary) rounded-xl inline-flex">
                     {statusFilters.map((status) => (
                         <Link
@@ -209,7 +224,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                             href={`/admin/payments?status=${status}`}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                                 currentStatus === status
-                                    ? 'bg-(--color-bg-primary) text-(--color-text-primary) shadow-(--shadow-sm)'
+                                    ? 'bg-(--color-bg-primary) text-(--color-text-primary) shadow-token-sm'
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)/50'
                             }`}
                         >
@@ -219,7 +234,6 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                     ))}
                 </div>
 
-                {/* Payments Table */}
                 <DataTable
                     columns={columns}
                     data={payments?.data || []}
@@ -227,7 +241,6 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                 />
             </div>
 
-            {/* Mark Paid Modal */}
             <Modal
                 isOpen={showMarkPaidModal && can.mark_paid}
                 onClose={() => setShowMarkPaidModal(false)}

@@ -145,13 +145,18 @@ class PaymentService
 
         // Check compliance before approval - REALTIME CHECK
         if ($approve) {
-            if ($request->is_compliance_blocked) {
-                throw new \Exception('Cannot approve payment: Request is flagged as non-compliant.');
-            }
+            $request->loadMissing('vendor');
+            $vendor = $request->vendor;
 
             // Critical: Re-check current vendor compliance status
-            if (! $request->vendor->isCompliant()) {
+            if (! $vendor || ! $vendor->isCompliant()) {
                 throw new \Exception('Cannot approve payment: Vendor is currently Non-Compliant (Status changed after request).');
+            }
+
+            // Auto-unblock legacy requests once vendor becomes compliant again.
+            if ($request->is_compliance_blocked) {
+                $this->paymentRepository->updateRequest($request, ['is_compliance_blocked' => false]);
+                $request->refresh();
             }
         }
 

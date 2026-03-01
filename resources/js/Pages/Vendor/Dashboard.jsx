@@ -1,12 +1,15 @@
 import { Link, usePage } from '@inertiajs/react';
-import { VendorLayout, PageHeader, Card, Badge, LinkButton } from '@/Components';
+import { AppIcon, Badge, Card, LinkButton, PageHeader, VendorLayout } from '@/Components';
 
 export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) {
     const { auth } = usePage().props;
-    const user = auth.user;
+    const user = auth?.user;
 
-    // Use actual vendor data
-    const displayVendor = vendor || { status: 'draft', compliance_score: 0, performance_score: 0 };
+    const displayVendor = vendor || {
+        status: 'draft',
+        compliance_score: 0,
+        performance_score: 0,
+    };
 
     const statusMessages = {
         draft: {
@@ -27,8 +30,8 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
             action: null,
         },
         approved: {
-            title: 'Application Approved!',
-            message: 'Congratulations! Your vendor account has been approved. Awaiting activation.',
+            title: 'Application Approved',
+            message: 'Your vendor account has been approved. Awaiting activation.',
             action: null,
         },
         active: {
@@ -48,7 +51,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
     const header = (
         <PageHeader
             title="Dashboard"
-            subtitle={`Welcome back, ${user?.name?.split(' ')[0]}!`}
+            subtitle={`Welcome back, ${user?.name?.split(' ')[0] || 'Vendor'}!`}
             actions={<Badge status={displayVendor.status} size="lg" />}
         />
     );
@@ -61,9 +64,8 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
             vendor={displayVendor}
         >
             <div className="space-y-8">
-                {/* Status Alert - Light Theme */}
                 <div
-                    className={`bg-(--color-bg-primary) border rounded-xl p-6 shadow-(--shadow-sm) border-l-4 ${
+                    className={`bg-(--color-bg-primary) border rounded-xl p-6 shadow-token-sm border-l-4 ${
                         displayVendor.status === 'active'
                             ? 'border-l-(--color-success)'
                             : displayVendor.status === 'suspended'
@@ -89,6 +91,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
+                                aria-hidden="true"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -101,16 +104,16 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                     )}
                 </div>
 
-                {/* Stats Cards */}
                 {displayVendor.status !== 'draft' && (
                     <div className="grid md:grid-cols-3 gap-6">
-                        {/* Compliance Score */}
-                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-(--shadow-sm)">
+                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-semibold text-lg text-(--color-text-primary)">
                                     Compliance
                                 </h3>
-                                <span className="text-2xl">🛡️</span>
+                                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-(--color-brand-primary-light) text-(--color-brand-primary)">
+                                    <AppIcon name="compliance" className="h-5 w-5" />
+                                </span>
                             </div>
                             <div
                                 className={`text-4xl font-bold mb-2 ${
@@ -133,36 +136,38 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                               : 'bg-(--color-danger)'
                                     }`}
                                     style={{ width: `${displayVendor.compliance_score || 0}%` }}
-                                ></div>
+                                />
                             </div>
                         </div>
 
-                        {/* Performance Score */}
-                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-(--shadow-sm)">
+                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-semibold text-lg text-(--color-text-primary)">
                                     Performance
                                 </h3>
-                                <span className="text-2xl">📈</span>
+                                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-(--color-info-light) text-(--color-info)">
+                                    <AppIcon name="trend" className="h-5 w-5" />
+                                </span>
                             </div>
                             <div className="text-4xl font-bold mb-2 text-(--color-brand-primary)">
                                 {displayVendor.performance_score || 0}/100
                             </div>
                             <p className="text-sm text-(--color-text-tertiary)">
-                                Based on delivery & quality metrics
+                                Based on delivery and quality metrics
                             </p>
                         </div>
 
-                        {/* Pending Payments */}
-                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-(--shadow-sm)">
+                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-semibold text-lg text-(--color-text-primary)">
                                     Pending Payments
                                 </h3>
-                                <span className="text-2xl">💰</span>
+                                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-(--color-warning-light) text-(--color-warning)">
+                                    <AppIcon name="payments" className="h-5 w-5" />
+                                </span>
                             </div>
                             <div className="text-4xl font-bold mb-2 text-(--color-text-primary)">
-                                ₹{Number(stats.pending_payments || 0).toLocaleString('en-IN')}
+                                INR {Number(stats.pending_payments || 0).toLocaleString('en-IN')}
                             </div>
                             {displayVendor.status === 'active' && (
                                 <LinkButton
@@ -177,7 +182,6 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                     </div>
                 )}
 
-                {/* Recent Documents */}
                 {recentDocuments.length > 0 && (
                     <Card
                         title="Recent Documents"
@@ -186,7 +190,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                 href="/vendor/documents"
                                 className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
                             >
-                                View All →
+                                View All
                             </Link>
                         }
                     >
@@ -197,7 +201,9 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                     className="flex items-center justify-between p-4 hover:bg-(--color-bg-hover) transition-colors"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <span className="text-xl">📄</span>
+                                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-(--color-bg-tertiary) text-(--color-brand-primary)">
+                                            <AppIcon name="documents" className="h-4 w-4" />
+                                        </span>
                                         <div>
                                             <div className="text-(--color-text-primary) text-sm font-medium">
                                                 {doc.file_name}

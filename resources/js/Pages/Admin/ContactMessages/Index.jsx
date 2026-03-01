@@ -61,7 +61,7 @@ export default function Index() {
             render: (row) => (
                 <Link href={`/admin/contact-messages/${row.id}`}>
                     <Button variant="ghost" size="sm">
-                        View →
+                        View
                     </Button>
                 </Link>
             ),
@@ -127,7 +127,7 @@ export default function Index() {
                                     {stats?.new || 0}
                                 </p>
                             </div>
-                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-xl bg-(--color-info-light) flex items-center justify-center">
                                 <svg
                                     className="w-5 h-5 text-(--color-info)"
                                     fill="none"
@@ -152,7 +152,7 @@ export default function Index() {
                                     {stats?.replied || 0}
                                 </p>
                             </div>
-                            <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-xl bg-(--color-success-light) flex items-center justify-center">
                                 <svg
                                     className="w-5 h-5 text-(--color-success)"
                                     fill="none"
@@ -210,7 +210,7 @@ export default function Index() {
                             href={`/admin/contact-messages?status=${status === 'all' ? '' : status}${search ? `&search=${search}` : ''}`}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
                                 filters?.status === status || (!filters?.status && status === 'all')
-                                    ? 'bg-(--color-brand-primary) text-white shadow-(--shadow-primary)'
+                                    ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
                             }`}
                         >

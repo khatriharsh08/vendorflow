@@ -1,39 +1,45 @@
-# Generated .gitignore for VendorFlow
-# Based on default Laravel + Node.js templates, cleaned and structured.
+# =========================================================
+# VendorFlow .gitignore (Laravel + React/Vite)
+# =========================================================
 
-### Dependencies ----------------------------------------------------------
+# Dependencies
 /vendor/
 /node_modules/
-package-lock.json
-npm-shrinkwrap.json
-yarn.lock
-pnpm-lock.yaml
 auth.json
 
-### Environment & Secrets --------------------------------------------------
-.env*
-!.env.testing
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
 
-### Build artifacts & output ------------------------------------------------
+# Build artifacts
 /public/build/
 /public/hot
 /public/storage
 /public/mix-manifest.json
 .vite/
 
-### Laravel storage & cache -------------------------------------------------
-/storage/*.key
-/storage/app/public/*
-/storage/framework/cache/data/*
-/storage/framework/sessions/*
-/storage/framework/testing/*
-/storage/framework/views/*
-/storage/logs/*
-!*/.gitkeep
+# Laravel runtime files
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
 
-### Testing / QA artefacts --------------------------------------------------
+/storage/*.key
+/storage/app/*
+!/storage/app/.gitignore
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+
+# Testing artifacts and reports
 /coverage/
-.phpunit.cache/
+/.phpunit.cache/
 .phpunit.result.cache
 .php-cs-fixer.cache
 .phpactor.json
@@ -43,60 +49,37 @@ clover.xml
 junit.xml
 phpunit.xml
 !phpunit.xml.dist
+/tests/Browser/screenshots/
+/tests/Browser/console/
+.nyc_output/
+coverage-final.json
 
-### IDEs & Editors ----------------------------------------------------------
+# Local databases
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# IDE/editor metadata
 .idea/
 .vscode/
-.editorconfig.bak
+.vscode-test/
+*.iml
 *.swp
 *.swo
-*.iml
+*.swn
 *.sublime-workspace
 *.sublime-project
+.editorconfig.bak
+.fleet/
+.idea_modules/
+.history/
 
-### OS generated files -------------------------------------------------------
+# OS-generated files
 .DS_Store
 Thumbs.db
 desktop.ini
-
-### Logs -------------------------------------------------------------------
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-### Project-specific --------------------------------------------------------
-/database/*.sqlite
-/database/*.sqlite-journal
-/manual_test_data.txt
-test_output.txt
-
-### Temporary & backup files ------------------------------------------------
-*.tmp
-*.bak
-*.orig
-*.rej
-*~
-*.swn
-
-### Local environment & machine-specific -----------------------------------
-.env.local
-.env.*.local
-.vault
-Homestead.yaml
-Homestead.json
-.vagrant/
-.php-version
-
-### Temporary directories ---------------------------------------------------
-.cache/
-.tmp/
-tmp/
-temp/
-.turbo/
-.DS_Store/
-
-### macOS specific ----------------------------------------------------------
+[Dd]esktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
 ._*
 .AppleDouble
 .LSOverride
@@ -105,17 +88,51 @@ Icon?
 .Spotlight-V100
 .Trashes
 
-### Windows specific --------------------------------------------------------
-$RECYCLE.BIN/
-ehthumbs.db
-[Dd]esktop.ini
-
-### Dusk & Testing artifacts ------------------------------------------------
-/tests/Browser/screenshots/
-/tests/Browser/console/
-
-### Miscellaneous temporary files -------------------------------------------
+# Local machine/project temp files
+.cache/
+.tmp/
+tmp/
+temp/
+.turbo/
+.vault
+.vagrant/
+.php-version
+Homestead.yaml
+Homestead.json
+manual_test_data.txt
+test_output.txt
+*.tmp
+*.bak
+*.orig
+*.rej
+*~
 *.pid
 *.seed
-.vscode-test/
-.nyc_output/
+*.stackdump
+nohup.out
+*.old
+*.save
+*.temp
+*.cache
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Frontend/build tool temporary caches
+.eslintcache
+.stylelintcache
+.sass-cache/
+.parcel-cache/
+.cache-loader/
+*.tsbuildinfo
+
+# Misc generated folders (non-source)
+dist/
+out/
+build/
+storybook-static/

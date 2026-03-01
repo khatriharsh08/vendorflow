@@ -7,6 +7,7 @@ use App\Models\ComplianceResult;
 use App\Models\ComplianceRule;
 use App\Models\DocumentType;
 use App\Models\Vendor;
+use App\Models\VendorDocument;
 use Carbon\Carbon;
 
 class ComplianceService
@@ -214,7 +215,9 @@ class ComplianceService
 
         $expiringDocs = $vendor->documents()
             ->where('is_current', true)
+            ->where('verification_status', VendorDocument::STATUS_VERIFIED)
             ->whereNotNull('expiry_date')
+            ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true))
             ->where('expiry_date', '<=', $warningDate)
             ->with('documentType')
             ->get();

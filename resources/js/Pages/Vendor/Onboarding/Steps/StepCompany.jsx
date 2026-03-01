@@ -23,7 +23,7 @@ export default function StepCompany({ vendor, sessionData }) {
     };
 
     return (
-        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-(--shadow-lg) animate-fade-in">
+        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-token-lg animate-fade-in">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-2 text-(--color-text-primary)">
                     Company Information
@@ -41,7 +41,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.company_name}
                             onChange={(e) => setData('company_name', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                             placeholder="Legal Entity Name"
                         />
                         {errors.company_name && (
@@ -75,7 +75,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.registration_number}
                             onChange={(e) => setData('registration_number', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                             placeholder="CIN / LLPIN"
                         />
                     </div>
@@ -88,7 +88,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.tax_id}
                             onChange={(e) => setData('tax_id', e.target.value.toUpperCase())}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                             placeholder="22AAAAA0000A1Z5"
                         />
                     </div>
@@ -101,7 +101,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.pan_number}
                             onChange={(e) => setData('pan_number', e.target.value.toUpperCase())}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                             placeholder="ABCDE1234F"
                         />
                         {errors.pan_number && (
@@ -117,7 +117,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.contact_person}
                             onChange={(e) => setData('contact_person', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                         />
                     </div>
 
@@ -129,7 +129,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="tel"
                             value={data.contact_phone}
                             onChange={(e) => setData('contact_phone', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                             placeholder="+91 98765 43210"
                         />
                         {errors.contact_phone && (
@@ -144,7 +144,7 @@ export default function StepCompany({ vendor, sessionData }) {
                         <textarea
                             value={data.address}
                             onChange={(e) => setData('address', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all min-h-[80px]"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all min-h-[80px]"
                             placeholder="Full street address"
                         ></textarea>
                     </div>
@@ -157,7 +157,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.city}
                             onChange={(e) => setData('city', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                         />
                     </div>
 
@@ -169,7 +169,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.state}
                             onChange={(e) => setData('state', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                         />
                     </div>
 
@@ -181,7 +181,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.pincode}
                             onChange={(e) => setData('pincode', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                         />
                     </div>
                 </div>
@@ -190,7 +190,7 @@ export default function StepCompany({ vendor, sessionData }) {
                     <button
                         type="submit"
                         disabled={processing}
-                        className="bg-linear-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/25 hover:-translate-y-px hover:shadow-indigo-500/40 transition-all flex items-center gap-2 text-lg px-8 py-3"
+                        className="bg-gradient-primary text-white font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
                     >
                         {processing ? 'Saving...' : 'Save & Continue'}
                         <svg

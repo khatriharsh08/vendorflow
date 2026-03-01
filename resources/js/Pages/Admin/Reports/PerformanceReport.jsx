@@ -10,12 +10,6 @@ import {
     DataTable,
     FormInput,
 } from '@/Components';
-const formatPaginationLabel = (label) =>
-    String(label || '')
-        .replace(/&laquo;/g, '<<')
-        .replace(/&raquo;/g, '>>')
-        .replace(/<[^>]*>/g, '')
-        .trim();
 
 export default function PerformanceReport({ vendors, stats, filters }) {
     const { auth } = usePage().props;
@@ -80,25 +74,25 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                     <StatCard
                         label="Active Vendors"
                         value={stats.total_active}
-                        icon="🏢"
+                        icon="vendors"
                         color="primary"
                     />
                     <StatCard
                         label="Avg Performance"
                         value={`${stats.avg_performance}%`}
-                        icon="📊"
+                        icon="metrics"
                         color="info"
                     />
                     <StatCard
-                        label="High Performers (≥80%)"
+                        label="High Performers (>=80%)"
                         value={stats.high_performers}
-                        icon="🏆"
+                        icon="metrics"
                         color="success"
                     />
                     <StatCard
                         label="Top Performer"
                         value={stats.top_scorer}
-                        icon="⭐"
+                        icon="success"
                         color="warning"
                     />
                 </div>
@@ -111,7 +105,7 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                                 {stats.high_performers}
                             </div>
                             <div className="text-sm text-(--color-text-secondary)">
-                                High Performers (≥80%)
+                                High Performers (&gt;=80%)
                             </div>
                         </div>
                         <div className="p-4 rounded-xl bg-(--color-warning-light) border border-(--color-warning)/20 text-center">
@@ -146,8 +140,8 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                                 max="100"
                                 placeholder="e.g. 50"
                                 value={localFilters.min_score}
-                                onChange={(e) =>
-                                    setLocalFilters({ ...localFilters, min_score: e.target.value })
+                                onChange={(value) =>
+                                    setLocalFilters({ ...localFilters, min_score: value })
                                 }
                             />
                         </div>
@@ -167,27 +161,9 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                     <DataTable
                         columns={columns}
                         data={vendors?.data || []}
+                        links={vendors?.links || []}
                         emptyMessage="No vendors found for the selected filters."
                     />
-
-                    {/* Pagination */}
-                    {vendors?.links && vendors.links.length > 3 && (
-                        <div className="p-4 border-t border-(--color-border-primary) flex justify-center gap-2">
-                            {vendors.links.map((link, idx) => (
-                                <Link
-                                    key={idx}
-                                    href={link.url || '#'}
-                                    className={`px-3 py-1 rounded text-sm ${
-                                        link.active
-                                            ? 'bg-(--color-brand-primary) text-white'
-                                            : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-tertiary)'
-                                    }`}
-                                >
-                                    {formatPaginationLabel(link.label)}
-                                </Link>
-                            ))}
-                        </div>
-                    )}
                 </Card>
             </div>
         </AdminLayout>

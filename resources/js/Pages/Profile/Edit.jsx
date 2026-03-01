@@ -81,7 +81,7 @@ export default function ProfileEdit() {
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                                 activeSection === section.id
                                     ? 'bg-(--color-brand-primary) text-white shadow-md'
-                                    : 'bg-white text-(--color-text-secondary) hover:text-(--color-brand-primary) border border-(--color-border-primary) shadow-sm'
+                                    : 'bg-(--color-bg-primary) text-(--color-text-secondary) hover:text-(--color-brand-primary) border border-(--color-border-primary) shadow-sm'
                             }`}
                         >
                             <span className="inline-flex">

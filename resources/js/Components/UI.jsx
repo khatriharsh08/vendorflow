@@ -152,7 +152,7 @@ export function Avatar({ name, src = null, size = 'md', className = '' }) {
 
     return (
         <div
-            className={`rounded-full bg-(--gradient-primary) flex items-center justify-center text-white font-semibold ${sizes[size]} ${className}`}
+            className={`rounded-full bg-gradient-primary flex items-center justify-center text-white font-semibold ${sizes[size]} ${className}`}
         >
             {name?.charAt(0)?.toUpperCase() || '?'}
         </div>

@@ -106,7 +106,18 @@ class VendorOnboardingController extends Controller
                 ->withErrors(['step' => 'Please complete previous steps first.']);
         }
 
-        $this->vendorService->storeOnboardingStep3($request->documents);
+        $incomingDocuments = $request->validated('documents', []);
+        if (! is_array($incomingDocuments)) {
+            $incomingDocuments = [];
+        }
+        $existingDocuments = $data['step3']['documents'] ?? [];
+
+        if (empty($incomingDocuments) && empty($existingDocuments)) {
+            return redirect()->route('vendor.onboarding', ['step' => 3])
+                ->withErrors(['documents' => 'Please upload at least one document before continuing.']);
+        }
+
+        $this->vendorService->storeOnboardingStep3($incomingDocuments);
 
         return redirect()->route('vendor.onboarding', ['step' => 4]);
     }
@@ -164,6 +175,26 @@ class VendorOnboardingController extends Controller
         if (! empty($missingDocs)) {
             return redirect()->route('vendor.onboarding', ['step' => 3])
                 ->withErrors(['documents' => 'Please upload all mandatory documents before submitting.']);
+        }
+
+        $documents = collect($data['step3']['documents'] ?? []);
+        $expiryTypeIds = DocumentType::query()
+            ->where('is_active', true)
+            ->where('has_expiry', true)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $documentsMissingExpiry = $documents->contains(function ($doc) use ($expiryTypeIds) {
+            $typeId = (int) ($doc['document_type_id'] ?? 0);
+            $needsExpiry = in_array($typeId, $expiryTypeIds, true);
+
+            return $needsExpiry && blank($doc['expiry_date'] ?? null);
+        });
+
+        if ($documentsMissingExpiry) {
+            return redirect()->route('vendor.onboarding', ['step' => 3])
+                ->withErrors(['documents' => 'Expiry date is required for one or more uploaded documents.']);
         }
 
         try {

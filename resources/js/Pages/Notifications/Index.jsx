@@ -22,10 +22,10 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
     };
 
     const severityColors = {
-        info: 'border-l-blue-500 bg-blue-500/5',
-        medium: 'border-l-yellow-500 bg-yellow-500/5',
-        high: 'border-l-orange-500 bg-orange-500/5',
-        critical: 'border-l-red-500 bg-red-500/5',
+        info: 'border-l-status-info bg-(--color-info-light)/35',
+        medium: 'border-l-status-warning bg-(--color-warning-light)/35',
+        high: 'border-l-status-warning bg-(--color-warning-light)/55',
+        critical: 'border-l-status-danger bg-(--color-danger-light)/40',
     };
 
     const severityIcons = {
@@ -49,11 +49,10 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
         />
     );
 
-    // Use VendorLayout for vendors, AdminLayout for staff
     const Layout = isVendor ? VendorLayout : AdminLayout;
     const layoutProps = {
         title: 'Notifications',
-        activeNav: 'Dashboard', // Notifications are in user menu
+        activeNav: 'Dashboard',
         header,
     };
 
@@ -63,18 +62,18 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                 <EmptyState
                     icon="notifications"
                     title="No notifications"
-                    description="You're all caught up! New notifications will appear here."
+                    description="You are all caught up. New notifications will appear here."
                 />
             ) : (
                 <Card>
-                    <div className="divide-y divide-slate-800">
+                    <div className="divide-y divide-(--color-border-secondary)">
                         {displayNotifications.map((notification) => (
                             <div
                                 key={notification.id}
                                 className={`p-5 border-l-4 transition-colors ${
                                     severityColors[notification.data?.severity] ||
-                                    'border-l-slate-500'
-                                } ${!notification.read_at ? 'bg-slate-800/20' : 'hover:bg-slate-800/10'}`}
+                                    'border-l-(--color-border-hover)'
+                                } ${!notification.read_at ? 'bg-(--color-bg-tertiary)/20' : 'hover:bg-(--color-bg-hover)/10'}`}
                             >
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex items-start gap-4 flex-1">
@@ -90,16 +89,16 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
                                                 {!notification.read_at && (
-                                                    <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
+                                                    <span className="w-2 h-2 rounded-full bg-(--color-brand-primary) flex-shrink-0" />
                                                 )}
-                                                <h3 className="font-semibold text-white">
+                                                <h3 className="font-semibold text-(--color-text-primary)">
                                                     {notification.data?.title}
                                                 </h3>
                                             </div>
-                                            <p className="text-slate-400 text-sm mb-2">
+                                            <p className="text-(--color-text-tertiary) text-sm mb-2">
                                                 {notification.data?.message}
                                             </p>
-                                            <div className="text-xs text-slate-500">
+                                            <div className="text-xs text-(--color-text-tertiary)">
                                                 {new Date(
                                                     notification.created_at
                                                 ).toLocaleDateString('en-IN', {

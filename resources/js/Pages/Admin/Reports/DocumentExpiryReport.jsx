@@ -10,12 +10,6 @@ import {
     DataTable,
     FormInput,
 } from '@/Components';
-const formatPaginationLabel = (label) =>
-    String(label || '')
-        .replace(/&laquo;/g, '<<')
-        .replace(/&raquo;/g, '>>')
-        .replace(/<[^>]*>/g, '')
-        .trim();
 
 export default function DocumentExpiryReport({ documents, stats, filters }) {
     const { auth } = usePage().props;
@@ -101,25 +95,25 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                     <StatCard
                         label="Expiring in 7 Days"
                         value={stats.expiring_7_days}
-                        icon="⚠️"
+                        icon="warning"
                         color="danger"
                     />
                     <StatCard
                         label="Expiring in 30 Days"
                         value={stats.expiring_30_days}
-                        icon="📅"
+                        icon="clock"
                         color="warning"
                     />
                     <StatCard
                         label="Already Expired"
                         value={stats.expired}
-                        icon="❌"
+                        icon="error"
                         color="danger"
                     />
                     <StatCard
                         label="Total with Expiry"
                         value={stats.total_with_expiry}
-                        icon="📄"
+                        icon="documents"
                         color="info"
                     />
                 </div>
@@ -134,8 +128,8 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                             <FormInput
                                 type="date"
                                 value={localFilters.start_date}
-                                onChange={(e) =>
-                                    setLocalFilters({ ...localFilters, start_date: e.target.value })
+                                onChange={(value) =>
+                                    setLocalFilters({ ...localFilters, start_date: value })
                                 }
                             />
                         </div>
@@ -146,8 +140,8 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                             <FormInput
                                 type="date"
                                 value={localFilters.end_date}
-                                onChange={(e) =>
-                                    setLocalFilters({ ...localFilters, end_date: e.target.value })
+                                onChange={(value) =>
+                                    setLocalFilters({ ...localFilters, end_date: value })
                                 }
                             />
                         </div>
@@ -167,27 +161,9 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                     <DataTable
                         columns={columns}
                         data={documents?.data || []}
+                        links={documents?.links || []}
                         emptyMessage="No documents found for the selected date range."
                     />
-
-                    {/* Pagination */}
-                    {documents?.links && documents.links.length > 3 && (
-                        <div className="p-4 border-t border-(--color-border-primary) flex justify-center gap-2">
-                            {documents.links.map((link, idx) => (
-                                <Link
-                                    key={idx}
-                                    href={link.url || '#'}
-                                    className={`px-3 py-1 rounded text-sm ${
-                                        link.active
-                                            ? 'bg-(--color-brand-primary) text-white'
-                                            : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-tertiary)'
-                                    }`}
-                                >
-                                    {formatPaginationLabel(link.label)}
-                                </Link>
-                            ))}
-                        </div>
-                    )}
                 </Card>
             </div>
         </AdminLayout>

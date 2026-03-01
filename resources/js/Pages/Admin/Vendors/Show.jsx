@@ -133,7 +133,7 @@ export default function VendorShow({ vendor }) {
                             onClick={() => setActiveTab(tab.id)}
                             className={`py-4 text-sm font-medium border-b-2 -mb-px transition-colors ${
                                 activeTab === tab.id
-                                    ? 'border-indigo-500 text-(--color-text-primary)'
+                                    ? 'border-(--color-brand-primary) text-(--color-text-primary)'
                                     : 'border-transparent text-(--color-text-secondary) hover:text-(--color-text-primary)'
                             }`}
                         >
@@ -221,9 +221,9 @@ export default function VendorShow({ vendor }) {
                             {can.rate_vendors && (
                                 <Link
                                     href={`/admin/performance/${vendor?.id}/rate`}
-                                    className="text-indigo-400 hover:text-indigo-300 text-sm block mt-4"
+                                    className="text-(--color-brand-primary) hover:text-(--color-brand-primary-light) text-sm block mt-4"
                                 >
-                                    Rate Performance →
+                                    Rate Performance
                                 </Link>
                             )}
                         </div>
@@ -332,7 +332,7 @@ export default function VendorShow({ vendor }) {
                     {vendor?.compliance_results?.map((result) => (
                         <div
                             key={result.id}
-                            className={`glass-card p-4 border-l-4 ${result.status === 'pass' ? 'border-l-green-500' : result.status === 'warning' ? 'border-l-yellow-500' : 'border-l-red-500'}`}
+                            className={`glass-card p-4 border-l-4 ${result.status === 'pass' ? 'border-l-status-success' : result.status === 'warning' ? 'border-l-status-warning' : 'border-l-status-danger'}`}
                         >
                             <div className="flex items-center justify-between">
                                 <div>
@@ -362,23 +362,23 @@ export default function VendorShow({ vendor }) {
                         {vendor?.state_logs?.map((log, idx) => (
                             <div key={log.id} className="relative pl-8 pb-6 last:pb-0">
                                 {idx < vendor.state_logs.length - 1 && (
-                                    <div className="absolute left-[11px] top-6 bottom-0 w-0.5 bg-slate-700" />
+                                    <div className="absolute left-[11px] top-6 bottom-0 w-0.5 bg-(--color-bg-muted)" />
                                 )}
-                                <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
-                                    <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                                <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-(--color-brand-primary)/20 flex items-center justify-center">
+                                    <div className="w-2 h-2 rounded-full bg-(--color-brand-primary)" />
                                 </div>
                                 <div className="bg-(--color-bg-secondary)/80 rounded-lg p-4 border border-(--color-border-secondary)">
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="text-(--color-text-secondary)">
                                             {log.from_status}
                                         </span>
-                                        <span className="text-slate-500">→</span>
+                                        <span className="text-(--color-text-tertiary)">to</span>
                                         <span className="text-(--color-text-primary) font-medium">
                                             {log.to_status}
                                         </span>
                                     </div>
-                                    <div className="text-xs text-slate-500">
-                                        by {log.user?.name} • {log.created_at}
+                                    <div className="text-xs text-(--color-text-tertiary)">
+                                        by {log.user?.name} - {log.created_at}
                                     </div>
                                     {log.comment && (
                                         <div className="text-sm text-(--color-text-secondary) mt-2">
@@ -396,8 +396,8 @@ export default function VendorShow({ vendor }) {
             {activeTab === 'notes' && can.edit_vendor_notes && (
                 <Card title="Internal Notes">
                     <div className="p-6">
-                        <p className="text-sm text-red-400 mb-4">
-                            ⚠️ These notes are NOT visible to the vendor
+                        <p className="text-sm text-(--color-danger) mb-4">
+                            Warning: these notes are not visible to the vendor.
                         </p>
                         <form onSubmit={saveNotes}>
                             <textarea

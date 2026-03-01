@@ -54,7 +54,7 @@ export default function AdminLayout({
                     {(flash?.success || flash?.error) && (
                         <div className="px-4 md:px-8 pt-6">
                             {flash.success && (
-                                <div className="p-4 rounded-xl bg-(--color-success-light) border border-(--color-success) text-(--color-success-dark) flex items-center gap-3 shadow-(--shadow-sm)">
+                                <div className="p-4 rounded-xl bg-(--color-success-light) border border-(--color-success) text-(--color-success-dark) flex items-center gap-3 shadow-token-sm">
                                     <span className="w-6 h-6 rounded-full bg-(--color-success) text-white flex items-center justify-center text-sm font-bold min-w-[24px]">
                                         <AppIcon name="success" className="h-4 w-4" />
                                     </span>
@@ -62,7 +62,7 @@ export default function AdminLayout({
                                 </div>
                             )}
                             {flash.error && (
-                                <div className="p-4 rounded-xl bg-(--color-danger-light) border border-(--color-danger) text-(--color-danger-dark) flex items-center gap-3 shadow-(--shadow-sm)">
+                                <div className="p-4 rounded-xl bg-(--color-danger-light) border border-(--color-danger) text-(--color-danger-dark) flex items-center gap-3 shadow-token-sm">
                                     <span className="w-6 h-6 rounded-full bg-(--color-danger) text-white flex items-center justify-center text-sm font-bold min-w-[24px]">
                                         <AppIcon name="error" className="h-4 w-4" />
                                     </span>

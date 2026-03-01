@@ -21,11 +21,16 @@ class DocumentController extends Controller
     {
         $this->authorize('viewCompliance');
 
+        $currentStatus = $request->string('status')->toString();
+        if ($currentStatus === '') {
+            $currentStatus = VendorDocument::STATUS_PENDING;
+        }
+
         $query = VendorDocument::with(['vendor', 'documentType']);
 
         // Filter by status
-        if ($request->has('status') && $request->status !== 'all') {
-            $query->where('verification_status', $request->status);
+        if ($currentStatus !== 'all') {
+            $query->where('verification_status', $currentStatus);
         }
 
         // Search by vendor name
@@ -42,6 +47,7 @@ class DocumentController extends Controller
         return Inertia::render('Admin/Documents/Index', [
             'documents' => $documents,
             'filters' => $request->only(['status', 'search']),
+            'currentStatus' => $currentStatus,
         ]);
     }
 
@@ -69,6 +75,10 @@ class DocumentController extends Controller
     {
         $this->authorize('verify', $document);
 
+        if (! $document->isPending()) {
+            return back()->with('error', 'Only pending documents can be verified.');
+        }
+
         $request->validate([
             'notes' => 'nullable|string|max:500',
         ]);
@@ -91,7 +101,10 @@ class DocumentController extends Controller
             $request->notes
         );
 
-        return back()->with('success', 'Document verified successfully.');
+        $document->loadMissing('documentType');
+        $documentType = $document->documentType?->display_name ?? 'Document';
+
+        return back()->with('success', "{$documentType} verified successfully.");
     }
 
     /**
@@ -100,6 +113,10 @@ class DocumentController extends Controller
     public function reject(Request $request, VendorDocument $document)
     {
         $this->authorize('reject', $document);
+
+        if (! $document->isPending()) {
+            return back()->with('error', 'Only pending documents can be rejected.');
+        }
 
         $request->validate([
             'reason' => 'required|string|max:500',
@@ -123,7 +140,10 @@ class DocumentController extends Controller
             $request->reason
         );
 
-        return back()->with('success', 'Document rejected.');
+        $document->loadMissing('documentType');
+        $documentType = $document->documentType?->display_name ?? 'Document';
+
+        return back()->with('success', "{$documentType} rejected.");
     }
 
     /**

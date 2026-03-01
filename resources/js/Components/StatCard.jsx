@@ -26,7 +26,7 @@ export default function StatCard({
             onClick={onClick}
             className={`
                 bg-(--color-bg-primary) rounded-xl p-3 border border-(--color-border-primary)
-                shadow-(--shadow-sm) hover:shadow-(--shadow-lg) hover:border-(--color-brand-primary-light)
+                shadow-token-sm hover:shadow-token-lg hover:border-(--color-brand-primary-light)
                 transition-all duration-300
                 text-left w-full group relative overflow-hidden
                 hover:-translate-y-0.5

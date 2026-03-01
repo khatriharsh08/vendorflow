@@ -1,5 +1,5 @@
 import { router, usePage } from '@inertiajs/react';
-import { AdminLayout, PageHeader, Card, Badge } from '@/Components';
+import { AdminLayout, PageHeader, Card, Badge, AppIcon } from '@/Components';
 
 export default function ComplianceRules({ rules = [] }) {
     const { auth } = usePage().props;
@@ -53,7 +53,7 @@ export default function ComplianceRules({ rules = [] }) {
                                         } ${!can.edit_rules ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <div
-                                            className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                                            className={`absolute top-1 w-4 h-4 rounded-full bg-(--color-bg-primary) shadow transition-transform ${
                                                 rule.is_active ? 'left-7' : 'left-1'
                                             }`}
                                         />
@@ -143,7 +143,9 @@ export default function ComplianceRules({ rules = [] }) {
 
                 {rules.length === 0 && (
                     <div className="glass-card p-12 text-center text-(--color-text-tertiary)">
-                        <span className="text-4xl block mb-4">📋</span>
+                        <span className="text-4xl block mb-4 inline-flex justify-center w-full">
+                            <AppIcon name="reports" className="h-10 w-10" />
+                        </span>
                         No compliance rules configured
                     </div>
                 )}

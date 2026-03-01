@@ -51,7 +51,7 @@ export default function VendorsIndex({ vendors = [], currentStatus = 'all', sear
             render: (row) => (
                 <Link href={`/admin/vendors/${row.id}`}>
                     <Button variant="ghost" size="sm">
-                        View →
+                        View
                     </Button>
                 </Link>
             ),
@@ -92,7 +92,6 @@ export default function VendorsIndex({ vendors = [], currentStatus = 'all', sear
     return (
         <AdminLayout title="Vendor Management" activeNav="Vendors" header={header}>
             <div className="space-y-6">
-                {/* Status Filters - Using filter-tabs styling */}
                 <div className="inline-flex gap-2 p-1 bg-(--color-bg-tertiary) rounded-xl flex-wrap">
                     {statusFilters.map((status) => (
                         <Link
@@ -100,7 +99,7 @@ export default function VendorsIndex({ vendors = [], currentStatus = 'all', sear
                             href={`/admin/vendors?status=${status}${searchQuery ? `&search=${searchQuery}` : ''}`}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
                                 currentStatus === status
-                                    ? 'bg-(--color-brand-primary) text-white shadow-(--shadow-primary)'
+                                    ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
@@ -109,7 +108,6 @@ export default function VendorsIndex({ vendors = [], currentStatus = 'all', sear
                     ))}
                 </div>
 
-                {/* Vendors Table */}
                 <DataTable
                     columns={columns}
                     data={vendors}

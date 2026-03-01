@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Vendor;
 
+use App\Models\DocumentType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Validator;
 
 class UploadDocumentRequest extends FormRequest
 {
@@ -23,9 +25,30 @@ class UploadDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'document_type_id' => 'required|exists:document_types,id',
+            'document_type_id' => 'required|exists:document_types,id,is_active,1',
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-            'expiry_date' => 'nullable|date',
+            'expiry_date' => 'nullable|date|after_or_equal:today',
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $documentTypeId = (int) $this->input('document_type_id');
+            $documentType = DocumentType::query()->find($documentTypeId);
+
+            if (! $documentType) {
+                return;
+            }
+
+            $expiryDate = $this->input('expiry_date');
+
+            if ($documentType->has_expiry && blank($expiryDate)) {
+                $validator->errors()->add(
+                    'expiry_date',
+                    "Expiry date is required for {$documentType->display_name}."
+                );
+            }
+        });
     }
 }

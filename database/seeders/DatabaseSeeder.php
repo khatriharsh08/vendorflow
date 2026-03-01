@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Services\SystemMasterDataService;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,12 +12,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            RoleAndPermissionSeeder::class,
-            VendorStateSeeder::class,
-            DocumentTypeSeeder::class,
-            ComplianceRuleSeeder::class,
-            PerformanceMetricSeeder::class,
-        ]);
+        app(SystemMasterDataService::class)->sync(includeDefaultStaffUsers: true);
     }
 }

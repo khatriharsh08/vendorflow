@@ -7,7 +7,11 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
         breakdown.length > 0
             ? Math.round(
                   breakdown.reduce(
-                      (total, metric) => total + Number(metric.current_score || 0),
+                      (total, metric) =>
+                          total +
+                          ((Number(metric.current_score || 0) /
+                              Math.max(1, Number(metric.max_score || 1))) *
+                              100 || 0),
                       0
                   ) / breakdown.length
               )
@@ -145,7 +149,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
                                     </div>
                                 </div>
                                 <div className="text-lg font-bold text-(--color-text-primary)">
-                                    {entry.average}
+                                    {entry.average}/100
                                 </div>
                             </div>
                         ))}

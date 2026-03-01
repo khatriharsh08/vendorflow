@@ -110,5 +110,14 @@ class SecurityHardeningTest extends TestCase
         $this->actingAs($user)
             ->get(route('documents.download', $safeDoc))
             ->assertOk();
+
+        $previewResponse = $this->actingAs($user)
+            ->get(route('documents.view', $safeDoc));
+
+        $previewResponse->assertOk();
+        $previewResponse->assertHeader('X-Frame-Options', 'SAMEORIGIN');
+        $this->assertNull($previewResponse->headers->get('Content-Security-Policy'));
+        $this->assertNull($previewResponse->headers->get('Cross-Origin-Opener-Policy'));
+        $this->assertNull($previewResponse->headers->get('Cross-Origin-Resource-Policy'));
     }
 }

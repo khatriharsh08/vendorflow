@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { router } from '@inertiajs/react';
+import { AppIcon } from '@/Components';
 
 export default function StepReview({ vendor, sessionData, documentTypes }) {
     const step1Session = sessionData?.step1 || {};
@@ -16,6 +17,23 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
     }, [documentTypes]);
 
     const [processing, setProcessing] = useState(false);
+    const formatExpiryDate = (value) => {
+        if (!value) {
+            return '-';
+        }
+
+        const date = new Date(`${value}T00:00:00`);
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+
+        return date.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+        });
+    };
+
     const submitApplication = () => {
         router.post(
             '/vendor/onboarding/submit',
@@ -28,10 +46,10 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
     };
 
     return (
-        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-(--shadow-lg) animate-fade-in">
+        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-token-lg animate-fade-in">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-2 text-(--color-text-primary)">
-                    Review & Submit
+                    Review and Submit
                 </h1>
                 <p className="text-(--color-text-tertiary)">
                     Please review your information before submitting.
@@ -39,11 +57,10 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
             </div>
 
             <div className="space-y-6">
-                {/* Company Summary */}
                 <div className="p-6 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary)">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold flex items-center gap-2 text-(--color-text-primary)">
-                            <span>🏢</span> Company Details
+                            <AppIcon name="vendors" className="h-5 w-5" /> Company Details
                         </h3>
                         <button
                             onClick={() => router.get('/vendor/onboarding?step=1')}
@@ -92,11 +109,10 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                     </div>
                 </div>
 
-                {/* Bank Summary */}
                 <div className="p-6 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary)">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold flex items-center gap-2 text-(--color-text-primary)">
-                            <span>🏦</span> Bank Details
+                            <AppIcon name="payments" className="h-5 w-5" /> Bank Details
                         </h3>
                         <button
                             onClick={() => router.get('/vendor/onboarding?step=2')}
@@ -136,11 +152,10 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                     </div>
                 </div>
 
-                {/* Documents Summary */}
                 <div className="p-6 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary)">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold flex items-center gap-2 text-(--color-text-primary)">
-                            <span>📄</span> Documents
+                            <AppIcon name="documents" className="h-5 w-5" /> Documents
                         </h3>
                         <button
                             onClick={() => router.get('/vendor/onboarding?step=3')}
@@ -162,6 +177,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                         ? doc.file_name.replace(/\.[^/.]+$/, '')
                                         : 'Uploaded Document');
                                 const fileSizeInBytes = Number(doc?.file_size || 0);
+                                const requiresExpiry = Boolean(type?.has_expiry);
                                 const fileSizeLabel =
                                     Number.isFinite(fileSizeInBytes) && fileSizeInBytes > 0
                                         ? `${(fileSizeInBytes / 1024).toFixed(1)} KB`
@@ -174,19 +190,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded bg-(--color-success-light) text-(--color-success) flex items-center justify-center">
-                                                <svg
-                                                    className="w-4 h-4"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth="2"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                    />
-                                                </svg>
+                                                <AppIcon name="success" className="h-4 w-4" />
                                             </div>
                                             <div>
                                                 <p className="text-sm font-medium text-(--color-text-primary)">
@@ -195,6 +199,11 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                                 <p className="text-xs text-(--color-text-tertiary)">
                                                     {doc.file_name}
                                                 </p>
+                                                {requiresExpiry && (
+                                                    <p className="text-xs text-(--color-text-tertiary)">
+                                                        Expiry: {formatExpiryDate(doc.expiry_date)}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                         <span className="text-xs px-2 py-1 rounded bg-(--color-bg-secondary) text-(--color-text-secondary)">
@@ -211,7 +220,6 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                     )}
                 </div>
 
-                {/* Terms */}
                 <div className="p-4 rounded-xl border border-(--color-warning) bg-(--color-warning-light)">
                     <p className="text-sm text-(--color-warning-dark)">
                         <strong>Important:</strong> By submitting this application, you confirm that
@@ -227,12 +235,12 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                     onClick={() => router.get('/vendor/onboarding?step=3')}
                     className="px-6 py-3 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) hover:bg-(--color-bg-hover) transition-colors font-medium"
                 >
-                    ← Back
+                    Back
                 </button>
                 <button
                     onClick={submitApplication}
                     disabled={processing}
-                    className="bg-linear-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/25 hover:-translate-y-px hover:shadow-indigo-500/40 transition-all flex items-center gap-2 text-lg px-8 py-3"
+                    className="bg-gradient-primary text-white font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
                 >
                     {processing ? 'Submitting...' : 'Submit Application'}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -9,7 +9,6 @@ use App\Http\Requests\Vendor\UploadDocumentRequest;
 use App\Models\ComplianceResult;
 use App\Models\DocumentType;
 use App\Models\Vendor;
-use Database\Seeders\DocumentTypeSeeder;
 use App\Services\PaymentService;
 use App\Services\UserNotificationService;
 use App\Services\VendorService;
@@ -93,50 +92,12 @@ class VendorController extends Controller
      */
     protected function getActiveDocumentTypes()
     {
-        $cacheKey = 'document_types_active';
-        $cachedTypes = Cache::get($cacheKey);
-
-        if ($cachedTypes && $cachedTypes->isNotEmpty()) {
-            return $cachedTypes;
-        }
-
-        if ($cachedTypes && $cachedTypes->isEmpty()) {
-            Cache::forget($cacheKey);
-        }
-
-        $documentTypes = DocumentType::where('is_active', true)->get();
-
-        if ($documentTypes->isEmpty()) {
-            $this->seedDefaultDocumentTypes();
-            $documentTypes = DocumentType::where('is_active', true)->get();
-        }
-
-        if ($documentTypes->isNotEmpty()) {
-            Cache::put($cacheKey, $documentTypes, now()->addDay());
-        }
-
-        return $documentTypes;
-    }
-
-    /**
-     * Ensure default onboarding document types exist.
-     */
-    protected function seedDefaultDocumentTypes(): void
-    {
-        foreach (DocumentTypeSeeder::defaults() as $docType) {
-            DocumentType::updateOrCreate(
-                ['name' => $docType['name']],
-                [
-                    'display_name' => $docType['display_name'],
-                    'description' => $docType['description'] ?? null,
-                    'is_mandatory' => $docType['is_mandatory'] ?? false,
-                    'has_expiry' => $docType['has_expiry'] ?? false,
-                    'expiry_warning_days' => $docType['expiry_warning_days'] ?? 30,
-                    'allowed_extensions' => $docType['allowed_extensions'] ?? ['pdf'],
-                    'is_active' => true,
-                ]
-            );
-        }
+        return Cache::remember('document_types_active', now()->addHours(12), function () {
+            return DocumentType::query()
+                ->where('is_active', true)
+                ->orderBy('display_name')
+                ->get();
+        });
     }
 
     /**

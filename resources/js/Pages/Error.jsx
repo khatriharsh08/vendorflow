@@ -72,7 +72,7 @@ export default function Error({ status }) {
     const { title, description, icon } = errors[statusCode] || errors[404];
 
     return (
-        <div className="min-h-screen bg-(--gradient-page) flex items-center justify-center p-6">
+        <div className="min-h-screen bg-gradient-page flex items-center justify-center p-6">
             <div className="max-w-md w-full text-center">
                 {/* Error Icon */}
                 <div className="mb-6 flex justify-center">

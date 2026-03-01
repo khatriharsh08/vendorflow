@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\VendorDocument;
 use App\Notifications\DocumentExpiryReminder;
 use App\Notifications\ExpiredDocumentsAlert;
+use App\Services\ComplianceService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -16,7 +17,7 @@ class SendExpiryReminders extends Command
 
     protected $description = 'Send reminders for documents expiring soon';
 
-    public function handle(): int
+    public function handle(ComplianceService $complianceService): int
     {
         $startedAt = now();
         $jobLog = JobLog::create([
@@ -31,7 +32,9 @@ class SendExpiryReminders extends Command
             // Find documents expiring in the next 30 days
             $expiringDocs = VendorDocument::with(['vendor.user', 'documentType'])
                 ->where('is_current', true)
+                ->where('verification_status', VendorDocument::STATUS_VERIFIED)
                 ->whereNotNull('expiry_date')
+                ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true))
                 ->whereBetween('expiry_date', [Carbon::now(), Carbon::now()->addDays(30)])
                 ->get();
 
@@ -51,8 +54,9 @@ class SendExpiryReminders extends Command
             $expiredDocs = VendorDocument::with(['vendor.user', 'documentType'])
                 ->where('is_current', true)
                 ->whereNotNull('expiry_date')
+                ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true))
                 ->where('expiry_date', '<', Carbon::now())
-                ->where('verification_status', '!=', 'expired')
+                ->where('verification_status', VendorDocument::STATUS_VERIFIED)
                 ->get();
 
             foreach ($expiredDocs as $doc) {
@@ -68,6 +72,22 @@ class SendExpiryReminders extends Command
                 $this->notifyOpsManagers($expiredDocs);
             }
 
+            $affectedVendorIds = $expiringDocs
+                ->merge($expiredDocs)
+                ->pluck('vendor_id')
+                ->unique()
+                ->values();
+
+            if ($affectedVendorIds->isNotEmpty()) {
+                $vendors = \App\Models\Vendor::query()
+                    ->whereIn('id', $affectedVendorIds)
+                    ->get();
+
+                foreach ($vendors as $vendor) {
+                    $complianceService->evaluateVendor($vendor);
+                }
+            }
+
             $jobLog->update([
                 'status' => 'success',
                 'finished_at' => now(),
@@ -75,6 +95,7 @@ class SendExpiryReminders extends Command
                 'result' => [
                     'reminders_sent' => $remindersSent,
                     'expired_docs' => $expiredDocs->count(),
+                    'vendors_re_evaluated' => $affectedVendorIds->count(),
                 ],
             ]);
 

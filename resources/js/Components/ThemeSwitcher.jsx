@@ -119,7 +119,7 @@ export default function ThemeSwitcher({ className = '', compact = false, align =
 
             {isOpen && (
                 <div
-                    className={`absolute ${alignClass[align] || alignClass.right} mt-2 w-52 rounded-2xl border border-(--color-border-primary) bg-(--color-bg-primary)/96 backdrop-blur-xl shadow-(--shadow-lg) p-2 z-50`}
+                    className={`absolute ${alignClass[align] || alignClass.right} mt-2 w-52 rounded-2xl border border-(--color-border-primary) bg-(--color-bg-primary)/96 backdrop-blur-xl shadow-token-lg p-2 z-50`}
                     role="menu"
                 >
                     {THEME_OPTIONS.map((option) => {

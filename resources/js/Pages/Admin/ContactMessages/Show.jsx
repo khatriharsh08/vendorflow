@@ -21,7 +21,7 @@ export default function Show({ message }) {
     const header = (
         <PageHeader
             title="Message Details"
-            subtitle={`From ${message.name} • ${new Date(message.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`}
+            subtitle={`From ${message.name} - ${new Date(message.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`}
             backUrl="/admin/contact-messages"
             actions={
                 <Button variant="danger" onClick={handleDelete}>
@@ -54,7 +54,7 @@ export default function Show({ message }) {
                                                     {message.name}
                                                 </span>
                                                 <span className="text-(--color-text-tertiary) mx-2">
-                                                    •
+                                                    -
                                                 </span>
                                                 <span className="text-(--color-text-tertiary)">
                                                     {message.email}

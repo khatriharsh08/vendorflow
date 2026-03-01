@@ -11,12 +11,6 @@ import {
     FormInput,
     FormSelect,
 } from '@/Components';
-const formatPaginationLabel = (label) =>
-    String(label || '')
-        .replace(/&laquo;/g, '<<')
-        .replace(/&raquo;/g, '>>')
-        .replace(/<[^>]*>/g, '')
-        .trim();
 
 export default function PaymentReport({ payments, stats, filters }) {
     const { auth } = usePage().props;
@@ -100,25 +94,25 @@ export default function PaymentReport({ payments, stats, filters }) {
                     <StatCard
                         label="Total Amount"
                         value={formatCurrency(stats.total_amount)}
-                        icon="💰"
+                        icon="payments"
                         color="primary"
                     />
                     <StatCard
                         label="Pending"
                         value={`${stats.pending_count} (${formatCurrency(stats.pending_amount)})`}
-                        icon="⏳"
+                        icon="clock"
                         color="warning"
                     />
                     <StatCard
                         label="Approved"
                         value={`${stats.approved_count} (${formatCurrency(stats.approved_amount)})`}
-                        icon="✅"
+                        icon="success"
                         color="info"
                     />
                     <StatCard
                         label="Paid"
                         value={`${stats.paid_count} (${formatCurrency(stats.paid_amount)})`}
-                        icon="💵"
+                        icon="payments"
                         color="success"
                     />
                 </div>
@@ -133,8 +127,8 @@ export default function PaymentReport({ payments, stats, filters }) {
                             <FormInput
                                 type="date"
                                 value={localFilters.start_date}
-                                onChange={(e) =>
-                                    setLocalFilters({ ...localFilters, start_date: e.target.value })
+                                onChange={(value) =>
+                                    setLocalFilters({ ...localFilters, start_date: value })
                                 }
                             />
                         </div>
@@ -145,8 +139,8 @@ export default function PaymentReport({ payments, stats, filters }) {
                             <FormInput
                                 type="date"
                                 value={localFilters.end_date}
-                                onChange={(e) =>
-                                    setLocalFilters({ ...localFilters, end_date: e.target.value })
+                                onChange={(value) =>
+                                    setLocalFilters({ ...localFilters, end_date: value })
                                 }
                             />
                         </div>
@@ -178,27 +172,9 @@ export default function PaymentReport({ payments, stats, filters }) {
                     <DataTable
                         columns={columns}
                         data={payments?.data || []}
+                        links={payments?.links || []}
                         emptyMessage="No payment records found for the selected filters."
                     />
-
-                    {/* Pagination */}
-                    {payments?.links && payments.links.length > 3 && (
-                        <div className="p-4 border-t border-(--color-border-primary) flex justify-center gap-2">
-                            {payments.links.map((link, idx) => (
-                                <Link
-                                    key={idx}
-                                    href={link.url || '#'}
-                                    className={`px-3 py-1 rounded text-sm ${
-                                        link.active
-                                            ? 'bg-(--color-brand-primary) text-white'
-                                            : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-tertiary)'
-                                    }`}
-                                >
-                                    {formatPaginationLabel(link.label)}
-                                </Link>
-                            ))}
-                        </div>
-                    )}
                 </Card>
             </div>
         </AdminLayout>

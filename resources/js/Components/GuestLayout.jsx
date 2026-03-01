@@ -29,7 +29,7 @@ export function AuthLayout({ children, title = 'VendorFlow' }) {
     return (
         <>
             <Head title={title} />
-            <div className="app-shell min-h-screen bg-(--gradient-page) flex items-center justify-center p-4">
+            <div className="app-shell min-h-screen bg-gradient-page flex items-center justify-center p-4">
                 <div className="animated-backdrop" aria-hidden="true">
                     <div className="animated-backdrop__grid" />
                 </div>

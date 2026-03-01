@@ -67,7 +67,7 @@ class PaymentController extends Controller
 
             return back()->with('success', $approve ? 'Payment validated successfully.' : 'Payment rejected.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -89,7 +89,7 @@ class PaymentController extends Controller
 
             return back()->with('success', $approve ? 'Payment approved successfully.' : 'Payment rejected.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -115,7 +115,7 @@ class PaymentController extends Controller
 
             return back()->with('success', 'Payment marked as paid.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            return back()->with('error', $e->getMessage());
         }
     }
 }

@@ -7,7 +7,7 @@ import { Suspense, Component, useEffect } from 'react';
 
 // Loading component for lazy-loaded pages - Light theme
 const PageLoader = () => (
-    <div className="min-h-screen bg-(--gradient-page) flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-page flex items-center justify-center">
         <div className="text-center">
             <div className="w-12 h-12 border-2 border-(--color-brand-primary)/30 border-t-(--color-brand-primary) rounded-full animate-spin mx-auto mb-4" />
             <span className="text-(--color-text-tertiary)">Loading...</span>
@@ -47,10 +47,10 @@ class ErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen bg-(--gradient-page) flex items-center justify-center p-6">
+                <div className="min-h-screen bg-gradient-page flex items-center justify-center p-6">
                     <div className="max-w-md w-full text-center">
                         <div className="mb-6 flex justify-center">
-                            <div className="w-24 h-24 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+                            <div className="w-24 h-24 rounded-full bg-(--color-danger-light) flex items-center justify-center text-(--color-danger)">
                                 <svg
                                     className="w-16 h-16"
                                     fill="none"

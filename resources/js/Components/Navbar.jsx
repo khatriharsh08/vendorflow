@@ -37,35 +37,10 @@ const createToolsLinks = [
     },
 ];
 
-const adminLinks = [
-    {
-        label: 'Admin Dashboard',
-        description: 'Overview and health',
-        href: '/admin/dashboard',
-        icon: 'dashboard',
-    },
-    {
-        label: 'Vendor Admin',
-        description: 'Review vendor accounts',
-        href: '/admin/vendors',
-        icon: 'vendors',
-    },
-    {
-        label: 'Payments Admin',
-        description: 'Approve payment requests',
-        href: '/admin/payments',
-        icon: 'payments',
-    },
-    {
-        label: 'Reports Admin',
-        description: 'Export analytics',
-        href: '/admin/reports',
-        icon: 'reports',
-    },
-];
-
 function MenuDropdown({ id, label, items, activeDropdown, setActiveDropdown }) {
     const isOpen = activeDropdown === id;
+
+    const close = () => setActiveDropdown(null);
 
     return (
         <div className="relative">
@@ -78,6 +53,7 @@ function MenuDropdown({ id, label, items, activeDropdown, setActiveDropdown }) {
                         : 'text-(--color-text-tertiary) hover:bg-(--color-bg-hover) hover:text-(--color-text-primary)'
                 }`}
                 aria-expanded={isOpen}
+                aria-haspopup="menu"
             >
                 <span>{label}</span>
                 <AppIcon
@@ -87,12 +63,17 @@ function MenuDropdown({ id, label, items, activeDropdown, setActiveDropdown }) {
             </button>
 
             {isOpen && (
-                <div className="absolute left-0 mt-2 w-72 rounded-2xl border border-(--color-border-primary) bg-(--color-bg-primary)/96 backdrop-blur-xl p-2 shadow-(--shadow-lg) z-50">
+                <div
+                    className="absolute left-0 mt-2 w-72 rounded-2xl border border-(--color-border-primary) bg-(--color-bg-primary)/96 backdrop-blur-xl p-2 shadow-token-lg z-50"
+                    role="menu"
+                >
                     {items.map((item) => (
                         <Link
                             key={item.label}
                             href={item.href}
+                            onClick={close}
                             className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-(--color-bg-secondary) transition-colors"
+                            role="menuitem"
                         >
                             <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-(--color-bg-tertiary) text-(--color-brand-primary)">
                                 <AppIcon name={item.icon} className="h-4 w-4" />
@@ -132,10 +113,19 @@ export default function Navbar({
             }
         };
 
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                setActiveDropdown(null);
+                setIsMobileOpen(false);
+            }
+        };
+
         window.addEventListener('mousedown', onClick);
+        window.addEventListener('keydown', onKeyDown);
 
         return () => {
             window.removeEventListener('mousedown', onClick);
+            window.removeEventListener('keydown', onKeyDown);
         };
     }, []);
 
@@ -167,14 +157,6 @@ export default function Navbar({
                             id="create-tools"
                             label="Create Tools"
                             items={createToolsLinks}
-                            activeDropdown={activeDropdown}
-                            setActiveDropdown={setActiveDropdown}
-                        />
-
-                        <MenuDropdown
-                            id="admin"
-                            label="Admin"
-                            items={adminLinks}
                             activeDropdown={activeDropdown}
                             setActiveDropdown={setActiveDropdown}
                         />
@@ -261,22 +243,6 @@ export default function Navbar({
                                 Create Tools
                             </p>
                             {createToolsLinks.map((item) => (
-                                <Link
-                                    key={item.label}
-                                    href={item.href}
-                                    className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-(--color-text-secondary) hover:bg-(--color-bg-hover)"
-                                >
-                                    <AppIcon name={item.icon} className="h-4 w-4" />
-                                    <span>{item.label}</span>
-                                </Link>
-                            ))}
-                        </div>
-
-                        <div className="rounded-xl border border-(--color-border-secondary) p-2">
-                            <p className="px-2 pb-1 text-xs uppercase tracking-wide text-(--color-text-muted)">
-                                Admin
-                            </p>
-                            {adminLinks.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.href}

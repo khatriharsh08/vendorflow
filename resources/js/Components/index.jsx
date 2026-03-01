@@ -182,8 +182,8 @@ export function CopyButton({ text, className = '' }) {
             onClick={handleCopy}
             className={`px-2 py-1 rounded text-xs transition-colors ${
                 copied
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-(--color-success-light) text-(--color-success-dark)'
+                    : 'bg-(--color-bg-tertiary) text-(--color-text-tertiary) hover:text-white'
             } ${className}`}
         >
             {copied ? 'Copied' : 'Copy'}

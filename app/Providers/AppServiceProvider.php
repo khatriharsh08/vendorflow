@@ -92,7 +92,10 @@ class AppServiceProvider extends ServiceProvider
 
     private function registerDestructiveCommandGuard(): void
     {
-        if (! $this->app->runningInConsole()) {
+        if (! $this->app->runningInConsole()
+            || $this->app->runningUnitTests()
+            || $this->app->environment('testing')
+            || $this->isRunningPhpUnit()) {
             return;
         }
 
@@ -105,6 +108,10 @@ class AppServiceProvider extends ServiceProvider
             ];
 
             if (! in_array($event->command, $destructiveCommands, true)) {
+                return;
+            }
+
+            if ($this->app->runningUnitTests() || $this->app->environment('testing') || $this->isRunningPhpUnit()) {
                 return;
             }
 
@@ -134,6 +141,25 @@ class AppServiceProvider extends ServiceProvider
                 "Set ALLOW_DESTRUCTIVE_DB_COMMANDS=true to allow this intentionally."
             );
         });
+    }
+
+    private function isRunningPhpUnit(): bool
+    {
+        if (defined('PHPUNIT_COMPOSER_INSTALL') || defined('__PHPUNIT_PHAR__')) {
+            return true;
+        }
+
+        $argv = $_SERVER['argv'] ?? [];
+
+        if (! is_array($argv) || $argv === []) {
+            return false;
+        }
+
+        $commandLine = strtolower(implode(' ', $argv));
+
+        return str_contains($commandLine, 'phpunit')
+            || str_contains($commandLine, 'pest')
+            || str_contains($commandLine, 'artisan test');
     }
 
     private function resolveConnectionNameFromInput(InputInterface $input): string

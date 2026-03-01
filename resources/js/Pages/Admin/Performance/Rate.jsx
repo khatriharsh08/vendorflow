@@ -3,7 +3,11 @@ import { AdminLayout, PageHeader, Card, Button } from '@/Components';
 
 export default function RateVendor({ vendor, metrics = [] }) {
     const form = useForm({
-        ratings: metrics.map((m) => ({ metric_id: m.id, score: 7, notes: '' })),
+        ratings: metrics.map((m) => ({
+            metric_id: m.id,
+            score: Math.round((Number(m.max_score || 10) * 70) / 100),
+            notes: '',
+        })),
         period_start: new Date().toISOString().split('T')[0].slice(0, 7) + '-01',
         period_end: new Date().toISOString().split('T')[0],
     });
@@ -65,8 +69,8 @@ export default function RateVendor({ vendor, metrics = [] }) {
                 <Card title="Performance Ratings">
                     <div className="p-6">
                         <p className="text-sm text-(--color-text-secondary) mb-6">
-                            Rate the vendor on each metric from 0 to 10. Scores are immutable once
-                            submitted.
+                            Rate each metric from 0 up to that metric max score. Scores are
+                            immutable once submitted.
                         </p>
                         <div className="space-y-6">
                             {metrics.map((metric) => {
@@ -106,7 +110,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                                                     parseInt(e.target.value)
                                                 )
                                             }
-                                            className="w-full h-2 bg-(--color-bg-tertiary) rounded-lg appearance-none cursor-pointer accent-indigo-500 mb-2"
+                                            className="w-full h-2 bg-(--color-bg-tertiary) rounded-lg appearance-none cursor-pointer accent-(--color-brand-primary) mb-2"
                                         />
                                         <input
                                             type="text"

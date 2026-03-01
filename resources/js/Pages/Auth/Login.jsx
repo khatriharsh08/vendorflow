@@ -18,9 +18,7 @@ export default function Login() {
         <>
             <Head title="Login - VendorFlow" />
             <div className="min-h-screen flex">
-                {/* Left Panel - Branding */}
-                <div className="hidden lg:flex lg:w-1/2 bg-indigo-600 relative overflow-hidden">
-                    {/* Background pattern */}
+                <div className="hidden lg:flex lg:w-1/2 bg-(--color-brand-primary) relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10">
                         <svg
                             className="w-full h-full"
@@ -47,7 +45,6 @@ export default function Login() {
                     </div>
 
                     <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
-                        {/* Logo */}
                         <Link
                             href="/"
                             className="inline-flex items-center gap-3 p-3 rounded-xl"
@@ -59,87 +56,86 @@ export default function Login() {
                             <Logo size="2xl" light={false} linkToHome={false} />
                         </Link>
 
-                        {/* Content */}
                         <div className="space-y-6">
                             <h1 className="text-4xl font-bold leading-tight">
                                 Manage your vendors with confidence
                             </h1>
-                            <p className="text-indigo-100 text-lg leading-relaxed max-w-md">
-                                Streamline onboarding, track compliance, and process payments — all
+                            <p className="text-white/90 text-lg leading-relaxed max-w-md">
+                                Streamline onboarding, track compliance, and process payments - all
                                 from one powerful platform.
                             </p>
 
-                            {/* Stats */}
                             <div className="flex gap-8 pt-6">
                                 <div>
                                     <div className="text-3xl font-bold">500+</div>
-                                    <div className="text-indigo-200 text-sm">Active Vendors</div>
+                                    <div className="text-white/80 text-sm">Active Vendors</div>
                                 </div>
                                 <div>
-                                    <div className="text-3xl font-bold">₹10Cr+</div>
-                                    <div className="text-indigo-200 text-sm">Processed</div>
+                                    <div className="text-3xl font-bold">INR 10Cr+</div>
+                                    <div className="text-white/80 text-sm">Processed</div>
                                 </div>
                                 <div>
                                     <div className="text-3xl font-bold">99.9%</div>
-                                    <div className="text-indigo-200 text-sm">Uptime</div>
+                                    <div className="text-white/80 text-sm">Uptime</div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Footer */}
-                        <div className="text-indigo-200 text-sm">
-                            © 2026 VendorFlow. All rights reserved.
+                        <div className="text-white/80 text-sm">
+                            (c) 2026 VendorFlow. All rights reserved.
                         </div>
                     </div>
                 </div>
 
-                {/* Right Panel - Form */}
-                <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+                <div className="flex-1 flex items-center justify-center p-8 bg-(--color-bg-secondary)">
                     <div className="w-full max-w-md">
-                        {/* Mobile logo */}
                         <div className="lg:hidden flex justify-center mb-8">
                             <Logo size="lg" />
                         </div>
 
                         <div className="mb-8">
-                            <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-                            <p className="text-gray-500 mt-2">
+                            <h2 className="text-2xl font-bold text-(--color-text-primary)">
+                                Welcome back
+                            </h2>
+                            <p className="text-(--color-text-tertiary) mt-2">
                                 Enter your credentials to access your account
                             </p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     Email
                                 </label>
                                 <input
                                     type="email"
                                     value={form.data.email}
                                     onChange={(e) => form.setData('email', e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors bg-white"
+                                    className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
                                     placeholder="you@company.com"
                                     required
                                 />
                                 {form.errors.email && (
-                                    <p className="mt-1 text-sm text-red-600">{form.errors.email}</p>
+                                    <p className="mt-1 text-sm text-(--color-danger)">
+                                        {form.errors.email}
+                                    </p>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     Password
                                 </label>
                                 <input
                                     type="password"
                                     value={form.data.password}
                                     onChange={(e) => form.setData('password', e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors bg-white"
-                                    placeholder="••••••••"
+                                    className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
+                                    placeholder="********"
                                     required
                                 />
                                 {form.errors.password && (
-                                    <p className="mt-1 text-sm text-red-600">
+                                    <p className="mt-1 text-sm text-(--color-danger)">
                                         {form.errors.password}
                                     </p>
                                 )}
@@ -151,13 +147,15 @@ export default function Login() {
                                         type="checkbox"
                                         checked={form.data.remember}
                                         onChange={(e) => form.setData('remember', e.target.checked)}
-                                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        className="w-4 h-4 rounded border-(--color-border-primary) text-(--color-brand-primary) focus:ring-(--color-brand-primary)/20"
                                     />
-                                    <span className="text-sm text-gray-600">Remember me</span>
+                                    <span className="text-sm text-(--color-text-tertiary)">
+                                        Remember me
+                                    </span>
                                 </label>
                                 <Link
                                     href="/forgot-password"
-                                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                                    className="text-sm text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) font-medium"
                                 >
                                     Forgot password?
                                 </Link>
@@ -166,26 +164,27 @@ export default function Login() {
                             <button
                                 type="submit"
                                 disabled={form.processing}
-                                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full py-3 px-4 bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {form.processing ? 'Signing in...' : 'Sign in'}
                             </button>
                         </form>
 
-                        <p className="mt-8 text-center text-gray-500">
+                        <p className="mt-8 text-center text-(--color-text-tertiary)">
                             Don't have an account?{' '}
                             <Link
                                 href="/register"
-                                className="text-indigo-600 hover:text-indigo-700 font-medium"
+                                className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) font-medium"
                             >
                                 Create one
                             </Link>
                         </p>
 
-                        {/* Demo credentials - subtle */}
-                        <div className="mt-8 p-4 rounded-lg bg-white border border-gray-200">
-                            <p className="text-xs font-medium text-gray-500 mb-2">Demo Accounts</p>
-                            <div className="grid gap-1 text-xs text-gray-400">
+                        <div className="mt-8 p-4 rounded-lg bg-(--color-bg-primary) border border-(--color-border-primary)">
+                            <p className="text-xs font-medium text-(--color-text-tertiary) mb-2">
+                                Demo Accounts
+                            </p>
+                            <div className="grid gap-1 text-xs text-(--color-text-muted)">
                                 <div>Admin: admin@vendorflow.com / password</div>
                                 <div>Ops: ops@vendorflow.com / password</div>
                                 <div>Finance: finance@vendorflow.com / password</div>

@@ -125,7 +125,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     className="p-5 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary) hover:border-(--color-brand-primary-light) hover:shadow-lg transition-all cursor-pointer group"
                                 >
                                     <div className="flex items-start gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-(--gradient-primary) text-(--color-text-primary) flex items-center justify-center shadow-(--shadow-primary) group-hover:scale-110 transition-transform">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-primary text-(--color-text-primary) flex items-center justify-center shadow-token-primary group-hover:scale-110 transition-transform">
                                             <AppIcon
                                                 name={report.icon}
                                                 className="h-6 w-6"
@@ -184,7 +184,7 @@ export default function ReportsIndex({ stats = {} }) {
                             These commands run automatically but can also be triggered manually:
                         </p>
                         <div className="grid md:grid-cols-3 gap-4">
-                            <div className="relative p-4 rounded-xl overflow-hidden shadow-lg shadow-indigo-100 border border-indigo-100">
+                            <div className="relative p-4 rounded-xl overflow-hidden shadow-lg shadow-token-sm border border-(--color-brand-primary-light)">
                                 <div
                                     className="absolute inset-0 opacity-50"
                                     style={{ background: 'var(--gradient-primary)' }}
@@ -194,12 +194,12 @@ export default function ReportsIndex({ stats = {} }) {
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
                                         Runs daily at 2:00 AM
                                     </div>
-                                    <code className="text-xs bg-white/60 px-2 py-1 rounded block text-(--color-text-primary)">
+                                    <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:evaluate-compliance
                                     </code>
                                 </div>
                             </div>
-                            <div className="relative p-4 rounded-xl overflow-hidden shadow-lg shadow-emerald-100 border border-emerald-100">
+                            <div className="relative p-4 rounded-xl overflow-hidden shadow-token-success border border-(--color-success)">
                                 <div
                                     className="absolute inset-0 opacity-50"
                                     style={{ background: 'var(--gradient-success)' }}
@@ -209,12 +209,12 @@ export default function ReportsIndex({ stats = {} }) {
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
                                         Runs daily at 8:00 AM
                                     </div>
-                                    <code className="text-xs bg-white/60 px-2 py-1 rounded block text-(--color-text-primary)">
+                                    <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:expiry-reminders
                                     </code>
                                 </div>
                             </div>
-                            <div className="relative p-4 rounded-xl overflow-hidden shadow-lg shadow-amber-100 border border-amber-100">
+                            <div className="relative p-4 rounded-xl overflow-hidden shadow-token-warning border border-(--color-warning)">
                                 <div
                                     className="absolute inset-0 opacity-50"
                                     style={{ background: 'var(--gradient-warning)' }}
@@ -224,7 +224,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
                                         Runs every Monday
                                     </div>
-                                    <code className="text-xs bg-white/60 px-2 py-1 rounded block text-(--color-text-primary)">
+                                    <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:weekly-summary
                                     </code>
                                 </div>

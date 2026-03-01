@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { AdminLayout, PageHeader, DataTable, Badge, Button } from '@/Components';
+import { AdminLayout, PageHeader, DataTable, Badge, Button, AppIcon } from '@/Components';
 
 export default function PerformanceIndex({
     vendors = [],
@@ -10,14 +10,14 @@ export default function PerformanceIndex({
     const getScoreColor = (score) => {
         if (score >= 80) return 'text-(--color-success)';
         if (score >= 60) return 'text-(--color-warning)';
-        if (score >= 40) return 'text-orange-500';
+        if (score >= 40) return 'text-(--color-warning-dark)';
         return 'text-(--color-danger)';
     };
 
     const getScoreBg = (score) => {
         if (score >= 80) return 'bg-(--color-success)';
         if (score >= 60) return 'bg-(--color-warning)';
-        if (score >= 40) return 'bg-orange-500';
+        if (score >= 40) return 'bg-(--color-warning-dark)';
         return 'bg-(--color-danger)';
     };
 
@@ -76,8 +76,7 @@ export default function PerformanceIndex({
     return (
         <AdminLayout title="Performance Dashboard" activeNav="Performance" header={header}>
             <div className="space-y-8">
-                {/* Metrics Overview */}
-                <div className="bg-white rounded-xl border border-(--color-border-primary) shadow-sm p-6">
+                <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
                     <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4">
                         Performance Metrics
                     </h2>
@@ -107,10 +106,9 @@ export default function PerformanceIndex({
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-8">
-                    {/* Top Performers */}
-                    <div className="bg-white rounded-xl border border-(--color-border-primary) shadow-sm p-6">
+                    <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
                         <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
-                            🏆 Top Performers
+                            <AppIcon name="metrics" className="h-5 w-5" /> Top Performers
                         </h2>
                         <div className="space-y-3">
                             {topPerformers.map((vendor, idx) => (
@@ -119,7 +117,7 @@ export default function PerformanceIndex({
                                     className="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-sm">
+                                        <div className="w-8 h-8 rounded-full bg-(--color-warning-light) flex items-center justify-center text-(--color-warning) font-bold text-sm">
                                             {idx + 1}
                                         </div>
                                         <span className="text-(--color-text-primary) font-medium">
@@ -141,10 +139,9 @@ export default function PerformanceIndex({
                         </div>
                     </div>
 
-                    {/* Needs Improvement */}
-                    <div className="bg-white rounded-xl border border-(--color-border-primary) shadow-sm p-6">
+                    <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
                         <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
-                            📉 Needs Improvement
+                            <AppIcon name="warning" className="h-5 w-5" /> Needs Improvement
                         </h2>
                         <div className="space-y-3">
                             {lowPerformers.map((vendor) => (
@@ -178,8 +175,11 @@ export default function PerformanceIndex({
                     </div>
                 </div>
 
-                {/* All Vendors Table */}
-                <DataTable columns={columns} data={vendors} emptyMessage="No vendors to display" />
+                <DataTable
+                    columns={columns}
+                    data={vendors}
+                    emptyMessage="No approved or active vendors available for rating"
+                />
             </div>
         </AdminLayout>
     );

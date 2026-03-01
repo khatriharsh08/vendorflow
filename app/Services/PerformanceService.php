@@ -21,7 +21,8 @@ class PerformanceService
         User $scoredBy,
         string $periodStart,
         string $periodEnd,
-        ?string $notes = null
+        ?string $notes = null,
+        bool $recalculate = true
     ): PerformanceScore {
         // Validate score range
         $score = max(0, min($metric->max_score, $score));
@@ -36,12 +37,14 @@ class PerformanceService
             'period_end' => $periodEnd,
         ]);
 
-        // Recalculate overall vendor performance score
-        $this->recalculateVendorScore($vendor, $scoredBy, [
-            'metric_id' => $metric->id,
-            'period_start' => $periodStart,
-            'period_end' => $periodEnd,
-        ]);
+        if ($recalculate) {
+            // Recalculate overall vendor performance score
+            $this->recalculateVendorScore($vendor, $scoredBy, [
+                'metric_id' => $metric->id,
+                'period_start' => $periodStart,
+                'period_end' => $periodEnd,
+            ]);
+        }
 
         return $performanceScore;
     }
@@ -61,19 +64,25 @@ class PerformanceService
         $totalWeight = 0;
         $weightedSum = 0;
 
-        foreach ($metrics as $metric) {
-            // Get most recent score for this metric
-            $latestScore = PerformanceScore::where('vendor_id', $vendor->id)
-                ->where('performance_metric_id', $metric->id)
-                ->orderBy('period_end', 'desc')
-                ->first();
+        $latestScoresByMetric = PerformanceScore::query()
+            ->where('vendor_id', $vendor->id)
+            ->whereIn('performance_metric_id', $metrics->pluck('id'))
+            ->orderByDesc('period_end')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy('performance_metric_id')
+            ->map(fn ($scores) => $scores->first());
 
-            if ($latestScore) {
-                // Normalize score to 0-100
-                $normalizedScore = ($latestScore->score / $metric->max_score) * 100;
-                $weightedSum += $normalizedScore * $metric->weight;
-                $totalWeight += $metric->weight;
+        foreach ($metrics as $metric) {
+            $latestScore = $latestScoresByMetric->get($metric->id);
+            if (! $latestScore || $metric->max_score <= 0) {
+                continue;
             }
+
+            // Normalize score to 0-100
+            $normalizedScore = ($latestScore->score / $metric->max_score) * 100;
+            $weightedSum += $normalizedScore * $metric->weight;
+            $totalWeight += $metric->weight;
         }
 
         $overallScore = $totalWeight > 0
@@ -116,16 +125,18 @@ class PerformanceService
                     'average' => 0,
                 ];
             }
+            $maxScore = max(1, (int) ($score->metric?->max_score ?? 1));
             $monthlyData[$month]['scores'][] = [
                 'metric' => $score->metric->name,
                 'score' => $score->score,
-                'max' => $score->metric->max_score,
+                'max' => $maxScore,
+                'normalized' => ($score->score / $maxScore) * 100,
             ];
         }
 
         // Calculate monthly averages
         foreach ($monthlyData as &$data) {
-            $total = array_sum(array_column($data['scores'], 'score'));
+            $total = array_sum(array_column($data['scores'], 'normalized'));
             $data['average'] = count($data['scores']) > 0
                 ? round($total / count($data['scores']))
                 : 0;
@@ -140,17 +151,20 @@ class PerformanceService
     public function getMetricBreakdown(Vendor $vendor): array
     {
         $metrics = PerformanceMetric::where('is_active', true)->get();
+        $scoresByMetric = PerformanceScore::query()
+            ->where('vendor_id', $vendor->id)
+            ->whereIn('performance_metric_id', $metrics->pluck('id'))
+            ->orderByDesc('period_end')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy('performance_metric_id');
+
         $breakdown = [];
 
         foreach ($metrics as $metric) {
-            $latestScore = PerformanceScore::where('vendor_id', $vendor->id)
-                ->where('performance_metric_id', $metric->id)
-                ->orderBy('period_end', 'desc')
-                ->first();
-
-            $allScores = PerformanceScore::where('vendor_id', $vendor->id)
-                ->where('performance_metric_id', $metric->id)
-                ->pluck('score');
+            $metricScores = $scoresByMetric->get($metric->id, collect());
+            $latestScore = $metricScores->first();
+            $allScores = $metricScores->pluck('score');
 
             $breakdown[] = [
                 'metric_id' => $metric->id,

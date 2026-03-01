@@ -23,7 +23,7 @@ export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, s
     ];
 
     return (
-        <div className="min-h-screen bg-(--gradient-page)">
+        <div className="min-h-screen bg-gradient-page">
             <Head title="Vendor Onboarding" />
 
             {/* Navigation - Light Theme */}
@@ -52,7 +52,7 @@ export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, s
                             aria-hidden="true"
                         ></div>
                         <div
-                            className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-(--gradient-primary) -z-10 rounded-full transition-all duration-500"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-primary -z-10 rounded-full transition-all duration-500"
                             style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
                             aria-hidden="true"
                         ></div>
@@ -69,7 +69,7 @@ export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, s
                                         step >= s.number
                                             ? 'bg-(--color-bg-primary) border-(--color-brand-primary) text-(--color-brand-primary)'
                                             : 'bg-(--color-bg-secondary) border-(--color-border-primary) text-(--color-text-muted)'
-                                    } ${step === s.number ? 'shadow-(--shadow-primary) scale-110' : ''}`}
+                                    } ${step === s.number ? 'shadow-token-primary scale-110' : ''}`}
                                     aria-hidden="true"
                                 >
                                     {step > s.number ? (

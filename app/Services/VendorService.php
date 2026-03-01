@@ -111,6 +111,7 @@ class VendorService
                 'file_size' => $file->getSize(),
                 'mime_type' => $file->getMimeType(),
                 'file_hash' => hash_file('sha256', $file->getRealPath()),
+                'expiry_date' => $doc['expiry_date'] ?? null,
             ];
         }
 
@@ -215,6 +216,7 @@ class VendorService
                         'file_hash' => $doc['file_hash'],
                         'file_size' => $doc['file_size'],
                         'mime_type' => $doc['mime_type'],
+                        'expiry_date' => $doc['expiry_date'] ?? null,
                         'version' => max(1, $nextVersion),
                         'is_current' => true,
                         'verification_status' => 'pending',

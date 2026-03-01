@@ -53,7 +53,10 @@ class GeneratePerformanceScores extends Command
                 $this->info("Vendor {$vendor->id} ({$vendor->company_name}) score recalculated: {$score}");
                 $processed = 1;
             } else {
-                $vendors = Vendor::where('status', Vendor::STATUS_ACTIVE)->get();
+                $vendors = Vendor::whereIn('status', [
+                    Vendor::STATUS_ACTIVE,
+                    Vendor::STATUS_APPROVED,
+                ])->get();
 
                 foreach ($vendors as $vendor) {
                     $performanceService->recalculateVendorScore($vendor, null, [

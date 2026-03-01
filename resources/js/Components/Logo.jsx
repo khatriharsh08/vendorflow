@@ -40,7 +40,7 @@ export default function Logo({ size = 'md', light = false, linkToHome = true, cl
                 />
             ) : (
                 <span
-                    className={`font-bold ${textSizes[size] || textSizes.md} ${light ? 'text-gray-900' : 'text-white'}`}
+                    className={`font-bold ${textSizes[size] || textSizes.md} ${light ? 'text-(--color-text-primary)' : 'text-white'}`}
                 >
                     VendorFlow
                 </span>

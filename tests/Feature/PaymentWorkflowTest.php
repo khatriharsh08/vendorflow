@@ -175,4 +175,68 @@ class PaymentWorkflowTest extends TestCase
             'payment_reference' => 'UTR-123456',
         ]);
     }
+
+    public function test_finance_manager_sees_error_when_payment_is_compliance_blocked()
+    {
+        $this->vendor->update(['compliance_status' => 'pending']);
+
+        $payment = PaymentRequest::create([
+            'vendor_id' => $this->vendor->id,
+            'requested_by' => $this->vendorUser->id,
+            'amount' => 5000,
+            'status' => 'pending_finance',
+            'reference_number' => 'PAY-TEST-4',
+            'description' => 'Blocked Payment',
+            'is_compliance_blocked' => true,
+        ]);
+
+        $response = $this->actingAs($this->financeUser)
+            ->from('/admin/payments')
+            ->post(route('admin.payments.approve-finance', $payment), [
+                'action' => 'approve',
+            ]);
+
+        $response->assertRedirect('/admin/payments');
+        $response->assertSessionHas(
+            'error',
+            'Cannot approve payment: Vendor is currently Non-Compliant (Status changed after request).'
+        );
+
+        $this->assertDatabaseHas('payment_requests', [
+            'id' => $payment->id,
+            'status' => 'pending_finance',
+        ]);
+    }
+
+    public function test_finance_manager_can_approve_previously_blocked_payment_after_vendor_is_compliant()
+    {
+        $this->vendor->update(['compliance_status' => 'pending']);
+
+        $payment = PaymentRequest::create([
+            'vendor_id' => $this->vendor->id,
+            'requested_by' => $this->vendorUser->id,
+            'amount' => 5000,
+            'status' => 'pending_finance',
+            'reference_number' => 'PAY-TEST-5',
+            'description' => 'Previously Blocked Payment',
+            'is_compliance_blocked' => true,
+        ]);
+
+        $this->vendor->update(['compliance_status' => 'compliant']);
+
+        $response = $this->actingAs($this->financeUser)
+            ->post(route('admin.payments.approve-finance', $payment), [
+                'action' => 'approve',
+                'comment' => 'Vendor is now compliant',
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', 'Payment approved successfully.');
+
+        $this->assertDatabaseHas('payment_requests', [
+            'id' => $payment->id,
+            'status' => 'approved',
+            'is_compliance_blocked' => false,
+        ]);
+    }
 }

@@ -200,7 +200,9 @@ class ReportService
     public function exportDocumentExpiryCsv(Request $request): Response
     {
         $query = VendorDocument::with(['vendor', 'documentType'])
-            ->whereNotNull('expiry_date');
+            ->where('is_current', true)
+            ->whereNotNull('expiry_date')
+            ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true));
 
         $startDate = $request->filled('start_date') ? $request->start_date : now()->format('Y-m-d');
         $endDate = $request->filled('end_date') ? $request->end_date : now()->addDays(30)->format('Y-m-d');
@@ -344,7 +346,9 @@ class ReportService
     public function documentExpiryReportData(Request $request): array
     {
         $query = VendorDocument::with(['vendor', 'documentType'])
-            ->whereNotNull('expiry_date');
+            ->where('is_current', true)
+            ->whereNotNull('expiry_date')
+            ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true));
 
         $startDate = $request->filled('start_date') ? $request->start_date : now()->format('Y-m-d');
         $endDate = $request->filled('end_date') ? $request->end_date : now()->addDays(30)->format('Y-m-d');
@@ -364,12 +368,21 @@ class ReportService
             'documents' => $documents,
             'stats' => [
                 'expiring_7_days' => VendorDocument::whereNotNull('expiry_date')
+                    ->where('is_current', true)
+                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true))
                     ->whereBetween('expiry_date', [now(), now()->addDays(7)])->count(),
                 'expiring_30_days' => VendorDocument::whereNotNull('expiry_date')
+                    ->where('is_current', true)
+                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true))
                     ->whereBetween('expiry_date', [now(), now()->addDays(30)])->count(),
                 'expired' => VendorDocument::whereNotNull('expiry_date')
+                    ->where('is_current', true)
+                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true))
                     ->where('expiry_date', '<', now())->count(),
-                'total_with_expiry' => VendorDocument::whereNotNull('expiry_date')->count(),
+                'total_with_expiry' => VendorDocument::whereNotNull('expiry_date')
+                    ->where('is_current', true)
+                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true))
+                    ->count(),
             ],
             'filters' => [
                 'start_date' => $startDate,

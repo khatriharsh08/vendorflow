@@ -10,12 +10,6 @@ import {
     DataTable,
     FormSelect,
 } from '@/Components';
-const formatPaginationLabel = (label) =>
-    String(label || '')
-        .replace(/&laquo;/g, '<<')
-        .replace(/&raquo;/g, '>>')
-        .replace(/<[^>]*>/g, '')
-        .trim();
 
 export default function VendorSummaryReport({ vendors, stats, filters }) {
     const { auth } = usePage().props;
@@ -112,13 +106,23 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
             <div className="space-y-6">
                 {/* Summary Stats */}
                 <div className="grid md:grid-cols-4 gap-4">
-                    <StatCard label="Total Vendors" value={stats.total} icon="🏢" color="primary" />
-                    <StatCard label="Active" value={stats.active} icon="✅" color="success" />
-                    <StatCard label="Compliant" value={stats.compliant} icon="🛡️" color="info" />
+                    <StatCard
+                        label="Total Vendors"
+                        value={stats.total}
+                        icon="vendors"
+                        color="primary"
+                    />
+                    <StatCard label="Active" value={stats.active} icon="success" color="success" />
+                    <StatCard
+                        label="Compliant"
+                        value={stats.compliant}
+                        icon="compliance"
+                        color="info"
+                    />
                     <StatCard
                         label="Avg Performance"
                         value={`${stats.avg_performance_score}%`}
-                        icon="📈"
+                        icon="trend"
                         color="warning"
                     />
                 </div>
@@ -166,27 +170,9 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                     <DataTable
                         columns={columns}
                         data={vendors?.data || []}
+                        links={vendors?.links || []}
                         emptyMessage="No vendors found for the selected filters."
                     />
-
-                    {/* Pagination */}
-                    {vendors?.links && vendors.links.length > 3 && (
-                        <div className="p-4 border-t border-(--color-border-primary) flex justify-center gap-2">
-                            {vendors.links.map((link, idx) => (
-                                <Link
-                                    key={idx}
-                                    href={link.url || '#'}
-                                    className={`px-3 py-1 rounded text-sm ${
-                                        link.active
-                                            ? 'bg-(--color-brand-primary) text-white'
-                                            : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-tertiary)'
-                                    }`}
-                                >
-                                    {formatPaginationLabel(link.label)}
-                                </Link>
-                            ))}
-                        </div>
-                    )}
                 </Card>
             </div>
         </AdminLayout>

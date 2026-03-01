@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
 import Logo from './Logo';
 
@@ -79,6 +79,7 @@ function IconRenderer({ icon, size = 'h-5 w-5' }) {
 // =====================================
 function UserMenu({ user, roleDisplay, onLogout }) {
     const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef(null);
 
     const menuItems = [
         { name: 'Profile', icon: 'profile', href: '/profile' },
@@ -86,14 +87,41 @@ function UserMenu({ user, roleDisplay, onLogout }) {
         { name: 'Settings', icon: 'settings', href: '/profile' },
     ];
 
+    useEffect(() => {
+        if (!isOpen) {
+            return undefined;
+        }
+
+        const onClick = (event) => {
+            if (!menuRef.current?.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        window.addEventListener('mousedown', onClick);
+        window.addEventListener('keydown', onKeyDown);
+
+        return () => {
+            window.removeEventListener('mousedown', onClick);
+            window.removeEventListener('keydown', onKeyDown);
+        };
+    }, [isOpen]);
+
     return (
-        <div className="relative">
+        <div ref={menuRef} className="relative">
             <button
                 type="button"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => setIsOpen((prev) => !prev)}
                 className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-(--color-bg-hover) transition-colors group"
                 aria-expanded={isOpen}
                 aria-label="Toggle user menu"
+                aria-haspopup="menu"
             >
                 <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
@@ -128,12 +156,17 @@ function UserMenu({ user, roleDisplay, onLogout }) {
             </button>
 
             {isOpen && (
-                <div className="absolute bottom-full left-0 right-0 mb-2 py-1.5 bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-(--shadow-xl)">
+                <div
+                    className="absolute bottom-full left-0 right-0 mb-2 py-1.5 bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-token-xl"
+                    role="menu"
+                >
                     {menuItems.map((item) => (
                         <Link
                             key={item.name}
                             href={item.href}
+                            onClick={() => setIsOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-(--color-text-secondary) hover:text-(--color-brand-primary) hover:bg-(--color-bg-hover) transition-colors text-sm font-medium"
+                            role="menuitem"
                         >
                             <IconRenderer icon={item.icon} size="h-4 w-4" />
                             {item.name}
@@ -144,6 +177,7 @@ function UserMenu({ user, roleDisplay, onLogout }) {
                         type="button"
                         onClick={onLogout}
                         className="w-full flex items-center gap-3 px-4 py-2.5 text-(--color-danger) hover:bg-(--color-danger-light) transition-colors text-sm font-medium"
+                        role="menuitem"
                     >
                         <IconRenderer icon="logout" size="h-4 w-4" />
                         Logout
@@ -161,6 +195,7 @@ function NavItem({ item, isActive }) {
     return (
         <Link
             href={item.href}
+            aria-current={isActive ? 'page' : undefined}
             className={`
                 flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                 transition-all duration-200
@@ -186,7 +221,7 @@ function NavItem({ item, isActive }) {
                     ml-auto px-2 py-0.5 rounded-full text-xs font-semibold
                     ${
                         isActive
-                            ? 'bg-white/20 text-white'
+                            ? 'bg-(--color-bg-primary)/20 text-white'
                             : 'bg-(--color-brand-primary-light) text-(--color-brand-primary)'
                     }
                 `}
@@ -246,6 +281,7 @@ export default function Sidebar({
                 <div
                     className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity"
                     onClick={onClose}
+                    aria-hidden="true"
                 />
             )}
 
@@ -257,6 +293,7 @@ export default function Sidebar({
                     md:translate-x-0
                     ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 `}
+                aria-label={`${logoText} navigation`}
             >
                 {/* Logo - matches PageHeader height */}
                 <div className="h-[73px] px-5 border-b border-(--color-border-primary) flex items-center justify-between">
@@ -274,8 +311,10 @@ export default function Sidebar({
                     </Link>
                     {/* Mobile Close Button */}
                     <button
+                        type="button"
                         onClick={onClose}
                         className="md:hidden text-(--color-text-muted) hover:text-(--color-text-primary)"
+                        aria-label="Close navigation"
                     >
                         <AppIcon name="close" className="w-5 h-5" fallback="X" />
                     </button>

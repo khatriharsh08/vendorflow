@@ -6,7 +6,6 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
     const [filter, setFilter] = useState('all');
 
     const displayNotifications = notifications.data || [];
-
     const unreadCount = displayNotifications.filter((n) => !n.read_at).length;
 
     const filteredNotifications =
@@ -17,20 +16,36 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
               : displayNotifications.filter((n) => n.data?.type === filter);
 
     const notificationTypes = {
-        document: { icon: 'documents', label: 'Document', color: 'bg-blue-100 text-blue-600' },
-        payment: { icon: 'payments', label: 'Payment', color: 'bg-green-100 text-green-600' },
+        document: {
+            icon: 'documents',
+            label: 'Document',
+            color: 'bg-(--color-info-light) text-(--color-info)',
+        },
+        payment: {
+            icon: 'payments',
+            label: 'Payment',
+            color: 'bg-(--color-success-light) text-(--color-success)',
+        },
         compliance: {
             icon: 'compliance',
             label: 'Compliance',
-            color: 'bg-amber-100 text-amber-600',
+            color: 'bg-(--color-warning-light) text-(--color-warning)',
         },
         performance: {
             icon: 'trend',
             label: 'Performance',
-            color: 'bg-purple-100 text-purple-600',
+            color: 'bg-(--color-brand-primary-light) text-(--color-brand-primary)',
         },
-        system: { icon: 'settings', label: 'System', color: 'bg-gray-100 text-gray-600' },
-        status: { icon: 'metrics', label: 'Status', color: 'bg-indigo-100 text-indigo-600' },
+        system: {
+            icon: 'settings',
+            label: 'System',
+            color: 'bg-(--color-bg-tertiary) text-(--color-text-tertiary)',
+        },
+        status: {
+            icon: 'metrics',
+            label: 'Status',
+            color: 'bg-(--color-brand-primary-light) text-(--color-brand-primary)',
+        },
     };
 
     const handleMarkAsRead = (id) => {
@@ -95,7 +110,6 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
             vendor={vendor}
         >
             <div className="space-y-6">
-                {/* Filters */}
                 <div className="flex gap-2 overflow-x-auto pb-2">
                     {filters.map((f) => (
                         <button
@@ -111,7 +125,9 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                             {f.count !== undefined && (
                                 <span
                                     className={`ml-2 px-1.5 py-0.5 rounded-full text-xs ${
-                                        filter === f.id ? 'bg-white/20' : 'bg-(--color-bg-tertiary)'
+                                        filter === f.id
+                                            ? 'bg-(--color-bg-primary)/20'
+                                            : 'bg-(--color-bg-tertiary)'
                                     }`}
                                 >
                                     {f.count}
@@ -121,7 +137,6 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                     ))}
                 </div>
 
-                {/* Notifications List */}
                 <Card>
                     {filteredNotifications.length === 0 ? (
                         <div className="p-12 text-center text-(--color-text-tertiary)">
@@ -131,7 +146,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                             <p className="text-lg font-medium">No notifications</p>
                             <p className="text-sm mt-1">
                                 {filter === 'all'
-                                    ? "You're all caught up!"
+                                    ? 'You are all caught up.'
                                     : `No ${filter} notifications found.`}
                             </p>
                         </div>
@@ -147,21 +162,19 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                     <div
                                         key={notification.id}
                                         className={`p-4 hover:bg-(--color-bg-hover) transition-colors cursor-pointer ${
-                                            isUnread ? 'bg-indigo-50/50' : ''
+                                            isUnread ? 'bg-(--color-brand-primary-light)/50' : ''
                                         }`}
                                         onClick={() =>
                                             isUnread && handleMarkAsRead(notification.id)
                                         }
                                     >
                                         <div className="flex items-start gap-4">
-                                            {/* Icon */}
                                             <div
                                                 className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${typeInfo.color}`}
                                             >
                                                 <AppIcon name={typeInfo.icon} className="h-5 w-5" />
                                             </div>
 
-                                            {/* Content */}
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start justify-between gap-2">
                                                     <h3
@@ -187,7 +200,6 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                                     {notification.data?.message}
                                                 </p>
 
-                                                {/* Action buttons based on notification data */}
                                                 {notification.data?.action_url && (
                                                     <a
                                                         href={notification.data.action_url}
@@ -199,7 +211,6 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                                 )}
                                             </div>
 
-                                            {/* Unread indicator */}
                                             {isUnread && (
                                                 <div className="w-2.5 h-2.5 rounded-full bg-(--color-brand-primary) flex-shrink-0 mt-2" />
                                             )}
@@ -211,7 +222,6 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                     )}
                 </Card>
 
-                {/* Sample Notifications Info (for empty state) */}
                 {displayNotifications.length === 0 && (
                     <div className="bg-(--color-bg-secondary) border border-(--color-border-secondary) rounded-xl p-6">
                         <h3 className="font-semibold text-(--color-text-primary) mb-4">

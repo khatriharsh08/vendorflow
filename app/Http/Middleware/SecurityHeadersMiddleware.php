@@ -17,20 +17,32 @@ class SecurityHeadersMiddleware
     {
         $response = $next($request);
 
-        $response->headers->set('X-Frame-Options', 'DENY');
+        // Document preview is intentionally embeddable in same-origin modal viewers.
+        $isDocumentPreview = $request->routeIs('documents.view', 'admin.documents.preview');
+        $frameAncestors = $isDocumentPreview ? "'self'" : "'none'";
+
+        $response->headers->set('X-Frame-Options', $isDocumentPreview ? 'SAMEORIGIN' : 'DENY');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-XSS-Protection', '0');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
-        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
-        $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
 
-        if (app()->environment('local')) {
-            // Development CSP for Vite HMR.
-            $response->headers->set('Content-Security-Policy', "default-src 'self' data: blob: http: https: ws: wss:; script-src 'self' 'unsafe-inline' http: https:; style-src 'self' 'unsafe-inline' http: https:; img-src 'self' data: blob: http: https:; font-src 'self' data: http: https:; connect-src 'self' ws: wss: http: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';");
+        if ($isDocumentPreview) {
+            // Relax preview response headers for browser-native PDF viewers inside same-origin iframes.
+            $response->headers->remove('Cross-Origin-Opener-Policy');
+            $response->headers->remove('Cross-Origin-Resource-Policy');
+            $response->headers->remove('Content-Security-Policy');
         } else {
-            // Production CSP disallows eval and untrusted origins.
-            $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.bunny.net; img-src 'self' data: blob:; font-src 'self' data: https://fonts.bunny.net; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';");
+            $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
+            $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
+
+            if (app()->environment('local')) {
+                // Development CSP for Vite HMR.
+                $response->headers->set('Content-Security-Policy', "default-src 'self' data: blob: http: https: ws: wss:; script-src 'self' 'unsafe-inline' http: https:; style-src 'self' 'unsafe-inline' http: https:; img-src 'self' data: blob: http: https:; font-src 'self' data: http: https:; connect-src 'self' ws: wss: http: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors {$frameAncestors};");
+            } else {
+                // Production CSP disallows eval and untrusted origins.
+                $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.bunny.net; img-src 'self' data: blob:; font-src 'self' data: https://fonts.bunny.net; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors {$frameAncestors};");
+            }
         }
 
         if ($request->isSecure() && app()->isProduction()) {

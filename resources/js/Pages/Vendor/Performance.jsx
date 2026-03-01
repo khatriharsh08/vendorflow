@@ -1,18 +1,18 @@
 import { AppIcon, Card, PageHeader, VendorLayout } from '@/Components';
 
 export default function Performance({ vendor, performanceScores = [], metrics = [] }) {
-    const overallScore = vendor?.performance_score || 0;
+    const overallScore = Number(vendor?.performance_score || 0);
 
     const getScoreColor = (score) => {
-        if (score >= 80) return 'text-emerald-600';
-        if (score >= 60) return 'text-amber-600';
-        return 'text-red-600';
+        if (score >= 80) return 'text-(--color-success)';
+        if (score >= 60) return 'text-(--color-warning)';
+        return 'text-(--color-danger)';
     };
 
     const getScoreBgClass = (score) => {
-        if (score >= 80) return 'bg-emerald-500';
-        if (score >= 60) return 'bg-amber-500';
-        return 'bg-red-500';
+        if (score >= 80) return 'bg-(--color-success)';
+        if (score >= 60) return 'bg-(--color-warning)';
+        return 'bg-(--color-danger)';
     };
 
     const getScoreLabel = (score) => {
@@ -24,6 +24,9 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
         return 'Needs Improvement';
     };
 
+    const toPercentage = (value, max) =>
+        Math.round((Number(value || 0) / Math.max(1, Number(max || 1))) * 100);
+
     const header = (
         <PageHeader
             title="Performance"
@@ -32,10 +35,10 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                 <div
                     className={`px-4 py-2 rounded-xl font-semibold ${
                         overallScore >= 80
-                            ? 'bg-emerald-100 text-emerald-700'
+                            ? 'bg-(--color-success-light) text-(--color-success-dark)'
                             : overallScore >= 60
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-red-100 text-red-700'
+                              ? 'bg-(--color-warning-light) text-(--color-warning-dark)'
+                              : 'bg-(--color-danger-light) text-(--color-danger-dark)'
                     }`}
                 >
                     {getScoreLabel(overallScore)}
@@ -44,27 +47,23 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
         />
     );
 
-    // Use only metrics from database
     const hasMetrics = metrics.length > 0;
 
     return (
         <VendorLayout title="Performance" activeNav="Performance" header={header} vendor={vendor}>
             <div className="space-y-8">
-                {/* Overall Score Card */}
-                <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl overflow-hidden shadow-(--shadow-sm)">
-                    <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-8 text-white">
+                <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl overflow-hidden shadow-token-sm">
+                    <div className="bg-gradient-primary p-8 text-white">
                         <div className="flex flex-col md:flex-row items-center gap-8">
-                            {/* Score Display */}
                             <div className="text-center">
                                 <div className="text-7xl font-bold mb-2">{overallScore}</div>
                                 <div className="text-lg opacity-90">out of 100</div>
                             </div>
 
-                            {/* Meter */}
                             <div className="flex-1 w-full max-w-md">
-                                <div className="relative h-4 bg-white/20 rounded-full overflow-hidden">
+                                <div className="relative h-4 bg-(--color-bg-primary)/20 rounded-full overflow-hidden">
                                     <div
-                                        className="absolute left-0 top-0 h-full bg-white rounded-full transition-all duration-1000"
+                                        className="absolute left-0 top-0 h-full bg-(--color-bg-primary) rounded-full transition-all duration-1000"
                                         style={{ width: `${overallScore}%` }}
                                     />
                                 </div>
@@ -79,19 +78,17 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                         </div>
                     </div>
 
-                    {/* Score Summary */}
                     <div className="p-6">
                         <p className="text-(--color-text-tertiary)">
                             {overallScore >= 80
-                                ? 'Great job! Your performance is above average. Keep up the excellent work!'
+                                ? 'Great job. Your performance is above average.'
                                 : overallScore >= 60
                                   ? 'Good performance. There is room for improvement in some areas.'
-                                  : 'Your performance needs attention. Please focus on improving the metrics below.'}
+                                  : 'Your performance needs attention. Focus on improving the metrics below.'}
                         </p>
                     </div>
                 </div>
 
-                {/* Individual Metrics */}
                 <Card title="Performance Metrics">
                     <div className="divide-y divide-(--color-border-secondary)">
                         {!hasMetrics ? (
@@ -109,7 +106,9 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                 const scoreData = performanceScores.find(
                                     (s) => s.performance_metric_id === metric.id
                                 );
-                                const score = scoreData?.score || 0;
+                                const maxScore = Number(metric.max_score || 10);
+                                const score = Number(scoreData?.score || 0);
+                                const scorePercentage = toPercentage(score, maxScore);
 
                                 return (
                                     <div
@@ -126,15 +125,15 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                                 </p>
                                             </div>
                                             <div
-                                                className={`text-2xl font-bold ${score > 0 ? getScoreColor(score) : 'text-gray-400'}`}
+                                                className={`text-2xl font-bold ${score > 0 ? getScoreColor(scorePercentage) : 'text-(--color-text-muted)'}`}
                                             >
-                                                {score > 0 ? score : 'N/A'}
+                                                {score > 0 ? `${score}/${maxScore}` : 'N/A'}
                                             </div>
                                         </div>
                                         <div className="relative h-2 bg-(--color-bg-tertiary) rounded-full overflow-hidden">
                                             <div
-                                                className={`absolute left-0 top-0 h-full rounded-full transition-all duration-700 ${score > 0 ? getScoreBgClass(score) : 'bg-gray-300'}`}
-                                                style={{ width: `${score}%` }}
+                                                className={`absolute left-0 top-0 h-full rounded-full transition-all duration-700 ${score > 0 ? getScoreBgClass(scorePercentage) : 'bg-(--color-bg-muted)'}`}
+                                                style={{ width: `${scorePercentage}%` }}
                                             />
                                         </div>
                                     </div>
@@ -144,7 +143,6 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                     </div>
                 </Card>
 
-                {/* Performance History */}
                 <Card title="Recent Performance">
                     <div className="p-6">
                         {performanceScores.length === 0 ? (
@@ -159,34 +157,39 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {performanceScores.slice(0, 5).map((score, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center justify-between p-3 bg-(--color-bg-secondary) rounded-xl"
-                                    >
-                                        <div>
-                                            <div className="font-medium text-(--color-text-primary)">
-                                                {score.metric?.display_name || 'Performance Review'}
-                                            </div>
-                                            <div className="text-sm text-(--color-text-tertiary)">
-                                                {score.period_start && score.period_end
-                                                    ? `${new Date(score.period_start).toLocaleDateString()} - ${new Date(score.period_end).toLocaleDateString()}`
-                                                    : 'Recent evaluation'}
-                                            </div>
-                                        </div>
+                                {performanceScores.slice(0, 5).map((score) => {
+                                    const maxScore = Number(score.metric?.max_score || 100);
+                                    const normalizedScore = toPercentage(score.score, maxScore);
+
+                                    return (
                                         <div
-                                            className={`text-xl font-bold ${getScoreColor(score.score)}`}
+                                            key={score.id}
+                                            className="flex items-center justify-between p-3 bg-(--color-bg-secondary) rounded-xl"
                                         >
-                                            {score.score}/100
+                                            <div>
+                                                <div className="font-medium text-(--color-text-primary)">
+                                                    {score.metric?.display_name ||
+                                                        'Performance Review'}
+                                                </div>
+                                                <div className="text-sm text-(--color-text-tertiary)">
+                                                    {score.period_start && score.period_end
+                                                        ? `${new Date(score.period_start).toLocaleDateString()} - ${new Date(score.period_end).toLocaleDateString()}`
+                                                        : 'Recent evaluation'}
+                                                </div>
+                                            </div>
+                                            <div
+                                                className={`text-xl font-bold ${getScoreColor(normalizedScore)}`}
+                                            >
+                                                {score.score}/{maxScore}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
                 </Card>
 
-                {/* Tips */}
                 <Card title="Improve Your Score">
                     <div className="p-6">
                         <div className="grid md:grid-cols-2 gap-4">

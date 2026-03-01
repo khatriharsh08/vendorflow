@@ -29,26 +29,26 @@ export default function VendorLayout({
 
     const statusBanners = {
         draft: {
-            bg: 'bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200',
-            text: 'text-amber-700',
+            bg: 'bg-(--color-warning-light) border-b border-(--color-warning)',
+            text: 'text-(--color-warning-dark)',
             icon: 'warning',
             message: 'Please complete your onboarding to start using VendorFlow',
         },
         submitted: {
-            bg: 'bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200',
-            text: 'text-blue-700',
+            bg: 'bg-(--color-info-light)/70 border-b border-(--color-border-primary)',
+            text: 'text-(--color-info-dark)',
             icon: 'clock',
             message: 'Your application is under review',
         },
         approved: {
-            bg: 'bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-200',
-            text: 'text-emerald-700',
+            bg: 'bg-(--color-success-light) border-b border-(--color-success)',
+            text: 'text-(--color-success-dark)',
             icon: 'success',
             message: 'Your application is approved. Awaiting activation.',
         },
         suspended: {
-            bg: 'bg-gradient-to-r from-rose-50 to-red-50 border-b border-rose-200',
-            text: 'text-rose-700',
+            bg: 'bg-(--color-danger-light) border-b border-(--color-danger)',
+            text: 'text-(--color-danger-dark)',
             icon: 'error',
             message: 'Your account is currently suspended',
         },
@@ -126,7 +126,7 @@ export default function VendorLayout({
                     {(flash?.success || flash?.error) && (
                         <div className="px-4 md:px-8 pt-4 animate-scale-in">
                             {flash.success && (
-                                <div className="p-4 rounded-xl bg-(--color-success-light) border border-(--color-success) text-(--color-success-dark) flex items-center gap-3 shadow-(--shadow-md)">
+                                <div className="p-4 rounded-xl bg-(--color-success-light) border border-(--color-success) text-(--color-success-dark) flex items-center gap-3 shadow-token-md">
                                     <span className="w-6 h-6 rounded-full bg-(--color-success) text-white flex items-center justify-center min-w-[24px]">
                                         <AppIcon
                                             name="success"
@@ -138,7 +138,7 @@ export default function VendorLayout({
                                 </div>
                             )}
                             {flash.error && (
-                                <div className="p-4 rounded-xl bg-(--color-danger-light) border border-(--color-danger) text-(--color-danger-dark) flex items-center gap-3 shadow-(--shadow-md)">
+                                <div className="p-4 rounded-xl bg-(--color-danger-light) border border-(--color-danger) text-(--color-danger-dark) flex items-center gap-3 shadow-token-md">
                                     <span className="w-6 h-6 rounded-full bg-(--color-danger) text-white flex items-center justify-center min-w-[24px]">
                                         <AppIcon
                                             name="error"

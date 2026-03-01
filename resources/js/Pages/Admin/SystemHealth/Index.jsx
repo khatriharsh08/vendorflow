@@ -167,7 +167,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                                 name="search"
                                 defaultValue={filters?.search || ''}
                                 placeholder="vendors:evaluate-compliance"
-                                className="mt-1 w-full rounded-xl border-2 border-(--color-border-primary) bg-white px-4 py-3 text-sm text-(--color-text-primary) placeholder:text-(--color-text-placeholder) transition-colors hover:border-(--color-border-secondary) focus:outline-none focus:border-(--color-brand-primary) focus:ring-4 focus:ring-(--color-brand-primary)/10"
+                                className="mt-1 w-full rounded-xl border-2 border-(--color-border-primary) bg-(--color-bg-primary) px-4 py-3 text-sm text-(--color-text-primary) placeholder:text-(--color-text-placeholder) transition-colors hover:border-(--color-border-secondary) focus:outline-none focus:border-(--color-brand-primary) focus:ring-4 focus:ring-(--color-brand-primary)/10"
                             />
                         </label>
 
@@ -199,7 +199,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                                 className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                                     link.active
                                         ? 'bg-(--color-brand-primary) text-white border-(--color-brand-primary)'
-                                        : 'bg-white text-(--color-text-secondary) border-(--color-border-primary) disabled:opacity-40'
+                                        : 'bg-(--color-bg-primary) text-(--color-text-secondary) border-(--color-border-primary) disabled:opacity-40'
                                 }`}
                             >
                                 {formatPaginationLabel(link.label)}

@@ -1,48 +1,48 @@
-// Professional Badge Component
 const statusColors = {
-    // Vendor statuses
-    draft: 'bg-gray-100 text-gray-600',
-    submitted: 'bg-blue-100 text-blue-700',
-    under_review: 'bg-amber-100 text-amber-700',
-    approved: 'bg-emerald-100 text-emerald-700',
-    active: 'bg-emerald-500 text-white',
-    suspended: 'bg-orange-100 text-orange-700',
-    terminated: 'bg-rose-500 text-white',
+    default: 'bg-(--color-bg-tertiary) text-(--color-text-tertiary)',
+    primary: 'bg-(--color-brand-primary-light) text-(--color-brand-primary-dark)',
+    secondary: 'bg-(--color-bg-secondary) text-(--color-text-secondary)',
+    danger: 'bg-(--color-danger-light) text-(--color-danger-dark)',
 
-    // Document statuses
-    pending: 'bg-amber-100 text-amber-700',
-    verified: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-rose-100 text-rose-700',
-    expired: 'bg-orange-100 text-orange-700',
+    draft: 'bg-(--color-bg-tertiary) text-(--color-text-tertiary)',
+    submitted: 'bg-(--color-info-light) text-(--color-info-dark)',
+    under_review: 'bg-(--color-warning-light) text-(--color-warning-dark)',
+    approved: 'bg-(--color-success-light) text-(--color-success-dark)',
+    active: 'bg-(--color-success) text-white',
+    suspended: 'bg-(--color-warning-light) text-(--color-warning-dark)',
+    terminated: 'bg-(--color-danger) text-white',
 
-    // Payment statuses
-    requested: 'bg-blue-100 text-blue-700',
-    pending_ops: 'bg-amber-100 text-amber-700',
-    pending_finance: 'bg-orange-100 text-orange-700',
-    paid: 'bg-emerald-500 text-white',
+    pending: 'bg-(--color-warning-light) text-(--color-warning-dark)',
+    verified: 'bg-(--color-success-light) text-(--color-success-dark)',
+    rejected: 'bg-(--color-danger-light) text-(--color-danger-dark)',
+    expired: 'bg-(--color-warning-light) text-(--color-warning-dark)',
 
-    // Compliance statuses
-    compliant: 'bg-emerald-100 text-emerald-700',
-    at_risk: 'bg-amber-100 text-amber-700',
-    non_compliant: 'bg-rose-100 text-rose-700',
-    blocked: 'bg-rose-500 text-white',
+    requested: 'bg-(--color-info-light) text-(--color-info-dark)',
+    pending_ops: 'bg-(--color-warning-light) text-(--color-warning-dark)',
+    pending_finance: 'bg-(--color-warning-light) text-(--color-warning-dark)',
+    paid: 'bg-(--color-success) text-white',
 
-    // Severity levels
-    critical: 'bg-rose-500 text-white',
-    high: 'bg-rose-100 text-rose-700',
-    medium: 'bg-amber-100 text-amber-700',
-    low: 'bg-blue-100 text-blue-700',
+    compliant: 'bg-(--color-success-light) text-(--color-success-dark)',
+    at_risk: 'bg-(--color-warning-light) text-(--color-warning-dark)',
+    non_compliant: 'bg-(--color-danger-light) text-(--color-danger-dark)',
+    blocked: 'bg-(--color-danger) text-white',
 
-    // Generic
-    success: 'bg-emerald-100 text-emerald-700',
-    warning: 'bg-amber-100 text-amber-700',
-    error: 'bg-rose-100 text-rose-700',
-    info: 'bg-blue-100 text-blue-700',
+    critical: 'bg-(--color-danger) text-white',
+    high: 'bg-(--color-danger-light) text-(--color-danger-dark)',
+    medium: 'bg-(--color-warning-light) text-(--color-warning-dark)',
+    low: 'bg-(--color-info-light) text-(--color-info-dark)',
+
+    success: 'bg-(--color-success-light) text-(--color-success-dark)',
+    warning: 'bg-(--color-warning-light) text-(--color-warning-dark)',
+    error: 'bg-(--color-danger-light) text-(--color-danger-dark)',
+    info: 'bg-(--color-info-light) text-(--color-info-dark)',
 };
 
-export default function Badge({ status, className = '', children, size = 'md' }) {
-    const colorClass = statusColors[status] || 'bg-gray-100 text-gray-600';
-    const displayText = children || status?.replace(/_/g, ' ');
+export default function Badge({ status, variant, className = '', children, size = 'md' }) {
+    const resolvedStatus = status ?? variant ?? 'default';
+    const colorClass =
+        statusColors[resolvedStatus] || 'bg-(--color-bg-tertiary) text-(--color-text-tertiary)';
+    const displayText = children || resolvedStatus?.replace(/_/g, ' ');
 
     const sizeClasses = {
         sm: 'px-2 py-0.5 text-[10px]',

@@ -25,7 +25,7 @@ class PerformanceController extends Controller
     {
         $this->authorize('viewPerformance');
 
-        $vendors = Vendor::where('status', 'active')
+        $vendors = Vendor::whereIn('status', [Vendor::STATUS_ACTIVE, Vendor::STATUS_APPROVED])
             ->orderBy('performance_score', 'desc')
             ->get()
             ->map(function ($vendor) {
@@ -103,9 +103,18 @@ class PerformanceController extends Controller
                 Auth::user(),
                 $request->period_start,
                 $request->period_end,
-                $rating['notes'] ?? null
+                $rating['notes'] ?? null,
+                false
             );
         }
+
+        // Recalculate once for the whole rating submission to avoid duplicate history entries.
+        $this->performanceService->recalculateVendorScore($vendor, Auth::user(), [
+            'source' => 'rating_batch',
+            'period_start' => $request->period_start,
+            'period_end' => $request->period_end,
+            'metric_count' => count($request->ratings),
+        ]);
 
         return redirect()->route('admin.performance.index')
             ->with('success', 'Performance ratings recorded successfully.');

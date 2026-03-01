@@ -15,7 +15,7 @@ export default function StepBank({ vendor, sessionData }) {
     };
 
     return (
-        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-(--shadow-lg) animate-fade-in">
+        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-token-lg animate-fade-in">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-2 text-(--color-text-primary)">
                     Bank Information
@@ -35,7 +35,7 @@ export default function StepBank({ vendor, sessionData }) {
                             type="text"
                             value={data.bank_name}
                             onChange={(e) => setData('bank_name', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                             placeholder="e.g., State Bank of India"
                         />
                         {errors.bank_name && (
@@ -51,7 +51,7 @@ export default function StepBank({ vendor, sessionData }) {
                             type="text"
                             value={data.bank_account_number}
                             onChange={(e) => setData('bank_account_number', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                             placeholder="Account Number"
                         />
                         {errors.bank_account_number && (
@@ -69,7 +69,7 @@ export default function StepBank({ vendor, sessionData }) {
                             type="text"
                             value={data.bank_ifsc}
                             onChange={(e) => setData('bank_ifsc', e.target.value.toUpperCase())}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all uppercase"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all uppercase"
                             placeholder="SBIN0001234"
                         />
                         {errors.bank_ifsc && (
@@ -85,7 +85,7 @@ export default function StepBank({ vendor, sessionData }) {
                             type="text"
                             value={data.bank_branch}
                             onChange={(e) => setData('bank_branch', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
                             placeholder="Branch Name"
                         />
                     </div>
@@ -97,12 +97,12 @@ export default function StepBank({ vendor, sessionData }) {
                         onClick={() => router.get('/vendor/onboarding?step=1')}
                         className="px-6 py-3 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) hover:bg-(--color-bg-hover) transition-colors font-medium"
                     >
-                        ← Back
+                        Back
                     </button>
                     <button
                         type="submit"
                         disabled={processing}
-                        className="bg-linear-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/25 hover:-translate-y-px hover:shadow-indigo-500/40 transition-all flex items-center gap-2 text-lg px-8 py-3"
+                        className="bg-gradient-primary text-white font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
                     >
                         {processing ? 'Saving...' : 'Save & Continue'}
                         <svg

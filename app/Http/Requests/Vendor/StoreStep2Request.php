@@ -26,7 +26,7 @@ class StoreStep2Request extends FormRequest
             'bank_name' => 'required|string|max:255',
             'bank_account_number' => ['required', 'string', 'regex:/^[0-9]{9,18}$/'],
             'bank_ifsc' => ['required', 'string', 'regex:/^[A-Z]{4}0[A-Z0-9]{6}$/'],
-            'bank_branch' => 'nullable|string|max:255',
+            'bank_branch' => 'required|string|max:255',
         ];
     }
 

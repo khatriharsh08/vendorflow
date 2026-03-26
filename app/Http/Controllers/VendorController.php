@@ -201,6 +201,11 @@ class VendorController extends Controller
         /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
+        // Make hidden fields visible so they appear on the Profile page
+        if ($vendor) {
+            $vendor->makeVisible(['tax_id', 'pan_number', 'bank_account_number', 'bank_ifsc']);
+        }
+
         return Inertia::render('Vendor/Profile', [
             'vendor' => $vendor,
         ]);
@@ -227,12 +232,16 @@ class VendorController extends Controller
                 'city',
                 'state',
                 'pincode',
+                'bank_name',
+                'bank_account_number',
+                'bank_ifsc',
+                'bank_branch',
             ];
             $attempted = array_diff(array_keys($request->validated()), $allowedFields);
 
             if (! empty($attempted)) {
                 return back()->withErrors([
-                    'profile' => 'Profile is locked after submission. Only contact and location fields can be updated.',
+                    'profile' => 'Profile is locked after submission. Only contact, location, and bank fields can be updated.',
                 ]);
             }
         }
